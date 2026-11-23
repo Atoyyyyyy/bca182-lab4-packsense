@@ -64,13 +64,13 @@ PLANS = {
     ],
     "als": [
         ("say", "Leave the board in normal room light. Have a phone torch ready.\n"
-                "   The light/proximity sensor is the AP3216C (U7 on the schematic)."),
+                "   The light/proximity sensor is the AP3216C (U7), near the TOP-RIGHT corner of the board."),
         ("cmd", "als", 10, []),
         ("cmd", "als stream 40", 25, [
             (0.2, "hands off (room light)"),
-            (3.0, "COVER the light sensor with your hand, about 1 cm above it"),
+            (3.0, "COVER the light sensor (top-right corner) with your hand, about 1 cm above it"),
             (6.0, "take your hand away"),
-            (7.0, "SHINE the phone torch straight at the sensor"),
+            (7.0, "SHINE the phone torch straight at the sensor (top-right corner)"),
             (9.5, "torch off"),
         ]),
         ("cmd", "i2c stats", 10, []),
