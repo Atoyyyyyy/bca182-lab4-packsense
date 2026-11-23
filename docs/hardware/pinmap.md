@@ -43,10 +43,11 @@ Target: SYSCLK 168 MHz from HSE 8 MHz via PLL (M=8, N=336, P=2, Q=7: 48 MHz for 
 
 | Bus | SCL | SDA | Pull-ups | Devices (7-bit addr) | Sheet | Status |
 |---|---|---|---|---|---|---|
-| **I2C2 (hardware)** | PF1 | PF0 | 5.1 kΩ (R1, R2) | **ICM-20608-G** `0x68` (AD0 → GND), **AP3216C** `0x1E`, **ES8388** audio codec `0x10` | 5, 6, 9 | S |
-| **SOFT_I2C (bit-banged GPIO)** | PE0 | PE1 | 5.1 kΩ (R6, R7) | **AHT21** temp/RH `0x38` | 5, 6 | S |
+| **I2C2 (hardware)** | PF1 | PF0 | 5.1 kΩ (R1, R2) | **ICM-20608-G** `0x68` (AD0 → GND), **AP3216C** `0x1E`, **ES8388** audio codec `0x10` | 5, 6, 9 | ✔ `i2c scan` in `evidence/m2_imu.log` (all three answer) |
+| **SOFT_I2C (bit-banged GPIO)** | PE0 | PE1 | 5.1 kΩ (R6, R7) | **AHT21** temp/RH `0x38` | 5, 6 | ✔ `i2c scan` in `evidence/m2_imu.log` |
 
-Interrupt lines: `ICM_INT` → **PG12**, `APS_INT` (AP3216C) → **PG13**.
+Interrupt lines: `ICM_INT` → **PG12**, `APS_INT` (AP3216C) → **PG13** (status S: the
+M2 drivers poll and do not use these lines yet).
 
 > ⚠ **AHT10 vs AHT21:** the schematic labels U8 as **AHT21**, while the PRD and the
 > RT-Thread BSP package say AHT10. Both use 0x38 and the same 0xAC trigger

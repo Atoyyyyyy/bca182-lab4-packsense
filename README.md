@@ -11,9 +11,10 @@ Team: Sherie Grace L. Lupoz · Renato G. Beroy · Binyusoph P. Sansarona
 ([authors and contributions](#authors-and-contributions)).
 
 > **Status:** M1 done (`evidence/m1_boot.log` passes all checks). M2 in progress:
-> console commands and the three I2C sensor drivers (IMU, light/proximity,
-> temperature/humidity) are in; their evidence logs and the remaining modules
-> (LEDs, buzzer, keys, LCD, LED matrix, RTC, SD, flash, Wi-Fi) are next.
+> console commands and the three I2C sensors (IMU, light/proximity,
+> temperature/humidity) work on the board, with evidence logs
+> ([results](docs/task_table.md#m2-on-board-results-i2c-sensors)). The remaining
+> modules (LEDs, buzzer, keys, LCD, LED matrix, RTC, SD, flash, Wi-Fi) are next.
 > See [Milestones](#milestones).
 
 ## Hardware
@@ -100,7 +101,7 @@ M2 capture procedure is in [`docs/test_sheets/m2_sensors.md`](docs/test_sheets/m
 |---|---|---|
 | M0 | Repo + design docs | done (concept sign-off: TODO) |
 | M1 | PlatformIO board + FreeRTOS bring-up | done: on-board log passes `check_heartbeat.py` ([results](docs/task_table.md#m1-on-board-results)); LED blink by eye: TODO(measure) |
-| M2 | Sensor/module drivers + DIAG mode | in progress: I2C sensors + console commands done, evidence logs pending ([test sheet](docs/test_sheets/m2_sensors.md)); other modules next |
+| M2 | Sensor/module drivers + DIAG mode | in progress: I2C sensors verified on the board ([results](docs/task_table.md#m2-on-board-results-i2c-sensors), [test sheet](docs/test_sheets/m2_sensors.md)); other modules next |
 | M3 | Data capture | — |
 | M4 | Features, baseline, model, C export | — |
 | M5 | On-device inference + product firmware | — |

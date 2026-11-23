@@ -22,6 +22,18 @@ redo one sensor; add `--force` to overwrite an existing log.
 
 The rest of this sheet is the same procedure done by hand.
 
+## Where the sensors are
+
+Hold the board with the long pin header at the top and the USB ports on the right:
+
+| Sensor | Where |
+|---|---|
+| Light/proximity (AP3216C, U7) | small black part on the **left edge, just below the LCD**, next to the printed text `Type 1A/3A` |
+| IMU (ICM-20608-G) | small square chip just right of it, with X/Y arrows printed next to it |
+| Temperature/humidity (AHT21, U8) | small **silver square in the bottom-left corner**, under `PMOD1`, above the IR receiver |
+
+The RS485/CAN terminals are in the top-right corner. No sensor is there.
+
 ## By hand: before you start
 
 ```powershell
