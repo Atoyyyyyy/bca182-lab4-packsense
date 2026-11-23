@@ -11,6 +11,7 @@
 
 #include "FreeRTOS.h"
 #include "semphr.h"
+#include "stream_buffer.h"
 #include "task.h"
 
 #include "app_config.h"
@@ -30,6 +31,12 @@ static volatile uint32_t s_tx_head;
 static volatile uint32_t s_tx_tail;
 
 static char s_line[CONSOLE_LINE_MAX]; /* formatting buffer, guarded by s_mutex */
+
+/* RX: the ISR writes, the CLI task reads (single writer, single reader). */
+static StreamBufferHandle_t s_rx;
+static StaticStreamBuffer_t s_rx_ctrl;
+static uint8_t s_rx_storage[CONSOLE_RX_BUF_SIZE + 1U];
+static volatile uint32_t s_rx_dropped;
 
 void console_init(void)
 {
@@ -72,6 +79,20 @@ void console_rtos_init(void)
 {
     s_mutex = xSemaphoreCreateMutexStatic(&s_mutex_buf);
     configASSERT(s_mutex != NULL);
+    s_rx = xStreamBufferCreateStatic(sizeof s_rx_storage, 1U, s_rx_storage, &s_rx_ctrl);
+    configASSERT(s_rx != NULL);
+    /* Start receiving. The IRQ is masked by BASEPRI until the scheduler runs. */
+    CONSOLE_USART->CR1 |= USART_CR1_RXNEIE;
+}
+
+size_t console_read(char *buf, size_t max, uint32_t wait)
+{
+    return xStreamBufferReceive(s_rx, buf, max, (TickType_t)wait);
+}
+
+uint32_t console_rx_dropped(void)
+{
+    return s_rx_dropped;
 }
 
 static void polled_write(const char *data, size_t len)
@@ -177,9 +198,18 @@ void console_uart_irq(void)
             CONSOLE_USART->CR1 &= ~USART_CR1_TXEIE;
         }
     }
-    /* RX is not used yet (console commands arrive in M2). Clear overrun so a
-       stray byte cannot leave the IRQ pending: read SR then DR. */
+    /* RX: reading DR (after SR) clears RXNE and ORE. */
     if ((sr & (USART_SR_ORE | USART_SR_RXNE)) != 0U) {
-        (void)CONSOLE_USART->DR;
+        uint8_t c = (uint8_t)CONSOLE_USART->DR;
+        if ((sr & USART_SR_ORE) != 0U) {
+            s_rx_dropped++;
+        }
+        if ((sr & USART_SR_RXNE) != 0U && s_rx != NULL) {
+            BaseType_t woken = pdFALSE;
+            if (xStreamBufferSendFromISR(s_rx, &c, 1U, &woken) != 1U) {
+                s_rx_dropped++;
+            }
+            portYIELD_FROM_ISR(woken);
+        }
     }
 }

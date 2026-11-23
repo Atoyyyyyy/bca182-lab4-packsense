@@ -16,6 +16,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include "app/cli.h"
 #include "app_config.h"
 #include "drivers/console_uart.h"
 #include "drivers/led.h"
@@ -40,6 +41,8 @@ static void heartbeat_task(void *arg)
 
         if ((toggles % HEARTBEAT_REPORT_EVERY) == 0U) {
             line_no++;
+        }
+        if ((toggles % HEARTBEAT_REPORT_EVERY) == 0U && g_hb_print) {
             console_printf("[hb] n=%lu tick=%lu led=%s heap_free=%u heap_min=%u hb_hwm=%lu\r\n",
                            (unsigned long)line_no, (unsigned long)xTaskGetTickCount(),
                            led_is_on(LED_RED) ? "on" : "off",
@@ -57,4 +60,6 @@ void tasks_create(void)
     TaskHandle_t h = xTaskCreateStatic(heartbeat_task, "Heartbeat", HEARTBEAT_TASK_STACK_WORDS,
                                        NULL, HEARTBEAT_TASK_PRIO, s_hb_stack, &s_hb_tcb);
     configASSERT(h != NULL);
+
+    cli_task_create();
 }

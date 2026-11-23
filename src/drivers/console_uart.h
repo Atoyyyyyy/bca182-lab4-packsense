@@ -11,6 +11,7 @@
 #define CONSOLE_UART_H
 
 #include <stddef.h>
+#include <stdint.h>
 
 /* GPIO + USART1 init (115200 8N1). Call after the system clock is set. */
 void console_init(void);
@@ -24,6 +25,14 @@ void console_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 
 /* Polled, lock-free output for fault/assert handlers (interrupts disabled). */
 void console_panic_write(const char *s);
+
+/* Received bytes (filled by the USART1 RX interrupt). Read by one task only
+   (the CLI). Blocks up to `wait` ticks for the first byte; returns the number
+   of bytes copied (0 on timeout). */
+size_t console_read(char *buf, size_t max, uint32_t wait);
+
+/* Bytes dropped because the RX buffer was full or the UART overran. */
+uint32_t console_rx_dropped(void);
 
 /* USART1 IRQ body, called from USART1_IRQHandler. */
 void console_uart_irq(void);
