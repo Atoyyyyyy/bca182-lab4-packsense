@@ -1,0 +1,9 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-23)
+19:20:48.921 sent: als
+19:20:49.678 sent: als stream 40
+19:20:49.986 cue: hands off (room light)
+19:20:52.778 cue: COVER the light sensor (left edge, below the screen) with your hand, about 1 cm above it
+19:20:55.802 cue: take your hand away
+19:20:56.754 cue: SHINE the phone torch straight at the sensor (left edge, below the screen)
+19:20:59.298 cue: torch off
+19:21:00.212 sent: i2c stats
