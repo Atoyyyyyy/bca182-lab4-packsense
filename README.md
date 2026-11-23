@@ -7,7 +7,8 @@ locally through an LCD, LEDs, an LED matrix and a buzzer. It needs no phone and
 no Internet.
 
 BCA182 Embedded Systems Programming, Lab Activity No. 4, MSU-IIT CCS.
-Team: Sherie Grace L. Lupoz · Renato G. Beroy · Binyusoph P. Sansarona.
+Team: Sherie Grace L. Lupoz · Renato G. Beroy · Binyusoph P. Sansarona
+([authors and contributions](#authors-and-contributions)).
 
 > **Status:** Milestone M1 (build system + FreeRTOS bring-up): firmware builds,
 > waiting for the first on-board boot log. See [Milestones](#milestones).
@@ -112,6 +113,20 @@ All figures are `TODO(measure)` until they are produced from real logs in `evide
 | Banner says `FALLBACK: HSE did not start` | The 8 MHz crystal X2 did not start. The firmware still runs at 168 MHz from the internal HSI (less accurate). Report it |
 
 More entries are added as issues come up (heap/stack overflow, SD mount, …).
+
+## Authors and contributions
+
+BCA182 Embedded Systems Programming, Lab Activity No. 4, MSU-IIT CCS (group submission).
+
+| Member | GitHub | Contributions |
+|---|---|---|
+| Sherie Grace L. Lupoz | [@Rie07](https://github.com/Rie07) | TODO: fill in |
+| Renato G. Beroy | [@Atoyyyyyy](https://github.com/Atoyyyyyy) | TODO: fill in |
+| Binyusoph P. Sansarona | [@BinSan21](https://github.com/BinSan21) | TODO: fill in |
+
+Every member must be able to explain the firmware, the model, the hardware roles
+and the results (PRD, milestone M7). The detailed record of who changed what is the
+[commit history](https://github.com/Atoyyyyyy/bca182-lab4-packsense/commits/main).
 
 ## License and attribution
 
