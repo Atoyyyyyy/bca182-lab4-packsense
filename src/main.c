@@ -94,10 +94,25 @@ static void print_banner(clk_source_t clk, uint32_t reset_csr)
                    (unsigned long)HAL_GetTickPrio());
     console_printf("[boot] FPU: CPACR CP10/CP11=%s\r\n",
                    ((SCB->CPACR & (0xFUL << 20)) == (0xFUL << 20)) ? "full access" : "OFF");
-    console_printf("[boot] FreeRTOS %s: tick %lu Hz, heap %u B (heap_4), max syscall prio %d\r\n",
+    console_printf("[boot] FreeRTOS %s: tick %lu Hz, heap %u B (heap_4, %u B usable), max syscall prio %d\r\n",
                    tskKERNEL_VERSION_NUMBER, (unsigned long)configTICK_RATE_HZ,
-                   (unsigned)configTOTAL_HEAP_SIZE, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY);
+                   (unsigned)configTOTAL_HEAP_SIZE, (unsigned)xPortGetFreeHeapSize(),
+                   configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY);
     console_printf("[boot] CCM RAM: %lu of 65536 B used (.ccmram)\r\n", (unsigned long)ccm_used);
+}
+
+/*
+ * heap_4 sets up its free list, and the counters behind xPortGetFreeHeapSize()
+ * and xPortGetMinimumEverFreeHeapSize(), only on the first pvPortMalloc().
+ * Everything in M1 is statically allocated, so without this both read 0 (seen
+ * on the first on-board run). pvPortMalloc(0) would return NULL and trip the
+ * malloc-failed hook, so allocate and free one byte. The minimum-ever value
+ * then includes this one short-lived minimum block.
+ */
+static void heap_init_for_stats(void)
+{
+    void *p = pvPortMalloc(1U);
+    vPortFree(p);
 }
 
 int main(void)
@@ -117,6 +132,7 @@ int main(void)
 
     led_init();
     console_init();
+    heap_init_for_stats();
     print_banner(clk, reset_csr);
 
     console_rtos_init();

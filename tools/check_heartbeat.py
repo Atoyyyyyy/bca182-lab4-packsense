@@ -128,6 +128,10 @@ def main(argv):
     check("same LED state at every 1 s report", len({h[3] for h in hb}) == 1,
           "states seen: %s" % ",".join(sorted({h[3] for h in hb})))
 
+    # heap_4 reports 0 until its first allocation; main.c initialises it at boot.
+    check("heap counters initialised (heap_free > 0)", all(h[4] > 0 and h[5] > 0 for h in hb),
+          "heap_free(min seen)=%d B" % min(h[4] for h in hb))
+
     print("info heap_free(last)=%d B heap_min=%d B heartbeat stack HWM(last)=%d words"
           % (hb[-1][4], min(h[5] for h in hb), hb[-1][6]))
     print("RESULT: %s" % ("PASS" if ok else "FAIL"))
