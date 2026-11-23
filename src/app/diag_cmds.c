@@ -18,6 +18,7 @@
 #include "board_pins.h"
 #include "drivers/console_uart.h"
 #include "drivers/i2c_bus.h"
+#include "drivers/ap3216c.h"
 #include "drivers/icm20608.h"
 
 #define T_NOW() ((unsigned long)xTaskGetTickCount())
@@ -198,12 +199,85 @@ static int cmd_imu_cal(int argc, char **argv)
     return 0;
 }
 
+/* ---- als (AP3216C) ------------------------------------------------------------ */
+
+static bool als_ready(void)
+{
+    ap_info_t info;
+    ap3216c_get_info(&info);
+    if (info.initialised) {
+        return true;
+    }
+    status_t st = ap3216c_init();
+    console_printf("[als] t=%lu init %s\r\n", T_NOW(), status_str(st));
+    return st == ST_OK;
+}
+
+static int cmd_als(int argc, char **argv)
+{
+    (void)argv;
+    if (argc != 0) {
+        return 1;
+    }
+    if (!als_ready()) {
+        return 0;
+    }
+    ap_sample_t s;
+    ap_info_t info;
+    status_t st = ap3216c_read(&s);
+    ap3216c_get_info(&info);
+    char b[FMT_F_BUF];
+    if (st == ST_OK || st == ST_RANGE_ERR) {
+        console_printf("[als] t=%lu lux=%s ps=%u ir=%u object=%s ir_overflow=%s st=%s\r\n",
+                       (unsigned long)s.t_ms, fmt_f(b, sizeof b, s.lux, 2), s.ps, s.ir,
+                       s.object_near ? "near" : "far", s.ir_overflow ? "yes" : "no", status_str(st));
+    }
+    console_printf("[als] reads=%lu errors=%lu last=%s\r\n", (unsigned long)info.reads,
+                   (unsigned long)info.errors, status_str(info.last_status));
+    return 0;
+}
+
+static int cmd_als_stream(int argc, char **argv)
+{
+    unsigned long n, period;
+    if (!stream_args(argc, argv, 40UL, 50UL, 250UL, &n, &period)) {
+        return 1;
+    }
+    if (!als_ready()) {
+        return 0;
+    }
+    console_printf("# als stream n=%lu period_ms=%lu cols=t_ms,lux,ps,ir,object,ir_overflow,status\r\n", n,
+                   period);
+    TickType_t wake = xTaskGetTickCount();
+    unsigned long done = 0U, errors = 0U;
+    for (; done < n; done++) {
+        if (cli_abort_requested()) {
+            break;
+        }
+        ap_sample_t s;
+        status_t st = ap3216c_read(&s);
+        char b[FMT_F_BUF];
+        if (st == ST_OK || st == ST_RANGE_ERR) {
+            console_printf("als,%lu,%s,%u,%u,%d,%d,%s\r\n", (unsigned long)s.t_ms, fmt_f(b, sizeof b, s.lux, 2),
+                           s.ps, s.ir, s.object_near ? 1 : 0, s.ir_overflow ? 1 : 0, status_str(st));
+        } else {
+            errors++;
+            console_printf("als,%lu,,,,,,%s\r\n", T_NOW(), status_str(st));
+        }
+        (void)xTaskDelayUntil(&wake, pdMS_TO_TICKS(period));
+    }
+    console_printf("# als stream end: %lu samples, %lu errors\r\n", done, errors);
+    return 0;
+}
+
 static const cli_cmd_t s_cmds[] = {
     {"i2c scan", "", "list devices that answer on both I2C buses", cmd_i2c_scan},
     {"i2c stats", "", "transfer and error counters per bus", cmd_i2c_stats},
     {"imu", "", "one IMU reading (inits the IMU on first use)", cmd_imu},
     {"imu stream", "[n] [period_ms]", "n IMU samples as CSV (default 500 @ 10 ms)", cmd_imu_stream},
     {"imu cal", "[samples]", "gyro bias calibration, board still (default 200)", cmd_imu_cal},
+    {"als", "", "one light/proximity reading (inits on first use)", cmd_als},
+    {"als stream", "[n] [period_ms]", "n light/proximity samples as CSV (40 @ 250 ms)", cmd_als_stream},
 };
 
 void diag_cmds_register(void)
