@@ -255,7 +255,7 @@ def find_als(port):
     except KeyboardInterrupt:
         ser.write(b"x")  # stop the stream...
         time.sleep(0.3)
-        ser.write(b"")  # ...and erase the key from the command line
+        ser.write(b"\x08")  # ...and erase the key from the command line
         print("\nstopped.")
     finally:
         ser.close()
