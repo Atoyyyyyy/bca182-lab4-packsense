@@ -342,6 +342,71 @@ static int cmd_env_stream(int argc, char **argv)
     return 0;
 }
 
+/* ---- diag sensors: one line per sensor, inits anything not yet initialised -- */
+
+static int cmd_diag_sensors(int argc, char **argv)
+{
+    (void)argv;
+    if (argc != 0) {
+        return 1;
+    }
+    char b[6][FMT_F_BUF];
+
+    if (imu_ready()) {
+        icm_sample_t s;
+        icm_info_t i;
+        status_t st = icm20608_read(&s);
+        icm20608_get_info(&i);
+        if (st == ST_OK || st == ST_RANGE_ERR) {
+            console_printf("[diag sensors] imu t=%lu st=%s |a|=%s m/s2 g=(%s, %s, %s) dps temp=%s C "
+                           "reads=%lu errors=%lu\r\n",
+                           (unsigned long)s.t_ms, status_str(st),
+                           fmt_f(b[0], FMT_F_BUF, sqrtf(s.ax * s.ax + s.ay * s.ay + s.az * s.az), 3),
+                           fmt_f(b[1], FMT_F_BUF, s.gx, 2), fmt_f(b[2], FMT_F_BUF, s.gy, 2),
+                           fmt_f(b[3], FMT_F_BUF, s.gz, 2), fmt_f(b[4], FMT_F_BUF, s.temp_c, 2),
+                           (unsigned long)i.reads, (unsigned long)i.errors);
+        } else {
+            console_printf("[diag sensors] imu t=%lu st=%s\r\n", T_NOW(), status_str(st));
+        }
+    } else {
+        console_printf("[diag sensors] imu t=%lu st=NOT_PRESENT\r\n", T_NOW());
+    }
+
+    if (als_ready()) {
+        ap_sample_t s;
+        ap_info_t i;
+        status_t st = ap3216c_read(&s);
+        ap3216c_get_info(&i);
+        if (st == ST_OK || st == ST_RANGE_ERR) {
+            console_printf("[diag sensors] als t=%lu st=%s lux=%s ps=%u ir=%u reads=%lu errors=%lu\r\n",
+                           (unsigned long)s.t_ms, status_str(st), fmt_f(b[0], FMT_F_BUF, s.lux, 2), s.ps,
+                           s.ir, (unsigned long)i.reads, (unsigned long)i.errors);
+        } else {
+            console_printf("[diag sensors] als t=%lu st=%s\r\n", T_NOW(), status_str(st));
+        }
+    } else {
+        console_printf("[diag sensors] als t=%lu st=NOT_PRESENT\r\n", T_NOW());
+    }
+
+    if (env_ready()) {
+        aht_sample_t s;
+        aht_info_t i;
+        status_t st = aht_read(&s);
+        aht_get_info(&i);
+        if (st == ST_OK || st == ST_RANGE_ERR) {
+            console_printf("[diag sensors] env t=%lu st=%s temp=%s C rh=%s %% chip=%s reads=%lu errors=%lu\r\n",
+                           (unsigned long)s.t_ms, status_str(st), fmt_f(b[0], FMT_F_BUF, s.temp_c, 2),
+                           fmt_f(b[1], FMT_F_BUF, s.rh, 2), aht_variant_name(i.variant),
+                           (unsigned long)i.reads, (unsigned long)i.errors);
+        } else {
+            console_printf("[diag sensors] env t=%lu st=%s\r\n", T_NOW(), status_str(st));
+        }
+    } else {
+        console_printf("[diag sensors] env t=%lu st=NOT_PRESENT\r\n", T_NOW());
+    }
+    return cmd_i2c_stats(0, NULL);
+}
+
 static const cli_cmd_t s_cmds[] = {
     {"i2c scan", "", "list devices that answer on both I2C buses", cmd_i2c_scan},
     {"i2c stats", "", "transfer and error counters per bus", cmd_i2c_stats},
@@ -352,6 +417,7 @@ static const cli_cmd_t s_cmds[] = {
     {"als stream", "[n] [period_ms]", "n light/proximity samples as CSV (40 @ 250 ms)", cmd_als_stream},
     {"env", "", "one temperature/humidity reading (inits on first use)", cmd_env},
     {"env stream", "[n] [period_ms]", "n temp/RH samples as CSV (30 @ 1000 ms, min 1 s)", cmd_env_stream},
+    {"diag sensors", "", "one reading from every sensor + bus counters", cmd_diag_sensors},
 };
 
 void diag_cmds_register(void)
