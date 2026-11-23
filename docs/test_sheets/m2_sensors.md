@@ -5,7 +5,24 @@ from a clean tree (the banner must not say `-dirty`).
 **Result files:** `evidence/m2_imu.log`, `evidence/m2_als.log`,
 `evidence/m2_env.log`, checked with `tools/m2_sensor_stats.py`.
 
-## Before you start
+## Easiest: the guided capture script
+
+Close any open serial monitor, then in a PowerShell window in the project folder:
+
+```powershell
+& "$env:USERPROFILE\.platformio\penv\Scripts\python.exe" tools\capture_m2.py all --flash
+```
+
+It flashes the firmware and asks you to press RESET. Then it types the
+commands below for you and shows in big letters **when** to tilt, cover,
+shine the torch or breathe. It writes `evidence/m2_<sensor>.log` (board output
+only, same format as the monitor) plus `evidence/m2_<sensor>_cues.txt` (what
+you were asked to do, and when). Use `imu`, `als` or `env` instead of `all` to
+redo one sensor; add `--force` to overwrite an existing log.
+
+The rest of this sheet is the same procedure done by hand.
+
+## By hand: before you start
 
 ```powershell
 $pio = "$env:USERPROFILE\.platformio\penv\Scripts\pio.exe"
