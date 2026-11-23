@@ -16,6 +16,18 @@ Kernel settings: `include/FreeRTOSConfig.h` (1 kHz tick, 7 priorities, heap_4
 | `IDLE` | FreeRTOS idle | 0 | 128 | kernel-provided static | always ready | — | TODO(measure) (M2 `diag mem`) |
 | `Tmr Svc` | FreeRTOS software timers | 2 | 256 | kernel-provided static | timer command queue | — | TODO(measure) (M2 `diag mem`) |
 
+## M2 (bring-up, in progress)
+
+Added on top of M1:
+
+| Task | Function | Prio | Stack (words) | Stack location | Period / activation | Communication | HWM (measured) |
+|---|---|---|---|---|---|---|---|
+| `CLI` | Console line editor + commands; runs the DIAG readouts and sensor streams (`imu stream` paces itself with `xTaskDelayUntil`) | 2 | 1024 | static, CCM RAM | blocks on the console RX stream buffer | ← USART1 RX ISR (stream buffer); I2C bus mutexes; console mutex | TODO(measure): `diag mem` in an M2 evidence log |
+
+The PRD 6.3 tasks (`SensorTask`, `EnvTask`, …) replace the CLI as the sensor
+owners from M3/M5 on; the drivers already lock each bus with a mutex, so
+several tasks can share them.
+
 ### M1 on-board results
 
 From `evidence/m1_boot.log` (firmware git `8d71a0c`, RT-Spark HW1.1), checked with
@@ -38,7 +50,8 @@ CCM RAM 2192 B (3.34 %).
 | IRQ | NVIC priority | Calls FreeRTOS API? | Purpose |
 |---|---|---|---|
 | TIM6_DAC | 4 | no (must not) | HAL tick (`HAL_GetTick`, HAL timeouts) |
-| USART1 | 6 | not yet (allowed: ≥ 5) | console TX ring buffer |
+| I2C2_EV / I2C2_ER | 5 | yes: `vTaskNotifyGiveIndexedFromISR` (slot 1) | I2C2 transfer completion / error → wakes the waiting task |
+| USART1 | 6 | yes: `xStreamBufferSendFromISR` | console TX ring buffer; RX bytes → CLI stream buffer |
 | SysTick | 15 | kernel | FreeRTOS tick |
 | PendSV / SVC | 15 / — | kernel | context switch / first task start |
 

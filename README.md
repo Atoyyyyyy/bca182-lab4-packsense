@@ -10,8 +10,10 @@ BCA182 Embedded Systems Programming, Lab Activity No. 4, MSU-IIT CCS.
 Team: Sherie Grace L. Lupoz · Renato G. Beroy · Binyusoph P. Sansarona
 ([authors and contributions](#authors-and-contributions)).
 
-> **Status:** Milestone M1 (build system + FreeRTOS bring-up) runs on the board:
-> boot log checked (`evidence/m1_boot.log`, all checks pass). Next: M2 drivers.
+> **Status:** M1 done (`evidence/m1_boot.log` passes all checks). M2 in progress:
+> console commands and the three I2C sensor drivers (IMU, light/proximity,
+> temperature/humidity) are in; their evidence logs and the remaining modules
+> (LEDs, buzzer, keys, LCD, LED matrix, RTC, SD, flash, Wi-Fi) are next.
 > See [Milestones](#milestones).
 
 ## Hardware
@@ -66,18 +68,31 @@ pio run -t upload
 pio device monitor
 ```
 
-### What a good boot looks like (M1)
+### What a good boot looks like
 
 The board prints a banner (git revision, reset cause, clock source, PLL
 settings read back from RCC, bus clocks, HAL/FreeRTOS versions), then
-`[rtos] scheduler started`, then one `[hb] ...` line per second. The red LED
-blinks at 1 Hz (500 ms on, 500 ms off).
+`[cli] ready, type 'help'` and `[rtos] scheduler started`. The red LED blinks
+at 1 Hz (500 ms on, 500 ms off). Since M2 the once-per-second `[hb] ...` lines
+are off by default; `hb on` turns them back on (needed for
+`tools/check_heartbeat.py`, which checked `evidence/m1_boot.log`).
 
-Check a captured log with:
+### Console commands (M2)
 
-```bash
-python tools/check_heartbeat.py evidence/m1_boot.log
-```
+Type into `pio device monitor`. `help` lists everything; any key stops a stream.
+
+| Command | Does |
+|---|---|
+| `i2c scan` / `i2c stats` | devices answering on both I2C buses / error counters |
+| `imu`, `imu cal`, `imu stream [n] [ms]` | ICM-20608-G reading, gyro-bias calibration, CSV stream (default 100 Hz) |
+| `als`, `als stream [n] [ms]` | AP3216C light (lux), proximity, IR |
+| `env`, `env stream [n] [ms]` | AHT temperature / humidity, detected chip variant |
+| `diag sensors` | one reading from every sensor + bus counters |
+| `diag mem` | heap, per-task stack high-water mark, CPU share |
+| `version`, `uptime`, `hb on\|off`, `reset` | housekeeping |
+
+Analyse captured streams with `python tools/m2_sensor_stats.py <log>`. The
+M2 capture procedure is in [`docs/test_sheets/m2_sensors.md`](docs/test_sheets/m2_sensors.md).
 
 ## Milestones
 
@@ -85,7 +100,7 @@ python tools/check_heartbeat.py evidence/m1_boot.log
 |---|---|---|
 | M0 | Repo + design docs | done (concept sign-off: TODO) |
 | M1 | PlatformIO board + FreeRTOS bring-up | done: on-board log passes `check_heartbeat.py` ([results](docs/task_table.md#m1-on-board-results)); LED blink by eye: TODO(measure) |
-| M2 | Sensor/module drivers + DIAG mode | — |
+| M2 | Sensor/module drivers + DIAG mode | in progress: I2C sensors + console commands done, evidence logs pending ([test sheet](docs/test_sheets/m2_sensors.md)); other modules next |
 | M3 | Data capture | — |
 | M4 | Features, baseline, model, C export | — |
 | M5 | On-device inference + product firmware | — |
