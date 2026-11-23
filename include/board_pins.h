@@ -29,4 +29,35 @@
 #define LED_ON_LEVEL               GPIO_PIN_RESET
 #define LED_OFF_LEVEL              GPIO_PIN_SET
 
+/* Hardware I2C2: ICM-20608-G 0x68, AP3216C 0x1E, ES8388 0x10; 5.1 kOhm
+   pull-ups R1/R2 (pinmap.md "I2C buses and devices", sheets 5, 6, 9).
+   PF0/PF1 carry I2C2 on alternate function 4 (STM32F407 datasheet AF table). */
+#define I2C_MAIN_INSTANCE          I2C2
+#define I2C_MAIN_EV_IRQn           I2C2_EV_IRQn
+#define I2C_MAIN_ER_IRQn           I2C2_ER_IRQn
+#define I2C_MAIN_SCL_PORT          GPIOF
+#define I2C_MAIN_SCL_PIN           GPIO_PIN_1
+#define I2C_MAIN_SDA_PORT          GPIOF
+#define I2C_MAIN_SDA_PIN           GPIO_PIN_0
+#define I2C_MAIN_GPIO_AF           GPIO_AF4_I2C2
+
+/* Bit-banged I2C ("SOFT_I2C"): AHT21 0x38; 5.1 kOhm pull-ups R6/R7
+   (pinmap.md "I2C buses and devices", sheets 5, 6). */
+#define I2C_SOFT_SCL_PORT          GPIOE
+#define I2C_SOFT_SCL_PIN           GPIO_PIN_0
+#define I2C_SOFT_SDA_PORT          GPIOE
+#define I2C_SOFT_SDA_PIN           GPIO_PIN_1
+
+/* 7-bit I2C addresses (pinmap.md; ICM AD0 is tied to GND). */
+#define I2C_ADDR_ICM20608          0x68U
+#define I2C_ADDR_AP3216C           0x1EU
+#define I2C_ADDR_ES8388            0x10U
+#define I2C_ADDR_AHT               0x38U
+
+/* Sensor interrupt lines (not used yet: sensors are polled). */
+#define ICM_INT_PORT               GPIOG
+#define ICM_INT_PIN                GPIO_PIN_12
+#define APS_INT_PORT               GPIOG
+#define APS_INT_PIN                GPIO_PIN_13
+
 #endif /* BOARD_PINS_H */

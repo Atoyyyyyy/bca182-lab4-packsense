@@ -9,12 +9,14 @@
  * | IRQ           | Priority | Calls FreeRTOS? |
  * |---------------|----------|-----------------|
  * | TIM6_DAC      | 4        | no (HAL tick)   |
- * | USART1        | 6        | no (yet)        |
+ * | I2C2_EV/ER    | 5        | yes (notify)    |
+ * | USART1        | 6        | yes (RX stream) |
  * | SysTick/PendSV| 15       | kernel          |
  */
 #include "stm32f4xx_hal.h"
 
 #include "drivers/console_uart.h"
+#include "drivers/i2c_bus.h"
 #include "fault.h"
 #include "hal_timebase_tim6.h"
 
@@ -56,4 +58,14 @@ void TIM6_DAC_IRQHandler(void)
 void USART1_IRQHandler(void)
 {
     console_uart_irq();
+}
+
+void I2C2_EV_IRQHandler(void)
+{
+    i2c_main_ev_irq();
+}
+
+void I2C2_ER_IRQHandler(void)
+{
+    i2c_main_er_irq();
 }

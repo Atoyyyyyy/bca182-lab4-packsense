@@ -38,7 +38,7 @@ uint64_t rtstats_counter(void);
 
 /* ---- Synchronisation primitives ---------------------------------------- */
 #define configUSE_TASK_NOTIFICATIONS            1
-#define configTASK_NOTIFICATION_ARRAY_ENTRIES   1
+#define configTASK_NOTIFICATION_ARRAY_ENTRIES   2 /* [1] = driver I/O completion */
 #define configUSE_MUTEXES                       1
 #define configUSE_RECURSIVE_MUTEXES             1
 #define configUSE_COUNTING_SEMAPHORES           1
