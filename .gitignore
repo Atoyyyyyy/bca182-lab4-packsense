@@ -7,6 +7,10 @@
 .vscode/launch.json
 .vscode/ipch
 
+# Raw serial captures from `pio device monitor` (log2file). Move the ones you
+# keep into evidence/ under their milestone name.
+logs/
+
 # Secrets (never commit) — copy include/secrets.example.h to include/secrets.h
 include/secrets.h
 
