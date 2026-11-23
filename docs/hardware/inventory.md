@@ -6,7 +6,7 @@
 file in the *Evidence* column. Anything missing or broken goes to
 [`exceptions.md`](exceptions.md).
 
-- Board revision printed on PCB: `__________` (schematic used: HW1.1)
+- Board revision printed on PCB: `HW: V1.1`, date code `24/23` (schematic used: HW1.1, matches). Evidence: [`evidence/m0_board_back.jpg`](../../evidence/m0_board_back.jpg)
 - Kit checked by: `__________` on `____-__-__`
 - Pin/bus details: see [`pinmap.md`](pinmap.md). Every assignment there is
   cited to a schematic sheet.

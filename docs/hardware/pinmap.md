@@ -11,8 +11,11 @@ on the board (silkscreen, chip marking, or a working M1/M2 test log in `evidence
 Firmware may use `S` rows for bring-up. A row that disagrees with the board is
 fixed here first, then in code.
 
-> Board revision check (H): read the revision printed on **your** PCB. If it is
-> not HW1.1, tell the agent before M1. The pin map may differ.
+> **Board revision check: done (2026-11-23).** The back of our PCB reads
+> **`HW: V1.1`**, date code `24/23`, `www.rt-thread.org`
+> (photo: [`evidence/m0_board_back.jpg`](../../evidence/m0_board_back.jpg),
+> SHA-256 `8aa6d782…97d8411`). This matches the schematic's HW1.1, so this pin map
+> applies to our board.
 
 ## Clocks
 
@@ -115,17 +118,58 @@ stores no samples).
 
 ## Expansion (connectors only, not sensors)
 
-| Connector | Pins | Notes |
-|---|---|---|
-| CAN1 | PB8 RX, PB9 TX | transceiver on the expansion sheet |
-| RS485 | USART6 PG14 TX / PG9 RX, DE/RE **PG8** | |
-| PMOD1 | PA4–PA7, PE2–PE5 | PA7 shared with LED-matrix data |
-| PMOD2 | PD11, PD12, PB10, PB11, PF4–PF7 | |
-| USB OTG FS | PA11 / PA12 | |
+| Connector | Pins | Notes | Status |
+|---|---|---|---|
+| CAN1 | PB8 RX, PB9 TX | transceiver on the expansion sheet | S |
+| RS485 | USART6 PG14 TX / PG9 RX, DE/RE **PG8** | | S |
+| PMOD1 | PA4–PA7, PE2–PE5 | PA7 shared with LED-matrix data | ✔ silkscreen |
+| PMOD2 | PD11, PD12, PB10, PB11, PF4–PF7 | | ✔ silkscreen |
+| USB OTG FS | PA11 / PA12 | | S |
+
+### PMOD silkscreen (from `evidence/m0_board_back.jpg`, back of board)
+
+Read top to bottom as printed on the back. The square pad is the first signal row
+(PD11 on PMOD2, PA4 on PMOD1).
+
+| PMOD2 left | PMOD2 right | | PMOD1 left | PMOD1 right |
+|---|---|---|---|---|
+| 3.3V | 3.3V | | 3.3V | 3.3V |
+| GND | GND | | GND | GND |
+| PD12 | PF4 | | PA5 | PE4 |
+| PB11 | PF5 | | PA6 | PE3 |
+| PB10 | PF6 | | PA7 | PE5 |
+| PD11 ◼ | PF7 | | PA4 ◼ | PE2 |
+
+### Other headers printed on the back
+
+| Header | Silkscreen | Notes | Status |
+|---|---|---|---|
+| 3-pin, right edge above PMOD1 | `5V  DAT  GND` | Data pin is probably `LED_EXT_IO` → **PC6** (sheet 11), but the silkscreen does not name the MCU pin | ⚠ verify on sheet 11 |
+| Power, left side | 3 × `5V`, 3 × `GND`, 3 × `3.3V`, 3 × `GND` | power only | ✔ silkscreen |
+| Test pad | `BOOT0` | pad only (R4 pull-down per sheet 5) | ✔ silkscreen |
+| Pads near the 2×20 header | `J1`–`J4` | purpose not on the silkscreen | ⚠ unknown |
 
 ## Free GPIOs (avoid for new wiring unless confirmed)
 
 `GPIO_PA0–PA3, PA8, PB2, PB6, PB7, PB14, PB15, PD7–PD10, PE6, PE11–PE15, PF13–PF15, PG0–PG7`
+
+### 2×20 expansion header (silkscreen, `evidence/m0_board_back.jpg`)
+
+Printed on the **back** of the board, left to right as seen from the back. The
+outer row is the one nearer the board edge. Seen from the component side, the
+order is mirrored. `⏚` = ground symbol.
+
+| Col | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Outer** | PE11 | PE13 | PE15 | ⏚ˣ | PD9 | ⏚ˣ | PG7 | PG6 | PG4 | PG2 | ⏚ | PB2 | PG0 | ⏚ | PA0 | PA3 | PA2 | ⏚ | 5V | 5V |
+| **Inner** | ⏚ | PE12 | PE14 | PD8 | PD10 | PF15 | PD7 | ⏚ | PG5 | PG3 | PG1 | 3.3V | PB15 | PB14 | PA1 | ⏚ | PA8 | PB6 | PB7 | 3.3V |
+
+- ⏚ˣ: the two ground symbols at outer columns 4 and 6 have a small `x` next to them.
+  The meaning is not clear from the photo. **H: continuity-check them to GND**
+  before using them as ground.
+- Every GPIO on this header is in the schematic's free-GPIO list above (✔ by silkscreen).
+- **PE6, PF13 and PF14** are in the free list but are **not** on this header (not
+  broken out, or not found on the silkscreen).
 
 ## Internal resources the firmware plans to use (MCU-side choices, not board facts)
 
