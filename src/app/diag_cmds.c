@@ -18,6 +18,7 @@
 #include "board_pins.h"
 #include "drivers/console_uart.h"
 #include "drivers/i2c_bus.h"
+#include "drivers/aht.h"
 #include "drivers/ap3216c.h"
 #include "drivers/icm20608.h"
 
@@ -270,6 +271,77 @@ static int cmd_als_stream(int argc, char **argv)
     return 0;
 }
 
+/* ---- env (AHT10/AHT21) ---------------------------------------------------------- */
+
+static bool env_ready(void)
+{
+    aht_info_t info;
+    aht_get_info(&info);
+    if (info.initialised) {
+        return true;
+    }
+    status_t st = aht_init();
+    aht_get_info(&info);
+    console_printf("[env] t=%lu init %s status=0x%02X\r\n", T_NOW(), status_str(st), info.status_byte);
+    return st == ST_OK;
+}
+
+static int cmd_env(int argc, char **argv)
+{
+    (void)argv;
+    if (argc != 0) {
+        return 1;
+    }
+    if (!env_ready()) {
+        return 0;
+    }
+    aht_sample_t s;
+    aht_info_t info;
+    status_t st = aht_read(&s);
+    aht_get_info(&info);
+    char b[2][FMT_F_BUF];
+    if (st == ST_OK || st == ST_RANGE_ERR) {
+        console_printf("[env] t=%lu temp=%s C rh=%s %% st=%s\r\n", (unsigned long)s.t_ms,
+                       fmt_f(b[0], FMT_F_BUF, s.temp_c, 2), fmt_f(b[1], FMT_F_BUF, s.rh, 2), status_str(st));
+    }
+    console_printf("[env] chip=%s status=0x%02X reads=%lu errors=%lu crc_errors=%lu last=%s\r\n",
+                   aht_variant_name(info.variant), info.status_byte, (unsigned long)info.reads,
+                   (unsigned long)info.errors, (unsigned long)info.crc_errors, status_str(info.last_status));
+    return 0;
+}
+
+static int cmd_env_stream(int argc, char **argv)
+{
+    unsigned long n, period;
+    if (!stream_args(argc, argv, 30UL, 1000UL, 1000UL, &n, &period)) {
+        return 1;
+    }
+    if (!env_ready()) {
+        return 0;
+    }
+    console_printf("# env stream n=%lu period_ms=%lu cols=t_ms,temp_c,rh,status\r\n", n, period);
+    TickType_t wake = xTaskGetTickCount();
+    unsigned long done = 0U, errors = 0U;
+    for (; done < n; done++) {
+        if (cli_abort_requested()) {
+            break;
+        }
+        aht_sample_t s;
+        status_t st = aht_read(&s);
+        char b[2][FMT_F_BUF];
+        if (st == ST_OK || st == ST_RANGE_ERR) {
+            console_printf("env,%lu,%s,%s,%s\r\n", (unsigned long)s.t_ms, fmt_f(b[0], FMT_F_BUF, s.temp_c, 2),
+                           fmt_f(b[1], FMT_F_BUF, s.rh, 2), status_str(st));
+        } else {
+            errors++;
+            console_printf("env,%lu,,,%s\r\n", T_NOW(), status_str(st));
+        }
+        (void)xTaskDelayUntil(&wake, pdMS_TO_TICKS(period));
+    }
+    console_printf("# env stream end: %lu samples, %lu errors\r\n", done, errors);
+    return 0;
+}
+
 static const cli_cmd_t s_cmds[] = {
     {"i2c scan", "", "list devices that answer on both I2C buses", cmd_i2c_scan},
     {"i2c stats", "", "transfer and error counters per bus", cmd_i2c_stats},
@@ -278,6 +350,8 @@ static const cli_cmd_t s_cmds[] = {
     {"imu cal", "[samples]", "gyro bias calibration, board still (default 200)", cmd_imu_cal},
     {"als", "", "one light/proximity reading (inits on first use)", cmd_als},
     {"als stream", "[n] [period_ms]", "n light/proximity samples as CSV (40 @ 250 ms)", cmd_als_stream},
+    {"env", "", "one temperature/humidity reading (inits on first use)", cmd_env},
+    {"env stream", "[n] [period_ms]", "n temp/RH samples as CSV (30 @ 1000 ms, min 1 s)", cmd_env_stream},
 };
 
 void diag_cmds_register(void)
