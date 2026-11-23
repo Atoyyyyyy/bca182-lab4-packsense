@@ -1,0 +1,55 @@
+19:21:37.462 > 
+19:21:37.462 > 
+19:21:37.462 > === PackSense 0.2.0-m2 (git f404b0e) built Nov 23 2026 19:12:23 ===
+19:21:37.462 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+19:21:37.462 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+19:21:37.462 > [boot] clock source: HSE 8 MHz crystal -> PLL
+19:21:37.462 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+19:21:37.462 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+19:21:37.462 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+19:21:37.462 > [boot] FPU: CPACR CP10/CP11=full access
+19:21:37.462 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40944 B usable), max syscall prio 5
+19:21:37.524 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+19:21:37.524 > [boot] starting scheduler
+19:21:37.524 > [cli] ready, type 'help'
+19:21:37.525 > > [rtos] scheduler started, first task running at tick 0
+19:21:42.499 > env
+19:21:42.499 > [env] t=4963 init OK status=0x18
+19:21:42.562 > [env] t=5043 temp=31.13 C rh=67.29 % st=OK
+19:21:42.562 > [env] chip=AHT2x (CRC byte valid) status=0x18 reads=1 errors=0 crc_errors=0 last=OK
+19:21:42.562 > > env stream 30
+19:21:43.105 > # env stream n=30 period_ms=1000 cols=t_ms,temp_c,rh,status
+19:21:43.156 > env,5647,31.05,67.32,OK
+19:21:44.184 > env,6647,31.45,68.87,OK
+19:21:45.131 > env,7647,31.40,68.74,OK
+19:21:46.135 > env,8647,31.15,68.18,OK
+19:21:47.153 > env,9647,31.07,67.90,OK
+19:21:48.160 > env,10647,31.53,69.18,OK
+19:21:49.166 > env,11647,31.74,69.65,OK
+19:21:50.172 > env,12647,31.95,70.28,OK
+19:21:51.184 > env,13647,32.23,70.96,OK
+19:21:52.124 > env,14647,32.37,71.60,OK
+19:21:53.184 > env,15647,32.42,72.18,OK
+19:21:54.126 > env,16647,32.48,72.64,OK
+19:21:55.184 > env,17647,32.51,73.53,OK
+19:21:56.140 > env,18647,32.38,73.60,OK
+19:21:57.152 > env,19647,32.51,73.57,OK
+19:21:58.149 > env,20647,32.19,74.12,OK
+19:21:59.148 > env,21647,32.35,73.41,OK
+19:22:00.132 > env,22647,32.09,72.28,OK
+19:22:01.125 > env,23647,31.93,71.23,OK
+19:22:02.127 > env,24647,31.80,70.36,OK
+19:22:03.138 > env,25647,31.71,69.57,OK
+19:22:04.157 > env,26647,31.62,68.86,OK
+19:22:05.150 > env,27647,31.53,68.39,OK
+19:22:06.150 > env,28647,31.46,67.88,OK
+19:22:07.147 > env,29647,31.42,67.41,OK
+19:22:08.164 > env,30647,31.37,67.02,OK
+19:22:09.172 > env,31647,31.31,66.63,OK
+19:22:10.175 > env,32647,31.24,66.28,OK
+19:22:11.187 > env,33647,31.17,65.98,OK
+19:22:12.174 > env,34647,31.13,65.62,OK
+19:22:13.100 > # env stream end: 30 samples, 0 errors
+19:22:13.100 > > i2c stats
+19:22:13.634 > [i2c] bus=i2c2(PF1/PF0) transfers=0 nacks=0 timeouts=0 bus_errors=0 recoveries=0
+19:22:13.634 > [i2c] bus=soft(PE0/PE1) transfers=63 nacks=0 timeouts=0 bus_errors=0 recoveries=0

@@ -1,0 +1,7 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-23)
+19:21:42.423 sent: env
+19:21:42.978 sent: env stream 30
+19:21:43.273 cue: hands off
+19:21:53.058 cue: BREATHE on the silver sensor in the bottom-left corner: mouth ~2 cm away, slow warm 'haaa' for 3 s
+19:21:56.079 cue: stop, leave it alone
+19:22:13.540 sent: i2c stats
