@@ -1,0 +1,227 @@
+17:49:31.819 > [hb] n=2 tick=1500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:32.816 > [hb] n=3 tick=2500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:33.815 > [hb] n=4 tick=3500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:34.811 > [hb] n=5 tick=4500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:35.555 > 
+17:49:35.556 > 
+17:49:35.556 > === PackSense 0.1.0-m1 (git 8d71a0c) built Nov 23 2026 17:49:23 ===
+17:49:35.560 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+17:49:35.567 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+17:49:35.572 > [boot] clock source: HSE 8 MHz crystal -> PLL
+17:49:35.576 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+17:49:35.581 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+17:49:35.590 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+17:49:35.598 > [boot] FPU: CPACR CP10/CP11=full access
+17:49:35.600 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40944 B usable), max syscall prio 5
+17:49:35.610 > [boot] CCM RAM: 2192 of 65536 B used (.ccmram)
+17:49:35.614 > [boot] starting scheduler
+17:49:35.616 > [rtos] scheduler started, first task running at tick 0
+17:49:36.117 > [hb] n=1 tick=500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:37.117 > [hb] n=2 tick=1500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:38.117 > [hb] n=3 tick=2500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:39.117 > [hb] n=4 tick=3500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:39.451 > 
+17:49:39.451 > 
+17:49:39.451 > === PackSense 0.1.0-m1 (git 8d71a0c) built Nov 23 2026 17:49:23 ===
+17:49:39.457 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+17:49:39.464 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+17:49:39.469 > [boot] clock source: HSE 8 MHz crystal -> PLL
+17:49:39.472 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+17:49:39.478 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+17:49:39.488 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+17:49:39.494 > [boot] FPU: CPACR CP10/CP11=full access
+17:49:39.497 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40944 B usable), max syscall prio 5
+17:49:39.506 > [boot] CCM RAM: 2192 of 65536 B used (.ccmram)
+17:49:39.510 > [boot] starting scheduler
+17:49:39.513 > [rtos] scheduler started, first task running at tick 0
+17:49:40.013 > [hb] n=1 tick=500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:41.013 > [hb] n=2 tick=1500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:42.012 > [hb] n=3 tick=2500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:43.013 > [hb] n=4 tick=3500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:44.011 > [hb] n=5 tick=4500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:45.013 > [hb] n=6 tick=5500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:46.013 > [hb] n=7 tick=6500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:46.998 > [hb] n=8 tick=7500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:48.011 > [hb] n=9 tick=8500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:49.014 > [hb] n=10 tick=9500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:50.013 > [hb] n=11 tick=10500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:51.005 > [hb] n=12 tick=11500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:52.007 > [hb] n=13 tick=12500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:53.014 > [hb] n=14 tick=13500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:54.014 > [hb] n=15 tick=14500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:55.009 > [hb] n=16 tick=15500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:56.010 > [hb] n=17 tick=16500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:57.014 > [hb] n=18 tick=17500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:58.014 > [hb] n=19 tick=18500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:49:59.007 > [hb] n=20 tick=19500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:00.010 > [hb] n=21 tick=20500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:01.014 > [hb] n=22 tick=21500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:02.015 > [hb] n=23 tick=22500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:03.015 > [hb] n=24 tick=23500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:04.015 > [hb] n=25 tick=24500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:05.014 > [hb] n=26 tick=25500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:06.015 > [hb] n=27 tick=26500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:07.015 > [hb] n=28 tick=27500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:08.015 > [hb] n=29 tick=28500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:09.015 > [hb] n=30 tick=29500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:10.015 > [hb] n=31 tick=30500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:11.015 > [hb] n=32 tick=31500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:12.015 > [hb] n=33 tick=32500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:13.011 > [hb] n=34 tick=33500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:14.008 > [hb] n=35 tick=34500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:15.015 > [hb] n=36 tick=35500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:16.015 > [hb] n=37 tick=36500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:17.009 > [hb] n=38 tick=37500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:18.013 > [hb] n=39 tick=38500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:19.015 > [hb] n=40 tick=39500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:20.015 > [hb] n=41 tick=40500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:21.012 > [hb] n=42 tick=41500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:22.015 > [hb] n=43 tick=42500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:23.015 > [hb] n=44 tick=43500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:24.014 > [hb] n=45 tick=44500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:25.015 > [hb] n=46 tick=45500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:26.015 > [hb] n=47 tick=46500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:27.015 > [hb] n=48 tick=47500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:28.016 > [hb] n=49 tick=48500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:29.017 > [hb] n=50 tick=49500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:30.017 > [hb] n=51 tick=50500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:31.017 > [hb] n=52 tick=51500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:32.016 > [hb] n=53 tick=52500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:33.016 > [hb] n=54 tick=53500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:34.015 > [hb] n=55 tick=54500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:35.008 > [hb] n=56 tick=55500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:36.016 > [hb] n=57 tick=56500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:37.017 > [hb] n=58 tick=57500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:38.017 > [hb] n=59 tick=58500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:39.007 > [hb] n=60 tick=59500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:40.017 > [hb] n=61 tick=60500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:41.017 > [hb] n=62 tick=61500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:42.017 > [hb] n=63 tick=62500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:43.016 > [hb] n=64 tick=63500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:44.017 > [hb] n=65 tick=64500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:45.017 > [hb] n=66 tick=65500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:46.017 > [hb] n=67 tick=66500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:47.008 > [hb] n=68 tick=67500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:48.007 > [hb] n=69 tick=68500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:49.017 > [hb] n=70 tick=69500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:50.017 > [hb] n=71 tick=70500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:51.011 > [hb] n=72 tick=71500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:52.007 > [hb] n=73 tick=72500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:53.017 > [hb] n=74 tick=73500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:54.018 > [hb] n=75 tick=74500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:55.018 > [hb] n=76 tick=75500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:56.017 > [hb] n=77 tick=76500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:57.017 > [hb] n=78 tick=77500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:58.018 > [hb] n=79 tick=78500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:50:59.018 > [hb] n=80 tick=79500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:00.018 > [hb] n=81 tick=80500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:01.007 > [hb] n=82 tick=81500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:02.010 > [hb] n=83 tick=82500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:03.019 > [hb] n=84 tick=83500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:04.018 > [hb] n=85 tick=84500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:05.019 > [hb] n=86 tick=85500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:06.018 > [hb] n=87 tick=86500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:07.019 > [hb] n=88 tick=87500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:08.019 > [hb] n=89 tick=88500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:09.018 > [hb] n=90 tick=89500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:10.019 > [hb] n=91 tick=90500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:11.018 > [hb] n=92 tick=91500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:12.019 > [hb] n=93 tick=92500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:13.019 > [hb] n=94 tick=93500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:14.019 > [hb] n=95 tick=94500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:15.019 > [hb] n=96 tick=95500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:16.018 > [hb] n=97 tick=96500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:17.019 > [hb] n=98 tick=97500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:18.019 > [hb] n=99 tick=98500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:19.009 > [hb] n=100 tick=99500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:20.006 > [hb] n=101 tick=100500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:21.019 > [hb] n=102 tick=101500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:22.020 > [hb] n=103 tick=102500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:23.019 > [hb] n=104 tick=103500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:24.019 > [hb] n=105 tick=104500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:25.019 > [hb] n=106 tick=105500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:26.019 > [hb] n=107 tick=106500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:27.020 > [hb] n=108 tick=107500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:28.020 > [hb] n=109 tick=108500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:29.015 > [hb] n=110 tick=109500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:30.019 > [hb] n=111 tick=110500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:31.021 > [hb] n=112 tick=111500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:32.020 > [hb] n=113 tick=112500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:33.021 > [hb] n=114 tick=113500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:34.020 > [hb] n=115 tick=114500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:35.020 > [hb] n=116 tick=115500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:36.021 > [hb] n=117 tick=116500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:37.015 > [hb] n=118 tick=117500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:38.021 > [hb] n=119 tick=118500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:39.021 > [hb] n=120 tick=119500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:40.020 > [hb] n=121 tick=120500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:41.021 > [hb] n=122 tick=121500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:42.021 > [hb] n=123 tick=122500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:43.020 > [hb] n=124 tick=123500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:44.021 > [hb] n=125 tick=124500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:45.021 > [hb] n=126 tick=125500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:46.021 > [hb] n=127 tick=126500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:47.021 > [hb] n=128 tick=127500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:48.021 > [hb] n=129 tick=128500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:49.021 > [hb] n=130 tick=129500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:50.021 > [hb] n=131 tick=130500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:51.021 > [hb] n=132 tick=131500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:52.021 > [hb] n=133 tick=132500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:53.021 > [hb] n=134 tick=133500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:54.021 > [hb] n=135 tick=134500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:55.021 > [hb] n=136 tick=135500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:56.021 > [hb] n=137 tick=136500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:57.021 > [hb] n=138 tick=137500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:58.021 > [hb] n=139 tick=138500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:51:59.021 > [hb] n=140 tick=139500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:00.021 > [hb] n=141 tick=140500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:01.022 > [hb] n=142 tick=141500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:02.022 > [hb] n=143 tick=142500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:03.022 > [hb] n=144 tick=143500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:04.022 > [hb] n=145 tick=144500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:05.022 > [hb] n=146 tick=145500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:06.023 > [hb] n=147 tick=146500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:07.023 > [hb] n=148 tick=147500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:08.022 > [hb] n=149 tick=148500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:09.023 > [hb] n=150 tick=149500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:10.023 > [hb] n=151 tick=150500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:11.023 > [hb] n=152 tick=151500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:12.009 > [hb] n=153 tick=152500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:13.023 > [hb] n=154 tick=153500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:14.023 > [hb] n=155 tick=154500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:15.023 > [hb] n=156 tick=155500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:16.023 > [hb] n=157 tick=156500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:17.023 > [hb] n=158 tick=157500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:18.023 > [hb] n=159 tick=158500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:19.022 > [hb] n=160 tick=159500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:20.023 > [hb] n=161 tick=160500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:21.023 > [hb] n=162 tick=161500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:22.023 > [hb] n=163 tick=162500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:23.009 > [hb] n=164 tick=163500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:24.022 > [hb] n=165 tick=164500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:25.024 > [hb] n=166 tick=165500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:26.023 > [hb] n=167 tick=166500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:27.023 > [hb] n=168 tick=167500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:28.023 > [hb] n=169 tick=168500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:29.023 > [hb] n=170 tick=169500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:30.024 > [hb] n=171 tick=170500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:31.025 > [hb] n=172 tick=171500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:32.024 > [hb] n=173 tick=172500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:33.022 > [hb] n=174 tick=173500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:34.023 > [hb] n=175 tick=174500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:35.025 > [hb] n=176 tick=175500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:36.025 > [hb] n=177 tick=176500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:37.023 > [hb] n=178 tick=177500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:38.023 > [hb] n=179 tick=178500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:39.024 > [hb] n=180 tick=179500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:40.024 > [hb] n=181 tick=180500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:41.024 > [hb] n=182 tick=181500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:42.024 > [hb] n=183 tick=182500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:43.025 > [hb] n=184 tick=183500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:44.025 > [hb] n=185 tick=184500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:45.025 > [hb] n=186 tick=185500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:46.025 > [hb] n=187 tick=186500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:47.025 > [hb] n=188 tick=187500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:48.025 > [hb] n=189 tick=188500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:49.025 > [hb] n=190 tick=189500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
+17:52:50.025 > [hb] n=191 tick=190500 led=off heap_free=40944 heap_min=40928 hb_hwm=126
