@@ -175,9 +175,10 @@ order is mirrored. `⏚` = ground symbol.
 
 | Resource | Use | Reason |
 |---|---|---|
-| SysTick | FreeRTOS tick only | PRD §6.1 |
-| TIM6 | HAL timebase | PRD §6.1 |
-| DWT CYCCNT | timing and run-time stats | PRD §8 |
+| SysTick | FreeRTOS tick only (1 kHz, priority 15) | PRD §6.1 |
+| TIM6 | HAL timebase, 1 kHz, NVIC priority **4** (never calls FreeRTOS) | PRD §6.1 |
+| USART1 | console, 115200 8N1, NVIC priority **6** | ST-LINK VCP |
+| DWT CYCCNT | timing and run-time stats (extended to 64 bits in software) | PRD §8 |
 | IWDG | watchdog | PRD §6.3 |
 | RTC on LSE | timestamps | X1 fitted (if the LSE fails to start, fall back to LSI and log it) |
-| CCM RAM (64 KB @ `0x1000_0000`) | task stacks / feature buffers only (**no DMA**) | F407 CCM is CPU-only |
+| CCM RAM (64 KB @ `0x1000_0000`) | task stacks / feature buffers only (**no DMA**). `.ccmram` is NOLOAD and zeroed in `main()`; use `CCM_BSS` | F407 CCM is CPU-only |
