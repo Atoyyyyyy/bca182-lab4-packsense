@@ -262,10 +262,80 @@ def find_als(port):
     return 0
 
 
+CHECK_ALS_CUES = [
+    (0.0, "leave the board alone (room light)"),
+    (5.0, "COVER THE WHOLE BOARD (book, cup or both hands) so no light reaches it"),
+    (10.0, "uncover, then hold the phone torch ~10 cm above the board, shining down on all of it"),
+    (15.0, "torch off, hands away"),
+]
+
+
+def check_als(port):
+    """20 s timed light test for diagnosing the AP3216C: room light, whole board
+    covered, torch over the whole board. Readout and cues go to
+    logs/als_check_<date-time>.log (git-ignored scratch, not evidence)."""
+    try:
+        ser = serial.Serial(port, BAUD, timeout=0.05)
+    except serial.SerialException as e:
+        print("Cannot open %s: %s\nClose any other serial monitor and try again." % (port, e))
+        return 1
+    os.makedirs(os.path.join(ROOT, "logs"), exist_ok=True)
+    path = os.path.join(ROOT, "logs", "als_check_%s.log" % datetime.datetime.now().strftime("%y%m%d-%H%M%S"))
+    out = open(path, "w", encoding="utf-8", newline="\n")
+    print("\nLIGHT SENSOR CHECK (20 s). Have the phone torch ready.")
+    input(">> Press Enter to start...")
+    ser.write(b"x")  # stop anything still streaming
+    time.sleep(0.3)
+    ser.write(b"\x08")
+    time.sleep(0.05)
+    ser.reset_input_buffer()
+    for ch in "als stream 200 100":
+        ser.write(ch.encode())
+        time.sleep(0.004)
+    ser.write(b"\r")
+    t0 = time.time()
+    cues = list(CHECK_ALS_CUES)
+    buf = ""
+    try:
+        while True:
+            el = time.time() - t0
+            while cues and el >= cues[0][0]:
+                msg = cues.pop(0)[1]
+                print("\n   ##########  NOW: %s  ##########\n" % msg)
+                out.write("%s # cue: %s\n" % (ts(), msg))
+            buf += ser.read(4096).decode("utf-8", "replace")
+            while "\n" in buf:
+                line, buf = buf.split("\n", 1)
+                line = line.strip()
+                if not line:
+                    continue
+                out.write("%s > %s\n" % (ts(), line))
+                parts = line.split(",")
+                if len(parts) == 8 and parts[0] == "als":
+                    print("  lux %8.2f   PS %5s   IR %5s" % (float(parts[2]), parts[3], parts[4]))
+                elif line.startswith("# als stream end"):
+                    print("\n" + line)
+                    print("Done. Saved to %s. Tell the agent." % os.path.relpath(path, ROOT))
+                    return 0
+            if el > 30.0:
+                print("No end of stream seen after 30 s; stopping. Saved to %s." % os.path.relpath(path, ROOT))
+                return 1
+    except KeyboardInterrupt:
+        ser.write(b"x")
+        time.sleep(0.3)
+        ser.write(b"\x08")
+        print("\nstopped. Partial log in %s." % os.path.relpath(path, ROOT))
+        return 1
+    finally:
+        out.close()
+        ser.close()
+
+
 def main():
     ap = argparse.ArgumentParser(description="Guided M2 sensor evidence capture.")
-    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "find-als"],
-                    help="find-als: live light/proximity readout to locate the sensor (writes no files)")
+    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "find-als", "check-als"],
+                    help="find-als: live light/proximity readout to locate the sensor (writes no files); "
+                         "check-als: 20 s timed cover/torch test, saved to logs/ (not evidence)")
     ap.add_argument("--port", help="serial port (default: auto-detect the ST-LINK VCP)")
     ap.add_argument("--flash", action="store_true", help="build and upload the firmware first")
     ap.add_argument("--force", action="store_true", help="overwrite existing evidence logs")
@@ -287,6 +357,8 @@ def main():
 
     if args.sensor == "find-als":
         return find_als(port)
+    if args.sensor == "check-als":
+        return check_als(port)
 
     names = ["imu", "als", "env"] if args.sensor == "all" else [args.sensor]
     ok = all(run_plan(n, port, args.force, args.out_dir) for n in names)
