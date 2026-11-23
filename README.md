@@ -10,8 +10,9 @@ BCA182 Embedded Systems Programming, Lab Activity No. 4, MSU-IIT CCS.
 Team: Sherie Grace L. Lupoz · Renato G. Beroy · Binyusoph P. Sansarona
 ([authors and contributions](#authors-and-contributions)).
 
-> **Status:** Milestone M1 (build system + FreeRTOS bring-up): firmware builds,
-> waiting for the first on-board boot log. See [Milestones](#milestones).
+> **Status:** Milestone M1 (build system + FreeRTOS bring-up) runs on the board:
+> boot log checked (`evidence/m1_boot.log`, all checks pass). Next: M2 drivers.
+> See [Milestones](#milestones).
 
 ## Hardware
 
@@ -83,7 +84,7 @@ python tools/check_heartbeat.py evidence/m1_boot.log
 | | Milestone | Status |
 |---|---|---|
 | M0 | Repo + design docs | done (concept sign-off: TODO) |
-| M1 | PlatformIO board + FreeRTOS bring-up | in progress: builds; on-board boot log pending |
+| M1 | PlatformIO board + FreeRTOS bring-up | done: on-board log passes `check_heartbeat.py` ([results](docs/task_table.md#m1-on-board-results)); LED blink by eye: TODO(measure) |
 | M2 | Sensor/module drivers + DIAG mode | — |
 | M3 | Data capture | — |
 | M4 | Features, baseline, model, C export | — |
@@ -99,7 +100,8 @@ All figures are `TODO(measure)` until they are produced from real logs in `evide
 |---|---|
 | Held-out macro-F1 (model / baseline) | TODO(measure) |
 | Inference time median / p95 | TODO(measure) |
-| Flash / RAM use | TODO(measure) (from `evidence/m1_build.txt` once captured) |
+| Flash / RAM use (M1 firmware) | FLASH 23104 B (2.20 %), RAM 49712 B (37.93 %, incl. 40 KB RTOS heap), CCM 2192 B, from `evidence/m1_build.txt` |
+| FreeRTOS tick vs PC clock (M1) | 999.93 ticks/s (−0.007 %) over 190 s, from `evidence/m1_boot.log` |
 
 ## Troubleshooting
 
