@@ -64,24 +64,27 @@ PLANS = {
     ],
     "als": [
         ("say", "Leave the board in normal room light. Have a phone torch ready.\n"
-                "   The light/proximity sensor is the AP3216C (U7), near the TOP-RIGHT corner of the board."),
+                "   The light/proximity sensor is the AP3216C (U7): with the long pin header at the top and\n"
+                "   the USB ports on the right, it is the small black part on the LEFT edge, just below the\n"
+                "   screen, next to the printed text 'Type 1A/3A'."),
         ("cmd", "als", 10, []),
         ("cmd", "als stream 40", 25, [
             (0.2, "hands off (room light)"),
-            (3.0, "COVER the light sensor (top-right corner) with your hand, about 1 cm above it"),
+            (3.0, "COVER the light sensor (left edge, below the screen) with your hand, about 1 cm above it"),
             (6.0, "take your hand away"),
-            (7.0, "SHINE the phone torch straight at the sensor (top-right corner)"),
+            (7.0, "SHINE the phone torch straight at the sensor (left edge, below the screen)"),
             (9.5, "torch off"),
         ]),
         ("cmd", "i2c stats", 10, []),
     ],
     "env": [
         ("say", "Leave the board alone for now. You will breathe on the\n"
-                "   temperature/humidity sensor (AHT, U8 on the schematic) during the stream."),
+                "   temperature/humidity sensor (AHT21, U8) during the stream: the small silver square in the\n"
+                "   BOTTOM-LEFT corner, under the 'PMOD1' label, just above the IR receiver."),
         ("cmd", "env", 10, []),
         ("cmd", "env stream 30", 45, [
             (0.2, "hands off"),
-            (10.0, "BREATHE gently on the temperature/humidity sensor, once or twice"),
+            (10.0, "BREATHE on the silver sensor in the bottom-left corner: mouth ~2 cm away, slow warm 'haaa' for 3 s"),
             (13.0, "stop, leave it alone"),
         ]),
         ("cmd", "i2c stats", 10, []),
