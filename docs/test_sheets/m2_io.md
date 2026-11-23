@@ -39,4 +39,4 @@ Hold the board with the long pin header at the top and the USB ports on the righ
 |---|---|---|
 | LEDs | `led red on`, `led blue on`, both, off, `led auto` | colour and blink by eye (this also settles the M1 "1 Hz blink" check) |
 | Buzzer | `buzzer beep 300`, `chirp`, `error`, `alarm` | silent at boot; 1 beep, 1 chirp, 3 beeps, ~3 s alarm that stops by itself |
-| Keys | `keys 25` while you press keys on cue | one `press` + one `release` per key press, hold time of the long UP press (≥ 800 ms → `long=1`), `edges` = raw edges per change (1 = clean, more = contact bounce the debounce removed) |
+| Keys | `keys 4` once per key (UP, DOWN, LEFT, RIGHT), then a held UP and 3 quick RIGHT taps | one `press` + one `release` per key press, hold time of the long UP press (≥ 800 ms → `long=1`), `edges` = raw edges per change (1 = clean, more = contact bounce the debounce removed) |

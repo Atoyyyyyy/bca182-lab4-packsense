@@ -125,15 +125,17 @@ PLANS = {
     "keys": [
         ("say", "The arrow keys UP, DOWN, LEFT, RIGHT are at the bottom right (RESET is the red one: do NOT\n"
                 "   press it). Press a key only when told. Keep your hands off the PC keyboard while it listens."),
-        ("cmd", "keys 25", 35, [
-            (1.0, "press UP once (short tap)"),
-            (4.0, "press DOWN once"),
-            (7.0, "press LEFT once"),
-            (10.0, "press RIGHT once"),
-            (13.0, "press and HOLD UP for about 2 s, then let go"),
-            (18.0, "tap RIGHT 3 times quickly"),
-            (22.0, "hands off"),
-        ]),
+        # One short listen per key, so every event in the log belongs to exactly
+        # one instruction (checks that each printed label maps to its pin).
+        ("say", "Each step listens for 4 s. Press ONLY the key named on the big line, ONCE, then let go."),
+        ("cmd", "keys 4", 10, [(0.3, "press UP once (the single key above the row), then let go")]),
+        ("cmd", "keys 4", 10, [(0.3, "press DOWN once (bottom row, middle), then let go")]),
+        ("cmd", "keys 4", 10, [(0.3, "press LEFT once (bottom row, next to the red RESET), then let go")]),
+        ("cmd", "keys 4", 10, [(0.3, "press RIGHT once (bottom row, right end), then let go")]),
+        ("say", "Next: a LONG press. Hold UP down until the screen says LET GO."),
+        ("cmd", "keys 5", 10, [(0.3, "press and HOLD UP ..."), (2.8, "LET GO of UP")]),
+        ("say", "Last: quick taps."),
+        ("cmd", "keys 4", 10, [(0.3, "tap RIGHT 3 times quickly, then hands off")]),
     ],
 }
 
