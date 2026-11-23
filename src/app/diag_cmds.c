@@ -9,6 +9,8 @@
 #include <math.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -90,6 +92,45 @@ static int cmd_i2c_stats(int argc, char **argv)
         console_printf("[i2c] bus=%s transfers=%lu nacks=%lu timeouts=%lu bus_errors=%lu recoveries=%lu\r\n",
                        i2c_bus_name((i2c_bus_id_t)b), (unsigned long)s.transfers, (unsigned long)s.nacks,
                        (unsigned long)s.timeouts, (unsigned long)s.bus_errors, (unsigned long)s.recoveries);
+    }
+    return 0;
+}
+
+/* "i2c read <main|soft> <addr hex> <reg hex> [n]": register dump for bring-up. */
+static int cmd_i2c_read(int argc, char **argv)
+{
+    if (argc < 3 || argc > 4) {
+        return 1;
+    }
+    i2c_bus_id_t bus;
+    if (strcmp(argv[0], "main") == 0) {
+        bus = I2C_BUS_MAIN;
+    } else if (strcmp(argv[0], "soft") == 0) {
+        bus = I2C_BUS_SOFT;
+    } else {
+        return 1;
+    }
+    char *end;
+    unsigned long addr = strtoul(argv[1], &end, 16);
+    if (*end != '\0' || addr < 0x08UL || addr > 0x77UL) {
+        return 1;
+    }
+    unsigned long reg = strtoul(argv[2], &end, 16);
+    if (*end != '\0' || reg > 0xFFUL) {
+        return 1;
+    }
+    unsigned long n = 1UL;
+    if (argc == 4 && !cli_arg_u32(argv[3], 1UL, 32UL, &n)) {
+        return 1;
+    }
+    for (unsigned long i = 0; i < n && reg + i <= 0xFFUL; i++) {
+        uint8_t v = 0U;
+        status_t st = i2c_read_regs(bus, (uint8_t)addr, (uint8_t)(reg + i), &v, 1U);
+        if (st != ST_OK) {
+            console_printf("[i2c] 0x%02lX reg 0x%02lX: %s\r\n", addr, reg + i, status_str(st));
+            break;
+        }
+        console_printf("[i2c] 0x%02lX reg 0x%02lX = 0x%02X\r\n", addr, reg + i, v);
     }
     return 0;
 }
@@ -410,6 +451,7 @@ static int cmd_diag_sensors(int argc, char **argv)
 static const cli_cmd_t s_cmds[] = {
     {"i2c scan", "", "list devices that answer on both I2C buses", cmd_i2c_scan},
     {"i2c stats", "", "transfer and error counters per bus", cmd_i2c_stats},
+    {"i2c read", "main|soft <addr> <reg> [n]", "read n registers (hex addr/reg)", cmd_i2c_read},
     {"imu", "", "one IMU reading (inits the IMU on first use)", cmd_imu},
     {"imu stream", "[n] [period_ms]", "n IMU samples as CSV (default 500 @ 10 ms)", cmd_imu_stream},
     {"imu cal", "[samples]", "gyro bias calibration, board still (default 200)", cmd_imu_cal},

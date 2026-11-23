@@ -253,7 +253,9 @@ def find_als(port):
                 elif "init" in line or "error" in line.lower():
                     print("  " + line.strip())
     except KeyboardInterrupt:
-        ser.write(b"x")
+        ser.write(b"x")  # stop the stream...
+        time.sleep(0.3)
+        ser.write(b"")  # ...and erase the key from the command line
         print("\nstopped.")
     finally:
         ser.close()
