@@ -18,10 +18,13 @@
 #include "task.h"
 
 #include "app/diag_cmds.h"
+#include "app/io_cmds.h"
 #include "app/tasks.h"
 #include "app_config.h"
 #include "drivers/console_uart.h"
 #include "drivers/i2c_bus.h"
+#include "drivers/buttons.h"
+#include "drivers/buzzer.h"
 #include "drivers/led.h"
 #include "fault.h"
 #include "system_clock.h"
@@ -133,6 +136,7 @@ int main(void)
     __HAL_RCC_CLEAR_RESET_FLAGS();
 
     led_init();
+    buzzer_init();
     console_init();
     heap_init_for_stats();
     print_banner(clk, reset_csr);
@@ -140,6 +144,8 @@ int main(void)
     console_rtos_init();
     i2c_bus_init();
     diag_cmds_register();
+    buttons_init();
+    io_cmds_register();
     tasks_create();
 
     console_puts("[boot] starting scheduler\r\n");

@@ -24,6 +24,10 @@ Added on top of M1:
 |---|---|---|---|---|---|---|---|
 | `CLI` | Console line editor + commands; runs the DIAG readouts and sensor streams (`imu stream` paces itself with `xTaskDelayUntil`) | 2 | 1024 | static, CCM RAM | blocks on the console RX stream buffer | ← USART1 RX ISR (stream buffer); I2C bus mutexes; console mutex | **788** words free (236 of 1024 used at peak) after the IMU calibration and streams; `diag mem` in `evidence/m2_imu.log` |
 
+The buzzer patterns run on a FreeRTOS software timer (`Tmr Svc` task), so
+`buzzer_play()` never blocks the caller. The `keys` command is the button
+queue's consumer for now; the `UiTask` takes that role in M5.
+
 The PRD 6.3 tasks (`SensorTask`, `EnvTask`, …) replace the CLI as the sensor
 owners from M3/M5 on; the drivers already lock each bus with a mutex, so
 several tasks can share them.
@@ -89,6 +93,7 @@ CCM RAM 2192 B (3.34 %).
 | TIM6_DAC | 4 | no (must not) | HAL tick (`HAL_GetTick`, HAL timeouts) |
 | I2C2_EV / I2C2_ER | 5 | yes: `vTaskNotifyGiveIndexedFromISR` (slot 1) | I2C2 transfer completion / error → wakes the waiting task |
 | USART1 | 6 | yes: `xStreamBufferSendFromISR` | console TX ring buffer; RX bytes → CLI stream buffer |
+| EXTI0 / EXTI1 / EXTI4 / EXTI9_5 | 7 | yes: `xQueueSendFromISR` | arrow keys LEFT PC0, DOWN PC1, RIGHT PC4, UP PC5: timestamp each raw edge into the button queue; debounce (30 ms) runs in the consuming task |
 | SysTick | 15 | kernel | FreeRTOS tick |
 | PendSV / SVC | 15 / — | kernel | context switch / first task start |
 

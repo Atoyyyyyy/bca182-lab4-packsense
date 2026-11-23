@@ -20,6 +20,7 @@
 /* NVIC priorities (0 = highest). See the rules in FreeRTOSConfig.h. */
 #define IRQ_PRIO_I2C_MAIN          5U
 #define IRQ_PRIO_CONSOLE_USART     6U
+#define IRQ_PRIO_BUTTONS           7U  /* EXTI0/1/4/9_5: xQueueSendFromISR */
 
 /* Task-notification slot used by drivers to wait for I/O completion
    (slot 0 stays free for application events). */
@@ -43,6 +44,11 @@
 #define I2C_MAIN_CLOCK_HZ          400000U /* fast mode: ICM-20608, AP3216C, ES8388 */
 #define I2C_SOFT_HALF_PERIOD_US    5U      /* ~100 kHz bit-banged bus (AHT) */
 #define I2C_TIMEOUT_MS             20U
+
+/* Buttons (PRD 6.2 buttons.c) */
+#define BUTTON_DEBOUNCE_MS         30U   /* key must be quiet this long */
+#define BUTTON_LONG_PRESS_MS       800U  /* held at least this long = long press */
+#define BUTTON_RAW_QUEUE_LEN       32U   /* raw edges from the EXTI ISR */
 
 /* Place a zero-initialised object in CCM RAM (CPU-only, no DMA). The section is
    NOLOAD and zeroed by ccmram_zero() in main(); initialisers are NOT applied. */

@@ -29,6 +29,22 @@
 #define LED_ON_LEVEL               GPIO_PIN_RESET
 #define LED_OFF_LEVEL              GPIO_PIN_SET
 
+/* Active (self-oscillating) buzzer BUZ1 through an S8050 NPN: HIGH = sound
+   (pinmap.md "Indicators and outputs", sheets 5, 6). */
+#define BUZZER_PORT                GPIOB
+#define BUZZER_PIN                 GPIO_PIN_0
+#define BUZZER_ON_LEVEL            GPIO_PIN_SET
+#define BUZZER_OFF_LEVEL           GPIO_PIN_RESET
+
+/* Arrow keys SW2-SW5: switch to GND, no external pull-up drawn, so internal
+   pull-up and pressed = LOW. Each key has its own EXTI line
+   (pinmap.md "User input", sheets 5, 6). */
+#define KEYS_PORT                  GPIOC
+#define KEY_UP_PIN                 GPIO_PIN_5 /* EXTI9_5 */
+#define KEY_DOWN_PIN               GPIO_PIN_1 /* EXTI1 */
+#define KEY_LEFT_PIN               GPIO_PIN_0 /* EXTI0 */
+#define KEY_RIGHT_PIN              GPIO_PIN_4 /* EXTI4 */
+
 /* Hardware I2C2: ICM-20608-G 0x68, AP3216C 0x1E, ES8388 0x10; 5.1 kOhm
    pull-ups R1/R2 (pinmap.md "I2C buses and devices", sheets 5, 6, 9).
    PF0/PF1 carry I2C2 on alternate function 4 (STM32F407 datasheet AF table). */

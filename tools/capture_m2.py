@@ -7,6 +7,7 @@ Run it with PlatformIO's Python (it has pyserial), from the project folder:
     ... tools\\capture_m2.py als
     ... tools\\capture_m2.py env
     ... tools\\capture_m2.py all        (the three, one after another)
+    ... tools\\capture_m2.py leds | buzzer | keys | io   (io = those three)
 
 Options: --port COM3 (default: auto-detect the ST-LINK virtual COM port),
          --flash (build + upload first), --force (overwrite an existing log),
@@ -44,7 +45,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BAUD = 115200
 
 # Each step: ("say", text) waits for Enter; ("cmd", command, timeout_s, cues)
-# sends a command; cues = [(seconds after sending, text), ...] shown on screen.
+# sends a command; cues = [(seconds after sending, text), ...] shown on screen;
+# ("ask", question) records what YOU saw or heard (y/n or a few words) in the
+# _cues.txt file, for things only a person can check (LED colour, sound).
 PLANS = {
     "imu": [
         ("say", "Lay the board FLAT on the table, components up. Do not touch it until told."),
@@ -88,6 +91,49 @@ PLANS = {
             (13.0, "stop, leave it alone"),
         ]),
         ("cmd", "i2c stats", 10, []),
+    ],
+    "leds": [
+        ("say", "Find the indicator LED D4: hold the board with the long pin header at the top and\n"
+                "   the USB ports on the right. D4 is just RIGHT of the big ST chip and is blinking red now."),
+        ("ask", "Is that LED blinking RED, about once per second (0.5 s on, 0.5 s off)?"),
+        ("cmd", "led red on", 5, []),
+        ("ask", "Is it now steady RED (not blinking)?"),
+        ("cmd", "led red off", 5, []),
+        ("cmd", "led blue on", 5, []),
+        ("ask", "Is a steady BLUE light now on at the same spot (D4)? If blue is somewhere else, say where."),
+        ("cmd", "led red on", 5, []),
+        ("ask", "Red and blue together: do you see both on (a purple/pink mix)?"),
+        ("cmd", "led red off", 5, []),
+        ("cmd", "led blue off", 5, []),
+        ("ask", "Is D4 completely off now?"),
+        ("cmd", "led auto", 5, []),
+        ("ask", "Is D4 blinking red again, once per second?"),
+    ],
+    "buzzer": [
+        ("say", "The buzzer is the round black part with a '+' on it, near the bottom middle of the board.\n"
+                "   Listen for each sound, then answer the question."),
+        ("ask", "Was the buzzer SILENT when you pressed RESET and while the board was idle?"),
+        ("cmd", "buzzer beep 300", 5, []),
+        ("ask", "Did you hear ONE beep (about a third of a second)?"),
+        ("cmd", "buzzer chirp", 5, []),
+        ("ask", "Did you hear one very short chirp?"),
+        ("cmd", "buzzer error", 5, []),
+        ("ask", "Did you hear THREE short beeps?"),
+        ("cmd", "buzzer alarm", 8, []),
+        ("ask", "Did you hear beep-beep-beep for about 3 seconds, and did it STOP by itself?"),
+    ],
+    "keys": [
+        ("say", "The arrow keys UP, DOWN, LEFT, RIGHT are at the bottom right (RESET is the red one: do NOT\n"
+                "   press it). Press a key only when told. Keep your hands off the PC keyboard while it listens."),
+        ("cmd", "keys 25", 35, [
+            (1.0, "press UP once (short tap)"),
+            (4.0, "press DOWN once"),
+            (7.0, "press LEFT once"),
+            (10.0, "press RIGHT once"),
+            (13.0, "press and HOLD UP for about 2 s, then let go"),
+            (18.0, "tap RIGHT 3 times quickly"),
+            (22.0, "hands off"),
+        ]),
     ],
 }
 
@@ -183,6 +229,15 @@ def run_plan(name, port, force, out_dir):
                 print("         For evidence, rebuild from a clean tree (--flash after committing).")
 
             for step in PLANS[name]:
+                if step[0] == "ask":
+                    board.poll()
+                    print("\n?? " + step[1])
+                    ans = ""
+                    while not ans:
+                        ans = input("?? Answer y / n (or a few words), then Enter: ").strip()
+                    cues.write("%s answer: %s -> %s\n" % (ts(), step[1], ans))
+                    cues.flush()
+                    continue
                 if step[0] == "say":
                     print("\n>> " + step[1])
                     input(">> Press Enter when ready... ")
@@ -336,8 +391,9 @@ def check_als(port):
 
 def main():
     ap = argparse.ArgumentParser(description="Guided M2 sensor evidence capture.")
-    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "find-als", "check-als"],
-                    help="find-als: live light/proximity readout to locate the sensor (writes no files); "
+    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io",
+                                       "find-als", "check-als"],
+                    help="all = imu, als, env; io = leds, buzzer, keys; find-als: live light/proximity readout to locate the sensor (writes no files); "
                          "check-als: 20 s timed cover/torch test, saved to logs/ (not evidence)")
     ap.add_argument("--port", help="serial port (default: auto-detect the ST-LINK VCP)")
     ap.add_argument("--flash", action="store_true", help="build and upload the firmware first")
@@ -363,7 +419,8 @@ def main():
     if args.sensor == "check-als":
         return check_als(port)
 
-    names = ["imu", "als", "env"] if args.sensor == "all" else [args.sensor]
+    groups = {"all": ["imu", "als", "env"], "io": ["leds", "buzzer", "keys"]}
+    names = groups.get(args.sensor, [args.sensor])
     ok = all(run_plan(n, port, args.force, args.out_dir) for n in names)
     if ok:
         print("\nAll done. Tell the agent the evidence is in.")

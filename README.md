@@ -89,11 +89,15 @@ Type into `pio device monitor`. `help` lists everything; any key stops a stream.
 | `als`, `als stream [n] [ms]` | AP3216C light (lux), proximity, IR |
 | `env`, `env stream [n] [ms]` | AHT temperature / humidity, detected chip variant |
 | `diag sensors` | one reading from every sensor + bus counters |
+| `led`, `led red\|blue on\|off`, `led auto` | indicator LED D4 state / drive it by hand / back to the 1 Hz blink |
+| `buzzer chirp\|alarm\|error`, `buzzer beep [ms]` | buzzer patterns (software timer, non-blocking) |
+| `keys [s]` | debounced arrow-key events as CSV, with hold time, long-press flag and bounce count |
 | `diag mem` | heap, per-task stack high-water mark, CPU share |
 | `version`, `uptime`, `hb on\|off`, `reset` | housekeeping |
 
 Analyse captured streams with `python tools/m2_sensor_stats.py <log>`. The
-M2 capture procedure is in [`docs/test_sheets/m2_sensors.md`](docs/test_sheets/m2_sensors.md).
+M2 capture procedures are in [`docs/test_sheets/m2_sensors.md`](docs/test_sheets/m2_sensors.md)
+and [`docs/test_sheets/m2_io.md`](docs/test_sheets/m2_io.md).
 
 ## Milestones
 

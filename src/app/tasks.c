@@ -21,6 +21,8 @@
 #include "drivers/console_uart.h"
 #include "drivers/led.h"
 
+volatile bool g_hb_led = true;
+
 static CCM_BSS StackType_t s_hb_stack[HEARTBEAT_TASK_STACK_WORDS];
 static CCM_BSS StaticTask_t s_hb_tcb;
 
@@ -36,7 +38,9 @@ static void heartbeat_task(void *arg)
                    (unsigned long)last_wake);
 
     for (;;) {
-        led_toggle(LED_RED);
+        if (g_hb_led) {
+            led_toggle(LED_RED);
+        }
         toggles++;
 
         if ((toggles % HEARTBEAT_REPORT_EVERY) == 0U) {

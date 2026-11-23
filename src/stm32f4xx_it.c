@@ -11,10 +11,12 @@
  * | TIM6_DAC      | 4        | no (HAL tick)   |
  * | I2C2_EV/ER    | 5        | yes (notify)    |
  * | USART1        | 6        | yes (RX stream) |
+ * | EXTI0/1/4/9_5 | 7        | yes (key queue) |
  * | SysTick/PendSV| 15       | kernel          |
  */
 #include "stm32f4xx_hal.h"
 
+#include "drivers/buttons.h"
 #include "drivers/console_uart.h"
 #include "drivers/i2c_bus.h"
 #include "fault.h"
@@ -68,4 +70,26 @@ void I2C2_EV_IRQHandler(void)
 void I2C2_ER_IRQHandler(void)
 {
     i2c_main_er_irq();
+}
+
+/* Arrow keys: LEFT PC0, DOWN PC1, RIGHT PC4, UP PC5. EXTI9_5 is shared with
+   later users (IR receiver PF8); buttons_exti_irq() only clears its own pins. */
+void EXTI0_IRQHandler(void)
+{
+    buttons_exti_irq();
+}
+
+void EXTI1_IRQHandler(void)
+{
+    buttons_exti_irq();
+}
+
+void EXTI4_IRQHandler(void)
+{
+    buttons_exti_irq();
+}
+
+void EXTI9_5_IRQHandler(void)
+{
+    buttons_exti_irq();
 }

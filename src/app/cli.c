@@ -140,7 +140,7 @@ static int cmd_help(int argc, char **argv)
     for (size_t t = 0; t < s_ntables; t++) {
         for (size_t i = 0; i < s_tables[t].n; i++) {
             const cli_cmd_t *c = &s_tables[t].cmds[i];
-            console_printf("  %-14s %-18s %s\r\n", c->name, c->usage, c->help);
+            console_printf("  %-14s %-36s %s\r\n", c->name, c->usage, c->help);
         }
     }
     return 0;
