@@ -211,9 +211,59 @@ def run_plan(name, port, force, out_dir):
     return True
 
 
+def find_als(port):
+    """Live readout to locate the AP3216C: move a fingertip over the board until
+    PS jumps. Nothing is written to disk. Ctrl+C to stop."""
+    try:
+        ser = serial.Serial(port, BAUD, timeout=0.05)
+    except serial.SerialException as e:
+        print("Cannot open %s: %s\nClose any other serial monitor and try again." % (port, e))
+        return 1
+    print("\nLIVE LIGHT/PROXIMITY FINDER (nothing is saved). Ctrl+C to stop.")
+    print("Hold a fingertip ~1 cm above one small chip at a time, 2-3 s each.")
+    print("Over the right chip, PS jumps into the hundreds and the bar fills.\n")
+    buf = ""
+    last_send = 0.0
+    try:
+        while True:
+            now = time.time()
+            if now - last_send > 31.0:  # restart the stream before it ends (300 x 100 ms = 30 s)
+                ser.write(b"x")  # any key stops a running stream; else it is erased below
+                time.sleep(0.3)
+                ser.write(b"\x08")  # if no stream was running, the 'x' sits in the line: erase it
+                time.sleep(0.05)
+                ser.reset_input_buffer()
+                for ch in "als stream 300 100":
+                    ser.write(ch.encode())
+                    time.sleep(0.004)
+                ser.write(b"\r")
+                last_send = time.time()
+            buf += ser.read(4096).decode("utf-8", "replace")
+            while "\n" in buf:
+                line, buf = buf.split("\n", 1)
+                parts = line.strip().split(",")
+                if len(parts) == 8 and parts[0] == "als":
+                    try:
+                        lux, ps = float(parts[2]), int(parts[3])
+                    except ValueError:
+                        continue
+                    bar = "#" * min(40, ps // 25)
+                    flag = "   <<< SENSOR IS HERE" if ps >= 200 else ""
+                    print("  lux %8.1f   PS %5d  |%-40s|%s" % (lux, ps, bar, flag))
+                elif "init" in line or "error" in line.lower():
+                    print("  " + line.strip())
+    except KeyboardInterrupt:
+        ser.write(b"x")
+        print("\nstopped.")
+    finally:
+        ser.close()
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description="Guided M2 sensor evidence capture.")
-    ap.add_argument("sensor", choices=["imu", "als", "env", "all"])
+    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "find-als"],
+                    help="find-als: live light/proximity readout to locate the sensor (writes no files)")
     ap.add_argument("--port", help="serial port (default: auto-detect the ST-LINK VCP)")
     ap.add_argument("--flash", action="store_true", help="build and upload the firmware first")
     ap.add_argument("--force", action="store_true", help="overwrite existing evidence logs")
@@ -232,6 +282,9 @@ def main():
         sys.exit("ST-LINK virtual COM port not found. Plug the board into the ST-LINK USB port, "
                  "or pass --port COMx.")
     print("Using %s" % port)
+
+    if args.sensor == "find-als":
+        return find_als(port)
 
     names = ["imu", "als", "env"] if args.sensor == "all" else [args.sensor]
     ok = all(run_plan(n, port, args.force, args.out_dir) for n in names)
