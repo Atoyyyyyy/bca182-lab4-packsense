@@ -1,0 +1,33 @@
+19:33:21.432 > 
+19:33:21.432 > 
+19:33:21.432 > === PackSense 0.2.0-m2 (git f8029de) built Nov 23 2026 19:31:34 ===
+19:33:21.432 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+19:33:21.494 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+19:33:21.494 > [boot] clock source: HSE 8 MHz crystal -> PLL
+19:33:21.494 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+19:33:21.494 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+19:33:21.495 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+19:33:21.495 > [boot] FPU: CPACR CP10/CP11=full access
+19:33:21.495 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40952 B usable), max syscall prio 5
+19:33:21.499 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+19:33:21.499 > [boot] starting scheduler
+19:33:21.499 > [cli] ready, type 'help'
+19:33:21.499 > > [rtos] scheduler started, first task running at tick 0
+19:33:38.605 > led red on
+19:33:38.605 > [led] t=17058 red=on (manual) blue=off
+19:33:38.605 > [led] heartbeat blink paused; 'led auto' resumes it
+19:33:38.606 > > led red off
+19:33:44.315 > [led] t=22769 red=off (manual) blue=off
+19:33:44.315 > [led] heartbeat blink paused; 'led auto' resumes it
+19:33:44.315 > > led blue on
+19:33:44.846 > [led] t=23308 red=off (manual) blue=on
+19:33:44.847 > > led red on
+19:33:55.942 > [led] t=34406 red=on (manual) blue=on
+19:33:55.942 > [led] heartbeat blink paused; 'led auto' resumes it
+19:33:55.943 > > led red off
+19:34:02.749 > [led] t=41207 red=off (manual) blue=on
+19:34:02.749 > [led] heartbeat blink paused; 'led auto' resumes it
+19:34:02.749 > > led blue off
+19:34:03.287 > [led] t=41750 red=off (manual) blue=off
+19:34:03.287 > > led auto
+19:34:06.985 > [led] t=45442 red=off (heartbeat blink) blue=off

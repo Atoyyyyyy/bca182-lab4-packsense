@@ -1,0 +1,10 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-23)
+19:34:26.260 answer: Was the buzzer SILENT when you pressed RESET and while the board was idle? -> Y
+19:34:26.260 sent: buzzer beep 300
+19:34:29.963 answer: Did you hear ONE beep (about a third of a second)? -> y
+19:34:29.964 sent: buzzer chirp
+19:34:33.145 answer: Did you hear one very short chirp? -> y
+19:34:33.145 sent: buzzer error
+19:34:35.734 answer: Did you hear THREE short beeps? -> Y
+19:34:35.734 sent: buzzer alarm
+19:34:41.811 answer: Did you hear beep-beep-beep for about 3 seconds, and did it STOP by itself? -> Y

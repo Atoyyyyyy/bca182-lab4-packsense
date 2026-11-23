@@ -1,0 +1,14 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-23)
+19:33:38.495 answer: Is that LED blinking RED, about once per second (0.5 s on, 0.5 s off)? -> Y
+19:33:38.496 sent: led red on
+19:33:44.200 answer: Is it now steady RED (not blinking)? -> Y
+19:33:44.200 sent: led red off
+19:33:44.739 sent: led blue on
+19:33:55.844 answer: Is a steady BLUE light now on at the same spot (D4)? If blue is somewhere else, say where. -> Y
+19:33:55.845 sent: led red on
+19:34:02.635 answer: Red and blue together: do you see both on (a purple/pink mix)? -> Y
+19:34:02.635 sent: led red off
+19:34:03.178 sent: led blue off
+19:34:06.890 answer: Is D4 completely off now? -> Y
+19:34:06.890 sent: led auto
+19:34:11.513 answer: Is D4 blinking red again, once per second? -> y

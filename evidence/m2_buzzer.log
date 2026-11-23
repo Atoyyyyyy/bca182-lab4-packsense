@@ -1,0 +1,27 @@
+19:34:16.096 > 
+19:34:16.096 > 
+19:34:16.097 > === PackSense 0.2.0-m2 (git f8029de) built Nov 23 2026 19:31:34 ===
+19:34:16.158 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+19:34:16.159 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+19:34:16.159 > [boot] clock source: HSE 8 MHz crystal -> PLL
+19:34:16.159 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+19:34:16.159 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+19:34:16.159 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+19:34:16.161 > [boot] FPU: CPACR CP10/CP11=full access
+19:34:16.161 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40952 B usable), max syscall prio 5
+19:34:16.163 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+19:34:16.163 > [boot] starting scheduler
+19:34:16.163 > [cli] ready, type 'help'
+19:34:16.163 > > [rtos] scheduler started, first task running at tick 0
+19:34:26.381 > buzzer beep 300
+19:34:26.381 > [buzzer] t=10173 beep 300 ms
+19:34:26.692 > [buzzer] t=10473 done
+19:34:26.692 > > buzzer chirp
+19:34:30.072 > [buzzer] t=13862 play chirp
+19:34:30.135 > [buzzer] t=13942 done
+19:34:30.135 > > buzzer error
+19:34:33.256 > [buzzer] t=17045 play error
+19:34:33.631 > [buzzer] t=17465 done
+19:34:33.631 > > buzzer alarm
+19:34:35.849 > [buzzer] t=19633 play alarm (stops after 3 s)
+19:34:38.791 > [buzzer] t=22633 done
