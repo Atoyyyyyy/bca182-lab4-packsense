@@ -10,7 +10,14 @@ It reports:
     PC time vs. FreeRTOS tick over all [hb] lines. 1000 ticks per PC second
     means the 168 MHz clock (and so the 8 MHz HSE) is right. An 8-vs-25 MHz
     mistake would show up as a ~3x error; crystal tolerance is ~0.005 %.
-  * gaps or repeats in the heartbeat sequence numbers, and resets (banners)
+  * gaps or repeats in the heartbeat sequence numbers
+  * resets: every boot banner in the capture must come from a RESET press or
+    power-on (reset cause PIN / POWER-ON / BROWN-OUT). A watchdog, software or
+    low-power reset means the firmware restarted itself and fails the check.
+
+The monitor usually opens on a board that is already running, and RESET may be
+pressed more than once. So lines before the last banner are only scanned for
+PANIC/FAULT/assert and reset causes; every other check uses the last boot.
 
 PC timestamps have USB/OS jitter of a few ms. Capture at least 60 s so the fit
 is precise. Prints a summary and exits 0 if every check passes, 1 otherwise.
@@ -28,6 +35,9 @@ RCC_RE = re.compile(r"\[boot\] RCC: SWS=(\w+) PLLSRC=(\w+) M=(\d+) N=(\d+) P=(\d
 MIN_SECONDS = 60.0
 TICK_HZ_EXPECTED = 1000.0
 TICK_TOLERANCE = 0.001  # 0.1 %: far wider than jitter, far tighter than any wrong-clock error
+# Reset-cause flags printed by main.c that a person causes (RESET key, power-on;
+# power-on also sets PIN and BROWN-OUT). SOFTWARE, IWDG, WWDG, LOWPOWER fail.
+RESET_OK = {"PIN", "POWER-ON", "BROWN-OUT"}
 
 
 def parse(path):
@@ -69,7 +79,7 @@ def main(argv):
         print("FAIL: no timestamped lines. Capture with: pio device monitor (time filter on)")
         return 1
 
-    texts = [t for _, t in lines]
+    all_texts = [t for _, t in lines]
     ok = True
 
     def check(name, passed, detail=""):
@@ -77,12 +87,26 @@ def main(argv):
         ok &= bool(passed)
         print("%-4s %s%s" % ("PASS" if passed else "FAIL", name, (" - " + detail) if detail else ""))
 
-    banners = [t for t in texts if t.startswith("=== PackSense")]
-    check("boot banner present", banners, banners[0] if banners else "")
-    check("exactly one boot (no resets during capture)", len(banners) == 1, "%d banner(s)" % len(banners))
+    banner_idx = [i for i, t in enumerate(all_texts) if t.startswith("=== PackSense")]
+    check("boot banner present", banner_idx, all_texts[banner_idx[-1]] if banner_idx else "")
+    if not banner_idx:
+        return 1
+    check("no PANIC/FAULT/assert lines (whole capture)",
+          not any(("PANIC" in t or "FAULT" in t or "assert" in t) for t in all_texts))
+
+    causes = []
+    for i in banner_idx:
+        line = next((t for t in all_texts[i:] if t.startswith("[boot] reset cause:")), "")
+        causes.append(set(line.replace("[boot] reset cause:", "").split("(")[0].split()))
+    check("every reset was a RESET press or power-on", all(c and c <= RESET_OK for c in causes),
+          "%d boot(s): %s" % (len(causes), "; ".join(" ".join(sorted(c)) or "cause line missing" for c in causes)))
+    if len(banner_idx) > 1 or banner_idx[0] > 0:
+        print("info checking the last boot only (log line %d onward)" % (banner_idx[-1] + 1))
+
+    lines = lines[banner_idx[-1]:]
+    texts = [t for _, t in lines]
     check("HAL init line", any(t.startswith("[boot] HAL init OK") for t in texts))
     check("scheduler started", any("scheduler started" in t for t in texts))
-    check("no PANIC/FAULT/assert lines", not any(("PANIC" in t or "FAULT" in t or "assert" in t) for t in texts))
 
     src = next((t for t in texts if t.startswith("[boot] clock source:")), "")
     check("clock source is the HSE crystal", "HSE 8 MHz crystal" in src, src.replace("[boot] clock source: ", ""))
