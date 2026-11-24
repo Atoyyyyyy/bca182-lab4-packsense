@@ -90,7 +90,7 @@ flowchart LR
   end
   subgraph RECORD
     SD["microSD (SDIO)<br/>CSV log"]
-    FL["W25Q128 SPI flash<br/>config"]
+    FL["W25Q64-class 8 MB SPI flash<br/>config"]
     WIFI["RW007 Wi-Fi<br/>(optional report)"]
     VCP["USART1 → ST-LINK VCP<br/>console / capture"]
   end
@@ -133,7 +133,7 @@ The full matrix, with pins and verification columns, is in
 | Context sensing (rule) | AHT21 temperature / humidity |
 | User input | 4 arrow keys (ack, guard arm/disarm, mute, mode, capture labels) |
 | Local output | ST7789V3 LCD, red/blue LED, SK6805 LED matrix, buzzer |
-| Logging / config | RTC (LSE), microSD, W25Q128 SPI flash |
+| Logging / config | RTC (LSE), microSD, 8 MB W25Q SPI flash (schematic says W25Q128; the fitted chip reports 8 MB) |
 | Communication (optional) | RW007 Wi-Fi; USART1 VCP console |
 | Diagnostics only | IR TX/RX loopback, ES8388 codec (no audio stored), CAN/RS485/PMOD connector status |
 
@@ -177,7 +177,7 @@ confusion.
 3. Only **red and blue** indicator LEDs are wired; the **SK6805 LED matrix** supplies other colours.
 4. The **buzzer is active** (on/off GPIO), so it plays patterns, not tones.
 5. **ES8388 codec + mic** exists. It is integrated in DIAG only (privacy).
-6. **SPI2 is shared** by the W25Q128 flash and RW007 Wi-Fi, so it needs a bus mutex.
+6. **SPI2 is shared** by the W25Q SPI flash and RW007 Wi-Fi, so it needs a bus mutex.
 7. The AHT sensor is on a **separate bit-banged I2C bus (PE0/PE1)**, so `EnvTask` does not contend with the 100 Hz IMU on I2C2.
 8. **PA7** is shared by LED-matrix data and PMOD1 MOSI, and **PB3/PA15** are shared by SWO/JTDI and I2S3. Do not attach PMOD modules, and do not use SWO trace while the codec is active.
 

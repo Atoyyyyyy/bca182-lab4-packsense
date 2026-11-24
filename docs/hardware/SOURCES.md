@@ -20,7 +20,7 @@ Upstream: <https://github.com/RT-Thread-Studio/sdk-bsp-stm32f407-spark> (branch 
 
 - **AHT21 datasheet** (Aosong). The schematic says AHT21, but the BSP only ships the AHT10 sheet.
 - **ST7789V3 datasheet** (Sitronix) for the LCD init sequence.
-- **W25Q128JV datasheet** (Winbond), **ES8388 datasheet** (Everest), **RW007 docs** (RT-Thread), **SK6805 datasheet** (for LED-matrix timing).
+- **W25Q64JV datasheet** (Winbond; the fitted chip reports JEDEC `EF 40 17` / 8 MiB, not the schematic's W25Q128), **ES8388 datasheet** (Everest), **RW007 docs** (RT-Thread), **SK6805 datasheet** (for LED-matrix timing).
 - **STM32F407 reference manual RM0090 + datasheet DS8626** (ST).
 
 Download these from the manufacturers' sites into `docs/hardware/vendor/` and

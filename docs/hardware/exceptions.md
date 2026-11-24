@@ -7,7 +7,7 @@ instructor's verification.
 
 | # | Component | Status (absent / broken / not integrated) | Reason and how it was checked | Evidence file | Logged by / date | Instructor verification (signature, date) |
 |---|---|---|---|---|---|---|
-| | | | | | | |
+| 1 | microSD **card** (the slot, SDIO and card-detect are fitted) | absent | No card in the kit (operator, 2026-11-24). `sd` reports `init NOT_PRESENT` (SDIO command-response timeout) and the system keeps running. The FAT logging (PRD `sdlog.c`) needs a card: FAT32 card to be added | `evidence/m2_storage.log` | R. Beroy, 2026-11-24 | |
 
 ### Notes
 
