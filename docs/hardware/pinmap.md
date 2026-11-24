@@ -73,10 +73,10 @@ M2 drivers poll and do not use these lines yet).
 
 | Item | MCU pin | Polarity / drive | Sheet | Status |
 |---|---|---|---|---|
-| LED red | **PF12** | LED anode to +3V3 via 2 kΩ (R17) → **active low** | 5, 6 | S |
-| LED blue | **PF11** | active low via 2 kΩ (R16) | 5, 6 | S |
+| LED red | **PF12** | LED anode to +3V3 via 2 kΩ (R17) → **active low** | 5, 6 | ✔ [`m2_leds.log`](../../evidence/m2_leds.log) (red on/off, 1 Hz heartbeat) |
+| LED blue | **PF11** | active low via 2 kΩ (R16) | 5, 6 | ✔ [`m2_leds.log`](../../evidence/m2_leds.log) (blue at D4) |
 | LED green | **no MCU pin found** | `LED_GREEN` appears on the hierarchy sheets, but sheet 5 routes only `GPIO_LED_R`/`GPIO_LED_B` and D4 is drawn with two inputs | 3, 5, 6 | ⚠ verify |
-| Buzzer | **PB0** | **active (self-oscillating) buzzer** via S8050 NPN, active high. Plain GPIO on/off, no PWM tone needed | 5, 6 | S |
+| Buzzer | **PB0** | **active (self-oscillating) buzzer** via S8050 NPN, active high. Plain GPIO on/off, no PWM tone needed | 5, 6 | ✔ [`m2_buzzer.log`](../../evidence/m2_buzzer.log) (silent at reset, beep/chirp/error/alarm heard) |
 | LED matrix | DATA **PA7**, EN **PF2** | **19 × SK6805** (WS2812-style serial RGB) behind a 74LVC1G125 buffer. `EN` is the buffer's /OE with a 10 kΩ pull-up → drive **low** to enable. PA7 is **shared with PMOD1 MOSI** | 5, 6 | S |
 | LED_EXT_IO | PC6 | expansion connector | 5, 11 | S |
 | IR transmitter | **PB1** | IR LED via S8050 NPN, active high | 5, 6 | S |
@@ -86,10 +86,10 @@ M2 drivers poll and do not use these lines yet).
 
 | Key | MCU pin | EXTI line | Wiring | Status |
 |---|---|---|---|---|
-| UP (SW2) | **PC5** | EXTI5 (EXTI9_5_IRQn) | to GND when pressed, no external pull-up drawn → **internal pull-up, active low** | S |
-| DOWN (SW4) | **PC1** | EXTI1 | same | S |
-| LEFT (SW3) | **PC0** | EXTI0 | same | S |
-| RIGHT (SW5) | **PC4** | EXTI4 | same | S |
+| UP (SW2) | **PC5** | EXTI5 (EXTI9_5_IRQn) | to GND when pressed, no external pull-up drawn → **internal pull-up, active low** | ✔ [`m2_keys.log`](../../evidence/m2_keys.log) |
+| DOWN (SW4) | **PC1** | EXTI1 | same | ✔ [`m2_keys.log`](../../evidence/m2_keys.log) |
+| LEFT (SW3) | **PC0** | EXTI0 | same | ✔ [`m2_keys.log`](../../evidence/m2_keys.log) |
+| RIGHT (SW5) | **PC4** | EXTI4 | same | ✔ [`m2_keys.log`](../../evidence/m2_keys.log) |
 | RESET (SW6) | NRST | — | hardware reset | S |
 
 The four EXTI lines are all distinct, so there is no EXTI conflict.

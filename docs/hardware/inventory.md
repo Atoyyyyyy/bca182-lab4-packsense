@@ -17,10 +17,10 @@ file in the *Evidence* column. Anything missing or broken goes to
 | 2 | AP3216C ALS + proximity + IR (U7) | I2C2, `0x1E`, INT PG13 | ☑ | ☑ | **Primary sensing**: light / opening / hand near | ML features, DIAG | [`m2_als.log`](../../evidence/m2_als.log): hand over sensor → lux 0, PS 1023, near |
 | 3 | AHT21 (or AHT10, **read marking**: `______`) temp/RH (U8) | soft-I2C PE0/PE1, `0x38` | ☑ | ☑ | **Context sensing**: bag climate | climate rule, DIAG | [`m2_env.log`](../../evidence/m2_env.log): AHT2x by CRC; breath → RH 67 → 74 % |
 | 4 | 1.3" 240×240 LCD, ST7789V3 (CN2) | FSMC 8-bit, NE3 PG10, RS A18 PD13, RST PD3, TE PD6, BL PF9 | ☐ | ☐ | **Output / UI** | home, alerts, DIAG | |
-| 5 | Red + blue indicator LED (D4) | PF12 (R), PF11 (B), active low | ☐ | ☐ | **Output**: state colour | RUN/GUARD, DIAG | |
+| 5 | Red + blue indicator LED (D4) | PF12 (R), PF11 (B), active low | ☑ | ☑ | **Output**: state colour | RUN/GUARD, DIAG | [`m2_leds.log`](../../evidence/m2_leds.log): red, blue and both at D4; 1 Hz heartbeat (operator: all yes) |
 | 6 | LED matrix, 19 × SK6805 (U6 buffer) | DATA PA7, EN PF2 (active low) | ☐ | ☐ | **Output**: alert animation | alarm, DIAG self-test | |
-| 7 | Active buzzer (BUZ1) | PB0, active high | ☐ | ☐ | **Output**: audible alert | alerts, DIAG | |
-| 8 | 4 arrow keys (SW2–SW5) + reset (SW6) | PC5 UP, PC1 DOWN, PC0 LEFT, PC4 RIGHT; active low | ☐ | ☐ | **User input** | ack, arm guard, mute, mode, capture labels | |
+| 7 | Active buzzer (BUZ1) | PB0, active high | ☑ | ☑ | **Output**: audible alert | alerts, DIAG | [`m2_buzzer.log`](../../evidence/m2_buzzer.log): silent at reset; beep, chirp, 3-beep error, 3 s alarm that stops (operator: all yes) |
+| 8 | 4 arrow keys (SW2–SW5) + reset (SW6) | PC5 UP, PC1 DOWN, PC0 LEFT, PC4 RIGHT; active low | ☑ | ☑ | **User input** | ack, arm guard, mute, mode, capture labels | [`m2_keys.log`](../../evidence/m2_keys.log): each printed label reports its own pin; long press 2009 ms; debounce removes bounce; 0 dropped |
 | 9 | RTC + 32.768 kHz crystal (X1) (+ backup battery? `____`) | internal RTC, LSE PC14/PC15 | ☐ | ☐ | **Logging**: timestamps | logs, DIAG | |
 | 10 | microSD slot (SDIO) + card (size `____`) | PC8–PC12, PD2, CD PF3 | ☐ | ☐ | **Logging**: events + captures | LogTask, DIAG | |
 | 11 | W25Q128 16 MB SPI flash (U10) | SPI2 PB13/PC2/PC3, CS PB12 | ☐ | ☐ | **Config / fallback log** | settings, DIAG | |

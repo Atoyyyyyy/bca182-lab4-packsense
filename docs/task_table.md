@@ -69,6 +69,27 @@ and `f404b0e` (light, temperature/humidity), both clean builds. Each log has a
   room air. Use it for *trends* (bag heating up, getting humid) rather than
   absolute room temperature.
 
+### M2 on-board results: indicator LED, buzzer, arrow keys
+
+Captured with `tools/capture_m2.py leds | buzzer | keys`, firmware `f8029de`
+(clean build). The LED and buzzer checks are the operator's answers recorded
+in the `_cues.txt` files; the key results come from the firmware's event lines.
+
+| Part | Check | Measured | Source |
+|---|---|---|---|
+| LED D4 | red / blue / both / off | all seen at D4 as commanded; `led auto` resumes the 1 Hz heartbeat blink (closes the M1 blink-by-eye check) | `m2_leds.log`, operator: all yes |
+| Buzzer | silent at reset | yes | `m2_buzzer_cues.txt` |
+| Buzzer | pattern lengths (firmware ticks, start → `done`) | beep 300 ms → 300; chirp 80; error (3 beeps) 420; alarm 3000, stops by itself | `m2_buzzer.log`, operator heard each |
+| Keys | label → pin | DOWN cue → DOWN (PC1), LEFT cue → LEFT (PC0), RIGHT cue → RIGHT (PC4), held UP → UP (PC5): printed labels match the pin map | `m2_keys.log` |
+| Keys | long press | UP held **2009 ms** → `long=1` (threshold 800 ms) | `m2_keys.log` |
+| Keys | debounce | DOWN: 4 raw edges for one press, reported as 1 press + 1 release; short taps 86–212 ms all caught | `m2_keys.log` |
+| Keys | lost events | `dropped=0` on all four keys; every press has a release | `[keys]` summary lines |
+
+Capture deviations (operator timing, kept as captured): the "UP once" window
+got no press, a stray UP tap fell in the LEFT window, and the quick-tap step
+has 2 RIGHT taps instead of 3. RIGHT's raw-edge count (6 = 3 presses × 2)
+shows the board saw exactly the presses that were logged.
+
 ### M1 on-board results
 
 From `evidence/m1_boot.log` (firmware git `8d71a0c`, RT-Spark HW1.1), checked with
