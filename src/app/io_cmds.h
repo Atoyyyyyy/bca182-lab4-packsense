@@ -1,6 +1,6 @@
 /*
- * io_cmds.h: DIAG console commands for the indicator LED, the buzzer and the
- * arrow keys (M2, PRD 5.1 DIAG self-test and 8.6 console commands).
+ * io_cmds.h: DIAG console commands for the indicator LED, the buzzer, the
+ * arrow keys and the LED matrix (M2, PRD 5.1 DIAG self-test and 8.6 console commands).
  */
 #ifndef IO_CMDS_H
 #define IO_CMDS_H

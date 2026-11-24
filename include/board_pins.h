@@ -92,6 +92,21 @@
 #define LCD_BL_ON_LEVEL            GPIO_PIN_SET
 #define LCD_BL_OFF_LEVEL           GPIO_PIN_RESET
 
+/* LED matrix: 19 x SK6805 serial RGB behind a 74LVC1G125 buffer whose /OE
+   (EN) has a 10 kOhm pull-up, so EN LOW enables the data line
+   (pinmap.md "Indicators and outputs", sheets 5, 6). PA7 is also PMOD1 MOSI.
+   PA7 = TIM3_CH2 on AF2 (STM32F407 datasheet AF table); the waveform comes
+   from TIM3 PWM fed by DMA1 stream 5 channel 5 (TIM3_CH2 request), as in the
+   board vendor's driver. Note: the IR transmitter PB1 is TIM3_CH4. */
+#define LEDMX_DATA_PORT            GPIOA
+#define LEDMX_DATA_PIN             GPIO_PIN_7
+#define LEDMX_DATA_AF              GPIO_AF2_TIM3
+#define LEDMX_EN_PORT              GPIOF
+#define LEDMX_EN_PIN               GPIO_PIN_2
+#define LEDMX_EN_ON_LEVEL          GPIO_PIN_RESET
+#define LEDMX_EN_OFF_LEVEL         GPIO_PIN_SET
+#define LEDMX_COUNT                19U
+
 /* Sensor interrupt lines (not used yet: sensors are polled). */
 #define ICM_INT_PORT               GPIOG
 #define ICM_INT_PIN                GPIO_PIN_12

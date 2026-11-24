@@ -1,6 +1,6 @@
 /*
  * io_cmds.c: console commands for the indicator LED (D4, red + blue), the
- * buzzer and the arrow keys.
+ * buzzer, the arrow keys and the LED matrix.
  *
  * Output lines start with a bracketed tag and t=<ms since boot>, like the
  * sensor commands. `keys` prints one CSV line per debounced event so the log
@@ -22,6 +22,8 @@
 #include "drivers/buzzer.h"
 #include "drivers/console_uart.h"
 #include "drivers/led.h"
+#include "drivers/led_matrix.h"
+#include "board_pins.h"
 
 #define T_NOW() ((unsigned long)xTaskGetTickCount())
 
@@ -181,10 +183,148 @@ static int cmd_keys(int argc, char **argv)
     return 0;
 }
 
+/* ---- LED matrix ----------------------------------------------------------- */
+
+#define MATRIX_MAX_LEVEL 64UL /* keep it dim: 19 LEDs at full white draw a lot */
+
+static bool matrix_ready(void)
+{
+    if (led_matrix_is_initialised()) {
+        return true;
+    }
+    status_t st = led_matrix_init();
+    console_printf("[matrix] t=%lu init %s (%u LEDs, all off)\r\n", T_NOW(), status_str(st),
+                   (unsigned)LEDMX_COUNT);
+    return st == ST_OK;
+}
+
+static void matrix_print_stats(void)
+{
+    led_matrix_stats_t s;
+    led_matrix_get_stats(&s);
+    console_printf("[matrix] t=%lu frames=%lu timeouts=%lu dma_errors=%lu last_wire_us=%lu\r\n", T_NOW(),
+                   (unsigned long)s.frames, (unsigned long)s.timeouts, (unsigned long)s.dma_errors,
+                   (unsigned long)s.last_wire_us);
+}
+
+static bool parse_rgb(char **argv, uint8_t rgb[3])
+{
+    for (int i = 0; i < 3; i++) {
+        unsigned long v;
+        if (!cli_arg_u32(argv[i], 0UL, MATRIX_MAX_LEVEL, &v)) {
+            return false;
+        }
+        rgb[i] = (uint8_t)v;
+    }
+    return true;
+}
+
+static int matrix_show_report(const char *what)
+{
+    status_t st = led_matrix_show();
+    console_printf("[matrix] t=%lu %s: %s\r\n", T_NOW(), what, status_str(st));
+    return 0;
+}
+
+/* "matrix": init on first use + counters. */
+static int cmd_matrix(int argc, char **argv)
+{
+    (void)argv;
+    if (argc != 0) {
+        return 1;
+    }
+    if (matrix_ready()) {
+        matrix_print_stats();
+    }
+    return 0;
+}
+
+/* "matrix fill r g b" (0..64 each), "matrix off" */
+static int cmd_matrix_fill(int argc, char **argv)
+{
+    uint8_t c[3];
+    if (argc != 3 || !parse_rgb(argv, c)) {
+        return 1;
+    }
+    if (!matrix_ready()) {
+        return 0;
+    }
+    led_matrix_fill(c[0], c[1], c[2]);
+    console_printf("[matrix] t=%lu fill r=%u g=%u b=%u\r\n", T_NOW(), c[0], c[1], c[2]);
+    return matrix_show_report("sent");
+}
+
+static int cmd_matrix_off(int argc, char **argv)
+{
+    (void)argv;
+    if (argc != 0) {
+        return 1;
+    }
+    if (!matrix_ready()) {
+        return 0;
+    }
+    led_matrix_fill(0, 0, 0);
+    return matrix_show_report("all off");
+}
+
+/* "matrix set <i> r g b": one LED, the others keep their colour. */
+static int cmd_matrix_set(int argc, char **argv)
+{
+    unsigned long idx;
+    uint8_t c[3];
+    if (argc != 4 || !cli_arg_u32(argv[0], 0UL, LEDMX_COUNT - 1U, &idx) || !parse_rgb(&argv[1], c)) {
+        return 1;
+    }
+    if (!matrix_ready()) {
+        return 0;
+    }
+    led_matrix_set((unsigned)idx, c[0], c[1], c[2]);
+    console_printf("[matrix] t=%lu set %lu r=%u g=%u b=%u\r\n", T_NOW(), idx, c[0], c[1], c[2]);
+    return matrix_show_report("sent");
+}
+
+/* "matrix chase [ms]": light LED 0, 1, ... 18 one at a time (dim white),
+   so a person can see that every LED in the chain works and in which order
+   they are wired. */
+static int cmd_matrix_chase(int argc, char **argv)
+{
+    unsigned long ms = 300UL;
+    if (argc > 1 || (argc == 1 && !cli_arg_u32(argv[0], 20UL, 5000UL, &ms))) {
+        return 1;
+    }
+    if (!matrix_ready()) {
+        return 0;
+    }
+    unsigned ok = 0U;
+    for (unsigned i = 0; i < LEDMX_COUNT; i++) {
+        led_matrix_fill(0, 0, 0);
+        led_matrix_set(i, 16, 16, 16);
+        if (led_matrix_show() == ST_OK) {
+            ok++;
+        }
+        console_printf("[matrix] t=%lu chase led=%u\r\n", T_NOW(), i);
+        vTaskDelay(pdMS_TO_TICKS(ms));
+        if (cli_abort_requested()) {
+            break;
+        }
+    }
+    led_matrix_fill(0, 0, 0);
+    (void)led_matrix_show();
+    console_printf("[matrix] t=%lu chase done: %u of %u frames sent OK, all off\r\n", T_NOW(), ok,
+                   (unsigned)LEDMX_COUNT);
+    matrix_print_stats();
+    return 0;
+}
+
 static const cli_cmd_t s_cmds[] = {
     {"led", "[auto | red|blue on|off]", "indicator LED state / drive it by hand", cmd_led},
     {"buzzer", "chirp|alarm|error | beep [ms] | off", "play a buzzer pattern", cmd_buzzer},
     {"keys", "[seconds]", "print debounced arrow-key events (default 20 s)", cmd_keys},
+    {"matrix", "", "LED matrix counters (inits it on first use)", cmd_matrix},
+    {"matrix fill", "<r> <g> <b>", "all 19 LEDs one colour, 0..64 each", cmd_matrix_fill},
+    {"matrix off", "", "all LEDs off", cmd_matrix_off},
+    {"matrix set", "<i> <r> <g> <b>", "one LED (0..18)", cmd_matrix_set},
+    {"matrix chase", "[ms]", "light LED 0..18 one at a time (default 300 ms each)", cmd_matrix_chase},
 };
 
 void io_cmds_register(void)

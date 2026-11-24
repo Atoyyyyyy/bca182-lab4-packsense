@@ -9,6 +9,7 @@ Run it with PlatformIO's Python (it has pyserial), from the project folder:
     ... tools\\capture_m2.py all        (the three, one after another)
     ... tools\\capture_m2.py leds | buzzer | keys | io   (io = those three)
     ... tools\\capture_m2.py lcd        (screen: asks what you see)
+    ... tools\\capture_m2.py matrix    (LED matrix: asks what you see)
 
 Options: --port COM3 (default: auto-detect the ST-LINK virtual COM port),
          --flash (build + upload first), --force (overwrite an existing log),
@@ -169,6 +170,28 @@ PLANS = {
         ("ask", "Photo: take one of the test pattern (whole board, header at the top), save it as "
                 "evidence/m2_lcd_test.jpg, then type 'done' (or 'skip').", ["done", "skip"]),
         ("cmd", "lcd", 10, []),
+    ],
+    "matrix": [
+        ("say", "Hold the board with the long pin header at the TOP and the USB ports on the RIGHT.\n"
+                "   Look at the LED matrix: 19 small RGB LEDs under the white diffuser. They are dim on purpose."),
+        ("ask", "Before the first matrix command: are ALL matrix LEDs off (dark)?"),
+        ("cmd", "matrix", 10, []),
+        ("ask", "After 'matrix' (init): still ALL off?"),
+        ("cmd", "matrix fill 16 0 0", 5, []),
+        ("ask", "Are ALL the matrix LEDs lit RED (not green, none dark)? If some are dark or another colour, say how many."),
+        ("cmd", "matrix fill 0 16 0", 5, []),
+        ("ask", "Are ALL of them GREEN now (not red)?"),
+        ("cmd", "matrix fill 0 0 16", 5, []),
+        ("ask", "Are ALL of them BLUE now?"),
+        ("cmd", "matrix fill 16 16 16", 5, []),
+        ("ask", "Are ALL of them WHITE-ish now (no LED clearly red/green/blue only)?"),
+        ("cmd", "matrix off", 5, []),
+        ("ask", "Are ALL of them off again?"),
+        ("say", "Next: one LED at a time walks through the chain (0.4 s each, about 8 s). Count the positions."),
+        ("cmd", "matrix chase 400", 20, [(0.3, "watch the matrix and COUNT how many different LEDs light up")]),
+        ("ask", "How many different LEDs lit up, one at a time?", [str(n) for n in range(0, 26)]),
+        ("ask", "Where did it start, and how did it move? (a few words, e.g. 'centre, then the ring clockwise')"),
+        ("cmd", "matrix", 10, []),
     ],
 }
 
@@ -439,7 +462,7 @@ def check_als(port):
 
 def main():
     ap = argparse.ArgumentParser(description="Guided M2 sensor evidence capture.")
-    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd",
+    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd", "matrix",
                                        "find-als", "check-als"],
                     help="all = imu, als, env; io = leds, buzzer, keys; find-als: live light/proximity readout to locate the sensor (writes no files); "
                          "check-als: 20 s timed cover/torch test, saved to logs/ (not evidence)")
