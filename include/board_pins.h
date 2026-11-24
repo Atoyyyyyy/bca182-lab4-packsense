@@ -121,6 +121,23 @@
 #define SD_CD_PORT                 GPIOF
 #define SD_CD_PIN                  GPIO_PIN_3
 
+/* SPI2: W25Q SPI flash (CS0 = PB12) and the RW007 Wi-Fi module (CS1 = PF10)
+   share SCK PB13, MISO PC2, MOSI PC3 (pinmap.md "Storage", "Wireless",
+   sheets 5, 7, 10). AF5 = SPI2 on all three (STM32F407 datasheet AF table).
+   Both chip selects are driven HIGH (deselected) at boot, so the RW007 can
+   never answer while the flash is being used. */
+#define SPI2_SCK_PORT              GPIOB
+#define SPI2_SCK_PIN               GPIO_PIN_13
+#define SPI2_MISO_PORT             GPIOC
+#define SPI2_MISO_PIN              GPIO_PIN_2
+#define SPI2_MOSI_PORT             GPIOC
+#define SPI2_MOSI_PIN              GPIO_PIN_3
+#define SPI2_GPIO_AF               GPIO_AF5_SPI2
+#define FLASH_CS_PORT              GPIOB
+#define FLASH_CS_PIN               GPIO_PIN_12
+#define WIFI_CS_PORT               GPIOF
+#define WIFI_CS_PIN                GPIO_PIN_10
+
 /* Sensor interrupt lines (not used yet: sensors are polled). */
 #define ICM_INT_PORT               GPIOG
 #define ICM_INT_PIN                GPIO_PIN_12

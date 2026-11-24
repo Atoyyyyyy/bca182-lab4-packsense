@@ -11,6 +11,7 @@ Run it with PlatformIO's Python (it has pyserial), from the project folder:
     ... tools\\capture_m2.py lcd        (screen: asks what you see)
     ... tools\\capture_m2.py matrix     (LED matrix: asks what you see)
     ... tools\\capture_m2.py rtc        (RTC: set from the PC clock, rate check, RESET)
+    ... tools\\capture_m2.py storage    (microSD detect + SPI flash ID and write test)
 
 Options: --port COM3 (default: auto-detect the ST-LINK virtual COM port),
          --flash (build + upload first), --force (overwrite an existing log),
@@ -196,6 +197,15 @@ PLANS = {
          [str(n) for n in range(0, 41)]),
         ("ask", "Where did it start, and how did it move? (e.g. 'centre, then the ring clockwise')", "text"),
         ("cmd", "matrix", 10, []),
+    ],
+    "storage": [
+        ("say", "Storage test: no hands needed after the RESET. About 15 s. The SD slot stays EMPTY."),
+        ("cmd", "sd", 15, []),
+        ("cmd", "sd", 15, []),
+        ("cmd", "flash", 10, []),
+        ("cmd", "flash test", 15, []),
+        ("cmd", "flash test", 15, []),
+        ("cmd", "diag mem", 10, []),
     ],
     "rtc": [
         ("say", "RTC test: no hands needed except one RESET press. It takes about 1.5 minutes."),
@@ -495,7 +505,7 @@ def check_als(port):
 
 def main():
     ap = argparse.ArgumentParser(description="Guided M2 sensor evidence capture.")
-    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd", "matrix", "rtc",
+    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd", "matrix", "rtc", "storage",
                                        "find-als", "check-als"],
                     help="all = imu, als, env; io = leds, buzzer, keys; find-als: live light/proximity readout to locate the sensor (writes no files); "
                          "check-als: 20 s timed cover/torch test, saved to logs/ (not evidence)")

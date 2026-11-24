@@ -70,7 +70,7 @@
 #define HAL_RTC_MODULE_ENABLED    /* calendar on LSE (rtc.c) */
 /* #define HAL_SAI_MODULE_ENABLED */
 #define HAL_SD_MODULE_ENABLED     /* microSD over SDIO (sdcard.c) */
-/* #define HAL_SPI_MODULE_ENABLED */
+#define HAL_SPI_MODULE_ENABLED    /* SPI2: W25Q flash (extflash.c), later RW007 */
 #define HAL_TIM_MODULE_ENABLED
 #define HAL_UART_MODULE_ENABLED
 /* #define HAL_USART_MODULE_ENABLED */
