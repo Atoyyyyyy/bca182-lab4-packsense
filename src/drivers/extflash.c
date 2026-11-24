@@ -1,6 +1,8 @@
 /*
  * extflash.c: SPI NOR flash on SPI2, HAL polled transfers, mode 0,
  * SPI2 clock = PCLK1 42 MHz / 4 = 10.5 MHz (well below any W25Q limit).
+ * The bus is shared with the RW007 (spi2_bus.c): every chip-select window
+ * holds the SPI2 mutex.
  */
 #include "extflash.h"
 
@@ -10,6 +12,7 @@
 #include "task.h"
 
 #include "board_pins.h"
+#include "spi2_bus.h"
 
 #define CMD_WREN     0x06U
 #define CMD_RDSR1    0x05U
@@ -25,29 +28,30 @@
 #define PAGE         256U
 #define SPI_TIMEOUT  100U
 
-static SPI_HandleTypeDef s_spi;
 static extflash_info_t s_info;
 static uint8_t s_save[SECTOR];
 static uint8_t s_page[PAGE];
 
 static inline void cs_low(void)
 {
+    spi2_take();
     HAL_GPIO_WritePin(FLASH_CS_PORT, FLASH_CS_PIN, GPIO_PIN_RESET);
 }
 
 static inline void cs_high(void)
 {
     HAL_GPIO_WritePin(FLASH_CS_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
+    spi2_give();
 }
 
 static status_t xfer(const uint8_t *tx, uint16_t ntx, uint8_t *rx, uint16_t nrx)
 {
     status_t st = ST_OK;
     cs_low();
-    if (ntx && HAL_SPI_Transmit(&s_spi, (uint8_t *)tx, ntx, SPI_TIMEOUT) != HAL_OK) {
+    if (ntx && HAL_SPI_Transmit(spi2_bus_handle(), (uint8_t *)tx, ntx, SPI_TIMEOUT) != HAL_OK) {
         st = ST_TIMEOUT;
     }
-    if (st == ST_OK && nrx && HAL_SPI_Receive(&s_spi, rx, nrx, SPI_TIMEOUT) != HAL_OK) {
+    if (st == ST_OK && nrx && HAL_SPI_Receive(spi2_bus_handle(), rx, nrx, SPI_TIMEOUT) != HAL_OK) {
         st = ST_TIMEOUT;
     }
     cs_high();
@@ -86,38 +90,6 @@ static status_t wait_ready(uint32_t timeout_ms, bool sleep)
     }
 }
 
-static void gpio_init(void)
-{
-    GPIO_InitTypeDef gpio = {0};
-
-    __HAL_RCC_GPIOB_CLK_ENABLE();
-    __HAL_RCC_GPIOC_CLK_ENABLE();
-    __HAL_RCC_GPIOF_CLK_ENABLE();
-    __HAL_RCC_SPI2_CLK_ENABLE();
-
-    /* Both chip selects high before anything else. */
-    HAL_GPIO_WritePin(FLASH_CS_PORT, FLASH_CS_PIN, GPIO_PIN_SET);
-    HAL_GPIO_WritePin(WIFI_CS_PORT, WIFI_CS_PIN, GPIO_PIN_SET);
-    gpio.Mode = GPIO_MODE_OUTPUT_PP;
-    gpio.Pull = GPIO_NOPULL;
-    gpio.Speed = GPIO_SPEED_FREQ_HIGH;
-    gpio.Pin = FLASH_CS_PIN;
-    HAL_GPIO_Init(FLASH_CS_PORT, &gpio);
-    gpio.Pin = WIFI_CS_PIN;
-    HAL_GPIO_Init(WIFI_CS_PORT, &gpio);
-
-    gpio.Mode = GPIO_MODE_AF_PP;
-    gpio.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    gpio.Alternate = SPI2_GPIO_AF;
-    gpio.Pin = SPI2_SCK_PIN;
-    HAL_GPIO_Init(SPI2_SCK_PORT, &gpio);
-    gpio.Pin = SPI2_MOSI_PIN;
-    HAL_GPIO_Init(SPI2_MOSI_PORT, &gpio);
-    gpio.Pull = GPIO_PULLUP; /* MISO floats while no chip is selected */
-    gpio.Pin = SPI2_MISO_PIN;
-    HAL_GPIO_Init(SPI2_MISO_PORT, &gpio);
-}
-
 static void read_sfdp(void)
 {
     /* SFDP read: 0x5A, 24-bit address, 1 dummy byte (JESD216). */
@@ -150,24 +122,10 @@ static void read_sfdp(void)
 status_t extflash_init(void)
 {
     memset(&s_info, 0, sizeof s_info);
-    gpio_init();
-
-    s_spi.Instance = SPI2;
-    s_spi.Init.Mode = SPI_MODE_MASTER;
-    s_spi.Init.Direction = SPI_DIRECTION_2LINES;
-    s_spi.Init.DataSize = SPI_DATASIZE_8BIT;
-    s_spi.Init.CLKPolarity = SPI_POLARITY_LOW;
-    s_spi.Init.CLKPhase = SPI_PHASE_1EDGE; /* mode 0 */
-    s_spi.Init.NSS = SPI_NSS_SOFT;
-    s_spi.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
-    s_spi.Init.FirstBit = SPI_FIRSTBIT_MSB;
-    s_spi.Init.TIMode = SPI_TIMODE_DISABLE;
-    s_spi.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-    s_spi.Init.CRCPolynomial = 7;
-    if (HAL_SPI_Init(&s_spi) != HAL_OK) {
+    if (spi2_bus_init() != ST_OK) {
         return ST_BUS_ERR;
     }
-    s_info.spi_hz = HAL_RCC_GetPCLK1Freq() / 4U;
+    s_info.spi_hz = spi2_bus_hz();
 
     (void)cmd(CMD_RELEASE); /* in case an earlier firmware left it powered down */
     vTaskDelay(pdMS_TO_TICKS(1));
@@ -198,8 +156,8 @@ status_t extflash_read(uint32_t addr, uint8_t *buf, uint32_t len)
     const uint8_t c[4] = {CMD_READ, (uint8_t)(addr >> 16), (uint8_t)(addr >> 8), (uint8_t)addr};
     status_t st = ST_OK;
     cs_low();
-    if (HAL_SPI_Transmit(&s_spi, (uint8_t *)c, 4, SPI_TIMEOUT) != HAL_OK ||
-        HAL_SPI_Receive(&s_spi, buf, (uint16_t)len, SPI_TIMEOUT) != HAL_OK) {
+    if (HAL_SPI_Transmit(spi2_bus_handle(), (uint8_t *)c, 4, SPI_TIMEOUT) != HAL_OK ||
+        HAL_SPI_Receive(spi2_bus_handle(), buf, (uint16_t)len, SPI_TIMEOUT) != HAL_OK) {
         st = ST_TIMEOUT;
     }
     cs_high();
@@ -226,8 +184,8 @@ static status_t program_page(uint32_t addr, const uint8_t *data)
     const uint8_t c[4] = {CMD_PP, (uint8_t)(addr >> 16), (uint8_t)(addr >> 8), (uint8_t)addr};
     status_t st = ST_OK;
     cs_low();
-    if (HAL_SPI_Transmit(&s_spi, (uint8_t *)c, 4, SPI_TIMEOUT) != HAL_OK ||
-        HAL_SPI_Transmit(&s_spi, (uint8_t *)data, PAGE, SPI_TIMEOUT) != HAL_OK) {
+    if (HAL_SPI_Transmit(spi2_bus_handle(), (uint8_t *)c, 4, SPI_TIMEOUT) != HAL_OK ||
+        HAL_SPI_Transmit(spi2_bus_handle(), (uint8_t *)data, PAGE, SPI_TIMEOUT) != HAL_OK) {
         st = ST_TIMEOUT;
     }
     cs_high();
