@@ -59,15 +59,15 @@ M2 drivers poll and do not use these lines yet).
 
 | Item | Value | Status |
 |---|---|---|
-| Panel | 1.3" 240×240, controller **ST7789V3**, 24-pin FPC | S |
-| Interface | **FSMC, 8-bit 8080 parallel** (`IM1/2` tied for 8-bit, check during M2) | S |
-| Chip select | FSMC_NE3 → **PG10** (Bank 1, region 3 → base `0x6800_0000`) | S |
-| D/C (RS) | FSMC_A18 → **PD13** (8-bit bus: data address = base + `1<<18`) | S |
-| Data D0..D7 | PD14, PD15, PD0, PD1, PE7, PE8, PE9, PE10 | S |
-| RD / WR | FSMC_NOE PD4 / FSMC_NWE PD5 | S |
-| Reset | GPIO_LCD_RST → **PD3** | S |
-| Tearing effect | GPIO_LCD_TE ← **PD6** | S |
-| Backlight | GPIO_LCD_BL → **PF9**, drives an S8050 NPN low-side, **active high** | S |
+| Panel | 1.3" 240×240, controller **ST7789V3**, 24-pin FPC | ✔ [`m2_lcd.log`](../../evidence/m2_lcd.log): answers on the bus, ID `81 81 B3`, full 240×240 area visible (white frame on all four edges). Orientation (MADCTL) not yet confirmed |
+| Interface | **FSMC, 8-bit 8080 parallel** (`IM1/2` tied for 8-bit) | ✔ [`m2_lcd.log`](../../evidence/m2_lcd.log): `lcd bus` write/read-back PASS on D0..D7 in 8-bit mode |
+| Chip select | FSMC_NE3 → **PG10** (Bank 1, region 3 → base `0x6800_0000`) | ✔ [`m2_lcd.log`](../../evidence/m2_lcd.log) |
+| D/C (RS) | FSMC_A18 → **PD13** (8-bit bus: data address = base + `1<<18`) | ✔ [`m2_lcd.log`](../../evidence/m2_lcd.log) |
+| Data D0..D7 | PD14, PD15, PD0, PD1, PE7, PE8, PE9, PE10 | ✔ [`m2_lcd.log`](../../evidence/m2_lcd.log) (`lcd bus` PASS) |
+| RD / WR | FSMC_NOE PD4 / FSMC_NWE PD5 | ✔ [`m2_lcd.log`](../../evidence/m2_lcd.log) (register reads and writes) |
+| Reset | GPIO_LCD_RST → **PD3** | ✔ [`m2_lcd.log`](../../evidence/m2_lcd.log) (init after reset pulse) |
+| Tearing effect | GPIO_LCD_TE ← **PD6** | ✔ [`m2_lcd.log`](../../evidence/m2_lcd.log) (59.11 Hz) |
+| Backlight | GPIO_LCD_BL → **PF9**, drives an S8050 NPN low-side, **active high** | ✔ [`m2_lcd.log`](../../evidence/m2_lcd.log) (operator: off goes dark) |
 
 ## Indicators and outputs
 

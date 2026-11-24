@@ -90,6 +90,27 @@ got no press, a stray UP tap fell in the LEFT window, and the quick-tap step
 has 2 RIGHT taps instead of 3. RIGHT's raw-edge count (6 = 3 presses × 2)
 shows the board saw exactly the presses that were logged.
 
+### M2 on-board results: LCD
+
+Captured with `tools/capture_m2.py lcd`, firmware `15df5af` (clean build).
+The init values and bus timing follow the board vendor's driver (see
+`docs/test_sheets/m2_lcd.md`).
+
+| Check | Measured | Source |
+|---|---|---|
+| Init | OK in 333 ms (two 100 ms reset waits + 120 ms sleep-out) | `m2_lcd.log` |
+| Controller ID (RDDID) | `81 81 B3` | `m2_lcd.log` |
+| Power mode (RDDPM) | `0x9C`: booster on, sleep out, normal mode, display on | `m2_lcd.log` |
+| FSMC data lines | `lcd bus` PASS 6/6: D0..D7 written and read back at both levels. COLMOD reads back bits 2..0 only (`0x65` → `0x05`) | `m2_lcd.log` |
+| Frame rate (TE pin PD6) | 16 917 µs period = **59.11 Hz** over 31 edges | `lcd te`, `m2_lcd.log` |
+| Full-screen write | 240×240×2 B in **13.39 ms** (≈ 8.6 MB/s, about 116 ns per byte with 9+8 HCLK write timing) | `lcd fill`, `m2_lcd.log` |
+| Colours, backlight, edges | white/red/green/blue correct, no dead lines; backlight off goes dark; white frame visible on all four edges | operator answers, `m2_lcd_cues.txt` |
+| Orientation | **not recorded** (the corner questions were answered `y`); no photo | TODO (H): `capture_m2.py lcd --force` |
+
+For the UI (M5): one full redraw takes about 13 ms, i.e. almost one frame
+(16.9 ms), so a full refresh every 50 ms is affordable. Partial redraws (PRD 6.2)
+are still the plan. The CLI task busy-waits during `lcd te`, for about 0.5 s.
+
 ### M1 on-board results
 
 From `evidence/m1_boot.log` (firmware git `8d71a0c`, RT-Spark HW1.1), checked with
