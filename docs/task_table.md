@@ -206,6 +206,36 @@ Static memory, from `evidence/m1_build.txt` (linker `--print-memory-usage`):
 FLASH 23104 B (2.20 %), RAM 49712 B (37.93 %, includes the 40 KB FreeRTOS heap),
 CCM RAM 2192 B (3.34 %).
 
+## M3–M5 (data capture + product firmware)
+
+The full PRD §6.3 task set. Priorities, stacks and periods are from
+`include/app_config.h`. All stacks and TCBs are static, in CCM RAM. HWM:
+`TODO(measure)` until it comes from a `diag mem` dump in an `evidence/` log
+(M5 parity / M6 soak); `tools/analyze_soak.py` prints the lowest value per task.
+
+| Task | Function | Prio | Stack (words) | Period / activation | Communication | Watchdog check-in | HWM (measured) |
+|---|---|---|---|---|---|---|---|
+| `Sensor` | IMU 100 Hz, AP3216C every 5th tick; validates, time-stamps, flags each sample (PRD 6.4); DEGRADED after 3 failed reads, IMU re-init every 5 s; `fault inject` | 5 | 512 | `xTaskDelayUntil` 10 ms while sampling; sleeps on a notification otherwise | → `qSamples` (64 × `sample_t`); I2C2 mutex | every sample (≤ 500 ms idle) | TODO(measure) |
+| `Infer` | 200-sample ring (stored as capture-log records, so quantised like the training data), validity check, 42 features, MLP, baseline, majority-of-3 smoothing; DWT timing | 4 | 1024 | every sample; a window every 50 samples (0.5 s hop) | ← `qSamples`; → `qResults` (4) to `Ui` | every loop (≤ 200 ms) | TODO(measure) |
+| `Ui` | Boot self-test, mode state machine (`app_mode.c`), keys, LCD screens, LED / LED matrix / buzzer, alerts, climate rule, `[win]` log line | 3 | 768 | waits ≤ 50 ms on `qResults`; DIAG redraw 500 ms | ← `qResults`, key queue, mode requests; → `qLog` | every loop | TODO(measure) |
+| `Capture` | CAPTURE mode (M3): trials to the flash log, its own keys / LCD / LED handling | 3 | 768 | 10 ms loop in the mode; request queue (1 s timeout) otherwise | ← `qSamples` (only in CAPTURE), request queue + ack semaphore | every loop (≤ 1 s) | TODO(measure) |
+| `Env` | AHT 1 Hz; ALS/PS and AHT re-init while DEGRADED | 2 | 384 | `xTaskDelayUntil` 1000 ms | soft-I2C (own bus); latest T/RH copied into each sample | twice per period | TODO(measure) |
+| `CLI` | Console commands (DIAG readouts, `mode`, `fault`, `selftest model`, `capture dump`…) | 2 | 1024 | blocks on console RX | console mutex; requests to `Ui` / `Capture` | **not monitored**: service commands may block for minutes (`capture dump`); a CLI that spins at prio 2 starves `Log` and `Heartbeat`, which then miss their check-ins | TODO(measure) |
+| `Log` | Event ring in SPI flash 0x000000–0x00FFFF (2048 × 32 B, seq + checksum), `[event]` console line, `log` command | 1 | 1024 | blocks on `qLog` (1 s timeout) | ← `qLog` (16); SPI2 bus mutex | every loop (≤ 1 s) | TODO(measure) |
+| `Heartbeat` | Watchdog feeder: every 500 ms checks the 2 s check-in window and feeds the IWDG only if all 7 monitored tasks checked in; optional `[hb]` line | 1 | 256 | `xTaskDelayUntil` 500 ms | check-in event group | is the feeder | TODO(measure) |
+
+Watchdog: IWDG timeout 4 s (LSI / 64), frozen while a debugger halts the core.
+A missing check-in is printed (`[wdg] check-in missing ...`), saved in RTC
+backup register 19, reported after the reset and logged as a `WDG` event.
+`fault hang <task>` stops that task's check-ins to demonstrate it.
+
+Agent-side check on the board (not evidence; the numbers for the report come
+from the M5/M6 logs): with the placeholder model, a 2 s window took 3.3–4.6 ms
+for the features; window close → LCD/LED feedback 19–28 ms; `diag mem` showed
+every task ≥ 101 words free; `fault hang infer` reset the board in ~8 s and the
+next boot named `Infer`. With a temporary synthetic model: MLP 123 µs, and
+`selftest model` matched 50/50 even while `Infer` ran at the same time.
+
 ## Interrupts
 
 | IRQ | NVIC priority | Calls FreeRTOS API? | Purpose |
@@ -213,7 +243,8 @@ CCM RAM 2192 B (3.34 %).
 | TIM6_DAC | 4 | no (must not) | HAL tick (`HAL_GetTick`, HAL timeouts) |
 | I2C2_EV / I2C2_ER | 5 | yes: `vTaskNotifyGiveIndexedFromISR` (slot 1) | I2C2 transfer completion / error → wakes the waiting task |
 | USART1 | 6 | yes: `xStreamBufferSendFromISR` | console TX ring buffer; RX bytes → CLI stream buffer |
-| EXTI0 / EXTI1 / EXTI4 / EXTI9_5 | 7 | yes: `xQueueSendFromISR` | arrow keys LEFT PC0, DOWN PC1, RIGHT PC4, UP PC5: timestamp each raw edge into the button queue; debounce (30 ms) runs in the consuming task |
+| EXTI0 / EXTI1 / EXTI4 / EXTI9_5 | 7 | yes: `xQueueSendFromISR` | arrow keys LEFT PC0, DOWN PC1, RIGHT PC4, UP PC5: timestamp each raw edge into the button queue; debounce (30 ms) runs in the consuming task. EXTI9_5 is shared with the IR receiver PF8 (`ir rx`, edge counting only) |
+| EXTI15_10 | 7 | yes: `xSemaphoreGiveFromISR` | RW007 INT (PG11) falling edge → wakes the SPI transfer (`wifi` commands only) |
 | SysTick | 15 | kernel | FreeRTOS tick |
 | PendSV / SVC | 15 / — | kernel | context switch / first task start |
 

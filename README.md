@@ -10,11 +10,12 @@ BCA182 Embedded Systems Programming, Lab Activity No. 4, MSU-IIT CCS.
 Team: Sherie Grace L. Lupoz · Renato G. Beroy · Binyusoph P. Sansarona
 ([authors and contributions](#authors-and-contributions)).
 
-> **Status:** M1 done (`evidence/m1_boot.log` passes all checks). M2 in progress:
-> console commands and the three I2C sensors (IMU, light/proximity,
-> temperature/humidity) work on the board, with evidence logs
-> ([results](docs/task_table.md#m2-on-board-results-i2c-sensors)). The remaining
-> modules (LEDs, buzzer, keys, LCD, LED matrix, RTC, SD, flash, Wi-Fi) are next.
+> **Status:** M1 done. M2: every module verified on the board with evidence
+> logs except the Wi-Fi capture. M3 capture firmware/tools and the M4 ML
+> pipeline + C inference are written and checked (synthetic smoke test only;
+> no real data yet). M5 product firmware (all PRD §6.3 tasks, modes, alerts,
+> event log, watchdog) runs on the board with a placeholder model. **Next:**
+> record the M3 sessions, then train/export the real model.
 > See [Milestones](#milestones).
 
 ## Hardware
@@ -38,8 +39,8 @@ boards/       custom RT-Spark PlatformIO board manifest       (M1)
 linker/       linker script with .ccmram                       (M1)
 include/      FreeRTOSConfig.h, HAL conf, app config, secrets.example.h
 lib/          vendored FreeRTOS, FatFs                         (M1/M2)
-src/          main, drivers/, dsp/, model/, app/               (M1–M5)
-test/         native parity tests, golden vectors              (M4)
+src/          main, drivers/, dsp/, model/, app/, ui/          (M1–M5)
+test/golden/  golden vectors for `selftest model` (generated)  (M4)
 ml/           data prep, features, baseline, training, export (M3–M4)
 tools/        capture, latency/soak analysis, hw-doc fetcher
 data/         anonymized raw captures + manifest               (M3)
@@ -73,10 +74,16 @@ pio device monitor
 
 The board prints a banner (git revision, reset cause, clock source, PLL
 settings read back from RCC, bus clocks, HAL/FreeRTOS versions), then
-`[cli] ready, type 'help'` and `[rtos] scheduler started`. The red LED blinks
-at 1 Hz (500 ms on, 500 ms off). Since M2 the once-per-second `[hb] ...` lines
-are off by default; `hb on` turns them back on (needed for
-`tools/check_heartbeat.py`, which checked `evidence/m1_boot.log`).
+`[cli] ready, type 'help'` and `[rtos] scheduler started`. Since M5 the UI task
+then runs the boot self-test (LCD list + `[selftest] <part> OK|absent|FAIL`
+lines, about 2 s), starts the watchdog and enters RUN: the LCD shows the state,
+its confidence and the "why" values, and one `[win] ...` line per 0.5 s goes to
+the console (`infer log off` stops them). Without a trained model the state reads
+`NO MODEL` and nothing is classified. Keys, screens and commands:
+[`docs/test_sheets/m5_product.md`](docs/test_sheets/m5_product.md).
+
+The M1 heartbeat lines (`[hb] ...`, for `tools/check_heartbeat.py`) are off by
+default; `hb on` turns them back on.
 
 ### Console commands (M2)
 
@@ -95,6 +102,11 @@ Type into `pio device monitor`. `help` lists everything; any key stops a stream.
 | `diag mem` | heap, per-task stack high-water mark, CPU share |
 | `version`, `uptime`, `hb on\|off`, `reset` | housekeeping |
 
+M3–M5 add: `capture`, `capture on|off|label|start|stop|dump|wipe` (recording
+trials, see [`m3_capture.md`](docs/test_sheets/m3_capture.md)); `mode`,
+`infer`, `ui`, `selftest model`, `fault`, `climate`, `log`, `wifi on|off`
+(see [`m5_product.md`](docs/test_sheets/m5_product.md)).
+
 Analyse captured streams with `python tools/m2_sensor_stats.py <log>`. The
 M2 capture procedures are in [`docs/test_sheets/m2_sensors.md`](docs/test_sheets/m2_sensors.md)
 and [`docs/test_sheets/m2_io.md`](docs/test_sheets/m2_io.md).
@@ -105,10 +117,10 @@ and [`docs/test_sheets/m2_io.md`](docs/test_sheets/m2_io.md).
 |---|---|---|
 | M0 | Repo + design docs | done (concept sign-off: TODO) |
 | M1 | PlatformIO board + FreeRTOS bring-up | done: on-board log passes `check_heartbeat.py` ([results](docs/task_table.md#m1-on-board-results)); LED blink by eye: TODO(measure) |
-| M2 | Sensor/module drivers + DIAG mode | in progress: I2C sensors verified on the board ([results](docs/task_table.md#m2-on-board-results-i2c-sensors), [test sheet](docs/test_sheets/m2_sensors.md)); other modules next |
-| M3 | Data capture | — |
-| M4 | Features, baseline, model, C export | — |
-| M5 | On-device inference + product firmware | — |
+| M2 | Sensor/module drivers + DIAG mode | all modules verified with evidence logs ([results](docs/task_table.md#m2-on-board-results-i2c-sensors)) except Wi-Fi: capture pending (`capture_m2.py wifi`) |
+| M3 | Data capture | firmware (CAPTURE mode → SPI flash log), `tools/capture.py`, protocol ([data/README.md](data/README.md), [test sheet](docs/test_sheets/m3_capture.md)) done; **recording sessions: TODO (H)** |
+| M4 | Features, baseline, model, C export | `ml/` pipeline, C features + MLP + baseline, `selftest model` done and smoke-tested on synthetic data; **real training: after M3** |
+| M5 | On-device inference + product firmware | firmware done and running (placeholder model); parity + functional check after M4 ([test sheet](docs/test_sheets/m5_product.md)) |
 | M6 | Testing and evaluation | — |
 | M7 | Report, README, demo | — |
 
