@@ -40,3 +40,23 @@ const char *fmt_f(char *buf, size_t n, float v, unsigned decimals)
     }
     return buf;
 }
+
+const char *fmt_e(char *buf, size_t n, float v)
+{
+    if (!isfinite(v)) {
+        return fmt_f(buf, n, v, 0);
+    }
+    if (v == 0.0f) {
+        (void)snprintf(buf, n, "0");
+        return buf;
+    }
+    int e = (int)floorf(log10f(fabsf(v)));
+    float m = v / powf(10.0f, (float)e);
+    if (fabsf(m) >= 9.995f) { /* rounding to 2 decimals would give 10.00 */
+        m /= 10.0f;
+        e++;
+    }
+    char mb[FMT_F_BUF];
+    (void)snprintf(buf, n, "%se%d", fmt_f(mb, sizeof mb, m, 2), e);
+    return buf;
+}

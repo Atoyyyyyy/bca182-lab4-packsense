@@ -17,4 +17,8 @@
    gives "0.00". Returns buf. Non-finite values give "nan"/"inf". */
 const char *fmt_f(char *buf, size_t n, float v, unsigned decimals);
 
+/* Scientific notation with 3 significant digits, e.g. "3.14e-6" (for tiny
+   error values). Returns buf. */
+const char *fmt_e(char *buf, size_t n, float v);
+
 #endif /* FMT_H */
