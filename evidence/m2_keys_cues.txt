@@ -1,0 +1,14 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-24)
+14:20:14.885 sent: keys 4
+14:20:15.221 cue: press UP once (the single key above the row), then let go
+14:20:19.437 sent: keys 4
+14:20:19.805 cue: press DOWN once (bottom row, middle), then let go
+14:20:23.999 sent: keys 4
+14:20:24.328 cue: press LEFT once (bottom row, next to the red RESET), then let go
+14:20:28.566 sent: keys 4
+14:20:28.957 cue: press RIGHT once (bottom row, right end), then let go
+14:20:43.982 sent: keys 5
+14:20:44.325 cue: press and HOLD UP ...
+14:20:46.837 cue: LET GO of UP
+14:20:53.646 sent: keys 4
+14:20:53.978 cue: tap RIGHT 3 times quickly, then hands off

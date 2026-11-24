@@ -1,0 +1,78 @@
+14:20:05.262 > 
+14:20:05.263 > 
+14:20:05.263 > === PackSense 0.2.0-m2 (git f8029de) built Nov 23 2026 19:31:34 ===
+14:20:05.325 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+14:20:05.325 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+14:20:05.325 > [boot] clock source: HSE 8 MHz crystal -> PLL
+14:20:05.325 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+14:20:05.325 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+14:20:05.325 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+14:20:05.325 > [boot] FPU: CPACR CP10/CP11=full access
+14:20:05.326 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40952 B usable), max syscall prio 5
+14:20:05.326 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+14:20:05.326 > [boot] starting scheduler
+14:20:05.326 > [cli] ready, type 'help'
+14:20:05.326 > > [rtos] scheduler started, first task running at tick 0
+14:20:14.965 > keys 4
+14:20:14.965 > # keys listen s=4 debounce_ms=30 long_ms=800 cols=t_ms,key,event,held_ms,long,edges
+14:20:16.582 > key,11230,UP,press,0,0,1
+14:20:16.705 > key,11346,UP,release,116,0,1
+14:20:19.015 > # keys end: 2 events
+14:20:19.015 > [keys] UP    presses=1 long=0 raw_edges=4 dropped=0 now=up
+14:20:19.015 > [keys] DOWN  presses=0 long=0 raw_edges=0 dropped=0 now=up
+14:20:19.015 > [keys] LEFT  presses=0 long=0 raw_edges=0 dropped=0 now=up
+14:20:19.015 > [keys] RIGHT presses=0 long=0 raw_edges=0 dropped=0 now=up
+14:20:19.015 > > keys 4
+14:20:19.517 > # keys listen s=4 debounce_ms=30 long_ms=800 cols=t_ms,key,event,held_ms,long,edges
+14:20:22.098 > key,16770,UP,press,0,0,1
+14:20:22.219 > key,16893,UP,release,123,0,3
+14:20:22.650 > key,17284,DOWN,press,0,0,1
+14:20:22.823 > key,17473,DOWN,release,189,0,1
+14:20:23.513 > # keys end: 4 events
+14:20:23.513 > [keys] UP    presses=2 long=0 raw_edges=8 dropped=0 now=up
+14:20:23.513 > [keys] DOWN  presses=1 long=0 raw_edges=2 dropped=0 now=up
+14:20:23.513 > [keys] LEFT  presses=0 long=0 raw_edges=0 dropped=0 now=up
+14:20:23.513 > [keys] RIGHT presses=0 long=0 raw_edges=0 dropped=0 now=up
+14:20:23.570 > > keys 4
+14:20:24.078 > # keys listen s=4 debounce_ms=30 long_ms=800 cols=t_ms,key,event,held_ms,long,edges
+14:20:26.508 > key,21158,DOWN,press,0,0,1
+14:20:26.570 > key,21244,DOWN,release,86,0,1
+14:20:28.067 > # keys end: 2 events
+14:20:28.067 > [keys] UP    presses=2 long=0 raw_edges=8 dropped=0 now=up
+14:20:28.129 > [keys] DOWN  presses=2 long=0 raw_edges=4 dropped=0 now=up
+14:20:28.129 > [keys] LEFT  presses=0 long=0 raw_edges=0 dropped=0 now=up
+14:20:28.129 > [keys] RIGHT presses=0 long=0 raw_edges=0 dropped=0 now=up
+14:20:28.130 > > keys 4
+14:20:28.644 > # keys listen s=4 debounce_ms=30 long_ms=800 cols=t_ms,key,event,held_ms,long,edges
+14:20:30.266 > key,24896,LEFT,press,0,0,1
+14:20:30.329 > key,24998,LEFT,release,102,0,1
+14:20:30.452 > key,25088,RIGHT,press,0,0,1
+14:20:30.577 > key,25251,RIGHT,release,163,0,1
+14:20:32.242 > key,26867,UP,press,0,0,1
+14:20:32.417 > key,27057,LEFT,press,0,0,1
+14:20:32.667 > key,27313,LEFT,release,256,0,1
+14:20:32.667 > # keys end: 7 events
+14:20:32.667 > [keys] UP    presses=3 long=0 raw_edges=9 dropped=0 now=down
+14:20:32.667 > [keys] DOWN  presses=2 long=0 raw_edges=4 dropped=0 now=up
+14:20:32.667 > [keys] LEFT  presses=2 long=0 raw_edges=6 dropped=0 now=up
+14:20:32.667 > [keys] RIGHT presses=1 long=0 raw_edges=2 dropped=0 now=up
+14:20:32.667 > > keys 5
+14:20:44.075 > # keys listen s=5 debounce_ms=30 long_ms=800 cols=t_ms,key,event,held_ms,long,edges
+14:20:49.061 > # keys end: 0 events
+14:20:49.061 > [keys] UP    presses=3 long=0 raw_edges=10 dropped=0 now=up
+14:20:49.061 > [keys] DOWN  presses=2 long=0 raw_edges=6 dropped=0 now=up
+14:20:49.061 > [keys] LEFT  presses=2 long=0 raw_edges=6 dropped=0 now=up
+14:20:49.061 > [keys] RIGHT presses=1 long=0 raw_edges=4 dropped=0 now=up
+14:20:49.061 > > keys 4
+14:20:53.726 > # keys listen s=4 debounce_ms=30 long_ms=800 cols=t_ms,key,event,held_ms,long,edges
+14:20:56.922 > key,51591,LEFT,press,0,0,1
+14:20:57.030 > key,51692,LEFT,release,101,0,1
+14:20:57.087 > key,51760,LEFT,press,0,0,1
+14:20:57.203 > key,51843,LEFT,release,83,0,1
+14:20:57.257 > key,51899,LEFT,press,0,0,1
+14:20:57.312 > key,51988,LEFT,release,89,0,3
+14:20:57.755 > # keys end: 6 events
+14:20:57.755 > [keys] UP    presses=3 long=0 raw_edges=12 dropped=0 now=up
+14:20:57.756 > [keys] DOWN  presses=2 long=0 raw_edges=6 dropped=0 now=up
+14:20:57.756 > [keys] LEFT  presses=5 long=0 raw_edges=14 dropped=0 now=up
+14:20:57.756 > [keys] RIGHT presses=1 long=0 raw_edges=4 dropped=0 now=up
