@@ -19,6 +19,7 @@
 #define CMD_READ     0x03U
 #define CMD_PP       0x02U
 #define CMD_SE4K     0x20U
+#define CMD_BE64K    0xD8U
 #define CMD_JEDEC    0x9FU
 #define CMD_SFDP     0x5AU
 #define CMD_RELEASE  0xABU /* release from power-down */
@@ -174,6 +175,49 @@ static status_t erase_sector(uint32_t addr)
         return ST_TIMEOUT;
     }
     return wait_ready(1000U, true);
+}
+
+status_t extflash_erase_sector(uint32_t addr)
+{
+    return s_info.initialised ? erase_sector(addr & ~(SECTOR - 1U)) : ST_NOT_PRESENT;
+}
+
+status_t extflash_erase_block(uint32_t addr)
+{
+    if (!s_info.initialised) {
+        return ST_NOT_PRESENT;
+    }
+    addr &= ~(EXTFLASH_BLOCK - 1U);
+    if (cmd(CMD_WREN) != ST_OK) {
+        return ST_TIMEOUT;
+    }
+    const uint8_t c[4] = {CMD_BE64K, (uint8_t)(addr >> 16), (uint8_t)(addr >> 8), (uint8_t)addr};
+    if (xfer(c, 4, NULL, 0) != ST_OK) {
+        return ST_TIMEOUT;
+    }
+    return wait_ready(3000U, true);
+}
+
+status_t extflash_program(uint32_t addr, const uint8_t *data, uint32_t len)
+{
+    if (!s_info.initialised) {
+        return ST_NOT_PRESENT;
+    }
+    if (len == 0U || len > PAGE || ((addr & (PAGE - 1U)) + len) > PAGE) {
+        return ST_RANGE_ERR;
+    }
+    if (cmd(CMD_WREN) != ST_OK) {
+        return ST_TIMEOUT;
+    }
+    const uint8_t c[4] = {CMD_PP, (uint8_t)(addr >> 16), (uint8_t)(addr >> 8), (uint8_t)addr};
+    status_t st = ST_OK;
+    cs_low();
+    if (HAL_SPI_Transmit(spi2_bus_handle(), (uint8_t *)c, 4, SPI_TIMEOUT) != HAL_OK ||
+        HAL_SPI_Transmit(spi2_bus_handle(), (uint8_t *)data, (uint16_t)len, SPI_TIMEOUT) != HAL_OK) {
+        st = ST_TIMEOUT;
+    }
+    cs_high();
+    return (st != ST_OK) ? st : wait_ready(20U, false);
 }
 
 static status_t program_page(uint32_t addr, const uint8_t *data)

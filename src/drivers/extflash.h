@@ -4,12 +4,12 @@
  *
  * Only standard SPI-NOR commands are used (JEDEC ID 0x9F, SFDP 0x5A, read
  * 0x03, write enable 0x06, page program 0x02, 4 KB sector erase 0x20, status
- * 0x05), and the capacity is taken from the chip's own SFDP table (JESD216),
+ * 0x05, 64 KB block erase 0xD8), and the capacity is taken from the chip's own SFDP table (JESD216),
  * so nothing depends on the exact part number.
  *
- * SPI2 is shared with the RW007 Wi-Fi module: both chip selects are held
- * high at init. A bus mutex is added with the Wi-Fi driver (M2 Wi-Fi step);
- * until then only the CLI task uses SPI2.
+ * SPI2 is shared with the RW007 Wi-Fi module (spi2_bus.c holds the mutex).
+ * Callers that write must serialise among themselves (one owner per region:
+ * the capture log owns 0x010000..0x7EFFFF, see caplog.h).
  */
 #ifndef EXTFLASH_H
 #define EXTFLASH_H
@@ -44,6 +44,18 @@ status_t extflash_init(void);
 void extflash_get_info(extflash_info_t *info);
 
 status_t extflash_read(uint32_t addr, uint8_t *buf, uint32_t len);
+
+#define EXTFLASH_SECTOR 4096U
+#define EXTFLASH_BLOCK  65536U
+#define EXTFLASH_PAGE   256U
+
+/* Erase one 4 KB sector / one 64 KB block (address rounded down). Sleep-waits
+   (vTaskDelay) for completion: ~60 ms / ~150-300 ms on this chip. */
+status_t extflash_erase_sector(uint32_t addr);
+status_t extflash_erase_block(uint32_t addr);
+
+/* Program up to one page; must not cross a 256-byte page boundary. */
+status_t extflash_program(uint32_t addr, const uint8_t *data, uint32_t len);
 
 /* Non-destructive write test on the last 4 KB sector: save it, erase,
    program a pattern, verify, then erase and write the saved bytes back. */
