@@ -20,6 +20,7 @@
 #include "app/diag_cmds.h"
 #include "app/io_cmds.h"
 #include "app/lcd_cmds.h"
+#include "app/rtc_cmds.h"
 #include "app/tasks.h"
 #include "app_config.h"
 #include "drivers/console_uart.h"
@@ -150,6 +151,7 @@ int main(void)
     buttons_init();
     io_cmds_register();
     lcd_cmds_register();
+    rtc_cmds_register();
     tasks_create();
 
     console_puts("[boot] starting scheduler\r\n");

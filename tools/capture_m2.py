@@ -9,7 +9,8 @@ Run it with PlatformIO's Python (it has pyserial), from the project folder:
     ... tools\\capture_m2.py all        (the three, one after another)
     ... tools\\capture_m2.py leds | buzzer | keys | io   (io = those three)
     ... tools\\capture_m2.py lcd        (screen: asks what you see)
-    ... tools\\capture_m2.py matrix    (LED matrix: asks what you see)
+    ... tools\\capture_m2.py matrix     (LED matrix: asks what you see)
+    ... tools\\capture_m2.py rtc        (RTC: set from the PC clock, rate check, RESET)
 
 Options: --port COM3 (default: auto-detect the ST-LINK virtual COM port),
          --flash (build + upload first), --force (overwrite an existing log),
@@ -50,6 +51,8 @@ BAUD = 115200
 # sends a command; cues = [(seconds after sending, text), ...] shown on screen;
 # ("ask", question[, words or "text"]) records what YOU saw or heard (y/n or a few words) in the
 # _cues.txt file, for things only a person can check (LED colour, sound).
+# ("reset", text) asks for a RESET press and waits for the board to boot again.
+# In a command, {now} is replaced by the PC's local time ("YYYY-MM-DD hh:mm:ss").
 COLOURS = ["red", "green", "blue", "yellow", "black", "white"]
 
 PLANS = {
@@ -194,6 +197,18 @@ PLANS = {
         ("ask", "Where did it start, and how did it move? (e.g. 'centre, then the ring clockwise')", "text"),
         ("cmd", "matrix", 10, []),
     ],
+    "rtc": [
+        ("say", "RTC test: no hands needed except one RESET press. It takes about 1.5 minutes."),
+        ("cmd", "rtc", 15, []),
+        ("cmd", "rtc set {now}", 10, []),
+        ("cmd", "rtc", 10, []),
+        ("cmd", "rtc check 20", 35, []),
+        ("cmd", "rtc check 20", 35, []),
+        ("reset", "The RTC should keep running through a RESET (same power)."),
+        ("cmd", "rtc", 15, []),
+        ("cmd", "rtc set 2026-02-30 10:00:00", 10, []),
+        ("cmd", "rtc", 10, []),
+    ],
 }
 
 
@@ -320,7 +335,19 @@ def run_plan(name, port, force, out_dir):
                     input(">> Press Enter when ready... ")
                     board.poll()
                     continue
+                if step[0] == "reset":
+                    print("\n>> " + step[1])
+                    print(">> Press the RESET button on the board now.")
+                    cues.write("%s cue: press RESET (%s)\n" % (ts(), step[1]))
+                    n_ready = sum("[cli] ready" in l for l in board.lines)
+                    if not board.wait_for(lambda: sum("[cli] ready" in l for l in board.lines) > n_ready, 60):
+                        print("!! no reboot seen within 60 s")
+                    board.wait_for(board.at_prompt, 3)
+                    cues.flush()
+                    continue
                 _, cmd, timeout, cue_list = step
+                # {now} = the PC's local time when the command is sent.
+                cmd = cmd.replace("{now}", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
                 print("\n>> sending: %s" % cmd)
                 cues.write("%s sent: %s\n" % (ts(), cmd))
                 board.send(cmd)
@@ -468,7 +495,7 @@ def check_als(port):
 
 def main():
     ap = argparse.ArgumentParser(description="Guided M2 sensor evidence capture.")
-    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd", "matrix",
+    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd", "matrix", "rtc",
                                        "find-als", "check-als"],
                     help="all = imu, als, env; io = leds, buzzer, keys; find-als: live light/proximity readout to locate the sensor (writes no files); "
                          "check-als: 20 s timed cover/torch test, saved to logs/ (not evidence)")
