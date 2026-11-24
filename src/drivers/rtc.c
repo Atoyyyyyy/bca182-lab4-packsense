@@ -220,10 +220,12 @@ static bool coarse_edge(uint32_t *cyc, uint32_t timeout_ms)
 static status_t fine_edge(uint32_t from, uint32_t predicted, uint32_t margin_cyc, unsigned before, uint32_t *cyc)
 {
     const uint32_t per_ms = SystemCoreClock / 1000U;
-    const uint32_t wake = predicted - margin_cyc;
-    const uint32_t now = DWT->CYCCNT;
-    if ((int32_t)(wake - now) > 0) {
-        vTaskDelay(pdMS_TO_TICKS((wake - now) / per_ms));
+    /* All times as unsigned offsets from `from` (< 25.5 s, so no wrap). A
+       signed difference would overflow beyond 12.8 s (m2_rtc.log, c4464ec). */
+    const uint32_t wake_off = (predicted - from) - margin_cyc;
+    const uint32_t now_off = DWT->CYCCNT - from;
+    if (now_off < wake_off) {
+        vTaskDelay(pdMS_TO_TICKS((wake_off - now_off) / per_ms));
     }
     if (sec_now() != before) {
         return ST_RANGE_ERR; /* woke too late: prediction off */
