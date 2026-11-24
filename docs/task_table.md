@@ -111,6 +111,22 @@ For the UI (M5): one full redraw takes about 13 ms, i.e. almost one frame
 (16.9 ms), so a full refresh every 50 ms is affordable. Partial redraws (PRD 6.2)
 are still the plan. The CLI task busy-waits during `lcd te`, for about 0.5 s.
 
+### M2 on-board results: LED matrix
+
+Captured with `tools/capture_m2.py matrix`; first run firmware `812b5f2`
+(commit `448999d`), re-run after the fix with `9daf44f`.
+
+| Check | Measured | Source |
+|---|---|---|
+| Frame on the wire | **545 µs** DMA start → complete (computed 459 bit periods × 1.19 µs = 546 µs) | `last_wire_us`, `m2_matrix.log` |
+| Reliability | 26 frames, 0 timeouts, 0 DMA errors | `m2_matrix.log` |
+| Colours | red, green, blue, white on all LEDs; GRB byte order correct | operator answers |
+| Chain | 19 LEDs, lit one at a time in order 1 → 19 | `matrix chase 400`, operator count |
+| Init | 812b5f2: **not** all off after init (buffer enabled while PA7 floated). 9daf44f: all off | both cue files |
+
+TIM3 is shared with the IR transmitter (PB1 = TIM3_CH4): the IR step must
+not reprogram TIM3 behind the matrix driver.
+
 ### M1 on-board results
 
 From `evidence/m1_boot.log` (firmware git `8d71a0c`, RT-Spark HW1.1), checked with
