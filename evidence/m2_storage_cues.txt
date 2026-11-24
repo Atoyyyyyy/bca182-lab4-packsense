@@ -1,0 +1,7 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-24)
+15:17:41.577 sent: sd
+15:17:42.080 sent: sd
+15:17:42.580 sent: flash
+15:17:43.093 sent: flash test
+15:17:43.828 sent: flash test
+15:17:44.559 sent: diag mem

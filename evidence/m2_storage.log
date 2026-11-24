@@ -1,0 +1,40 @@
+15:17:36.896 > 
+15:17:36.897 > 
+15:17:36.897 > === PackSense 0.2.0-m2 (git f8699b4) built Nov 24 2026 15:16:17 ===
+15:17:36.897 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+15:17:36.958 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+15:17:36.958 > [boot] clock source: HSE 8 MHz crystal -> PLL
+15:17:36.959 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+15:17:36.959 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+15:17:36.960 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+15:17:36.964 > [boot] FPU: CPACR CP10/CP11=full access
+15:17:36.965 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40944 B usable), max syscall prio 5
+15:17:36.965 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+15:17:36.965 > [boot] starting scheduler
+15:17:36.965 > [cli] ready, type 'help'
+15:17:36.966 > > [rtos] scheduler started, first task running at tick 0
+15:17:41.641 > sd
+15:17:41.641 > [sd] t=4641 card-detect pin PF3 = high (polarity not confirmed yet)
+15:17:41.642 > [sd] t=4644 init NOT_PRESENT in 3 ms hal_error=0x00000004
+15:17:41.642 > [sd] no card answered on SDIO (none inserted, or not seated)
+15:17:41.642 > > sd
+15:17:42.142 > [sd] t=5143 card-detect pin PF3 = high (polarity not confirmed yet)
+15:17:42.142 > [sd] t=5147 init NOT_PRESENT in 4 ms hal_error=0x00000004
+15:17:42.143 > [sd] no card answered on SDIO (none inserted, or not seated)
+15:17:42.143 > > flash
+15:17:42.656 > [flash] t=5658 init OK: JEDEC ID EF 40 17, SPI2 10500000 Hz
+15:17:42.657 > [flash] SFDP v1.5: density 8388608 bytes (8 MiB)
+15:17:42.657 > [flash] t=5658 JEDEC EF 40 17 size=8388608 bytes
+15:17:42.657 > > flash test
+15:17:43.328 > [flash] t=6368 test OK in 174 ms: sector 0x7FF000 was_blank=yes erase=68 ms program 4096 B=9588 us
+15:17:43.328 > [flash] errors: erase=0 verify=0 restore=0 (bytes)
+15:17:43.391 > > flash test
+15:17:44.060 > [flash] t=7099 test OK in 170 ms: sector 0x7FF000 was_blank=yes erase=65 ms program 4096 B=9588 us
+15:17:44.061 > [flash] errors: erase=0 verify=0 restore=0 (bytes)
+15:17:44.123 > > diag mem
+15:17:44.653 > [diag mem] t=7652 heap_free=40944 heap_min=40928 console_rx_dropped=0
+15:17:44.653 > [diag mem] task            prio state    hwm_words cpu_permille
+15:17:44.653 > [diag mem] CLI                2 run            854           11
+15:17:44.654 > [diag mem] IDLE               0 ready          101          988
+15:17:44.654 > [diag mem] Heartbeat          1 blocked        124            0
+15:17:44.654 > [diag mem] Tmr Svc            2 blocked        223            0
