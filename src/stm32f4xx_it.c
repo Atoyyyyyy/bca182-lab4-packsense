@@ -12,12 +12,14 @@
  * | I2C2_EV/ER    | 5        | yes (notify)    |
  * | USART1        | 6        | yes (RX stream) |
  * | EXTI0/1/4/9_5 | 7        | yes (key queue); EXTI8 = IR RX, no RTOS call |
+ * | EXTI15_10     | 7        | yes (RW007 INT semaphore) |
  * | SysTick/PendSV| 15       | kernel          |
  */
 #include "stm32f4xx_hal.h"
 
 #include "drivers/buttons.h"
 #include "drivers/ir.h"
+#include "drivers/rw007.h"
 #include "drivers/console_uart.h"
 #include "drivers/i2c_bus.h"
 #include "fault.h"
@@ -94,4 +96,9 @@ void EXTI9_5_IRQHandler(void)
 {
     buttons_exti_irq(); /* key UP, PC5 = EXTI5 */
     ir_exti_irq();      /* IR receiver, PF8 = EXTI8 */
+}
+
+void EXTI15_10_IRQHandler(void)
+{
+    rw007_exti_irq(); /* RW007 INT, PG11 = EXTI11 */
 }

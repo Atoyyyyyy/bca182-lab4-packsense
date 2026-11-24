@@ -22,6 +22,7 @@
 #include "app/lcd_cmds.h"
 #include "app/rtc_cmds.h"
 #include "app/storage_cmds.h"
+#include "app/wifi_cmds.h"
 #include "app/tasks.h"
 #include "app_config.h"
 #include "drivers/console_uart.h"
@@ -156,6 +157,7 @@ int main(void)
     lcd_cmds_register();
     rtc_cmds_register();
     storage_cmds_register();
+    wifi_cmds_register();
     tasks_create();
 
     console_puts("[boot] starting scheduler\r\n");

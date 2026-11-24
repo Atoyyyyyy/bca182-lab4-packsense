@@ -21,6 +21,7 @@
 #define IRQ_PRIO_I2C_MAIN          5U
 #define IRQ_PRIO_CONSOLE_USART     6U
 #define IRQ_PRIO_BUTTONS           7U  /* EXTI0/1/4/9_5: xQueueSendFromISR */
+#define IRQ_PRIO_WIFI_INT          7U  /* EXTI15_10 (RW007 INT): xSemaphoreGiveFromISR */
 
 /* Task-notification slot used by drivers to wait for I/O completion
    (slot 0 stays free for application events). */

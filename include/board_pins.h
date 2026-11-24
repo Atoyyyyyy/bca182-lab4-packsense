@@ -137,6 +137,14 @@
 #define FLASH_CS_PIN               GPIO_PIN_12
 #define WIFI_CS_PORT               GPIOF
 #define WIFI_CS_PIN                GPIO_PIN_10
+/* RW007 control lines (pinmap.md "Wireless", sheet 10): RST PG15 (LOW =
+   reset), INT/BUSY PG11 (module output; LOW while booting, then a falling
+   edge each time it has finished a transfer stage or has data). PG11 uses
+   EXTI11 (EXTI15_10 vector, no other user). */
+#define WIFI_RST_PORT              GPIOG
+#define WIFI_RST_PIN               GPIO_PIN_15
+#define WIFI_INT_PORT              GPIOG
+#define WIFI_INT_PIN               GPIO_PIN_11
 
 /* IR: transmitter LED on PB1 through an S8050 NPN (HIGH = LED on), receiver
    IRM-H638T on PF8, demodulated output active LOW (pinmap.md "Indicators and
