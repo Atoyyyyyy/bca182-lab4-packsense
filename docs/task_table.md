@@ -173,6 +173,22 @@ Captured with `tools/capture_m2.py ir`, firmware `aab7b56`.
 EXTI8 (IR RX) and EXTI5 (key UP) share the EXTI9_5 vector; each handler
 clears only its own pending bit.
 
+### M2 on-board results: audio codec (control port)
+
+Captured with `tools/capture_m2.py codec`, firmware `78bada8`.
+
+| Check | Measured | Source |
+|---|---|---|
+| Presence | ACK at I2C2 `0x10` | `codec` |
+| Register dump | 53 registers (0x00–0x34) in 6–7 ms; DACPOWER `0xC0` (outputs off), LOUT1VOL `0x00` | `codec` |
+| Write path | LOUT1VOL `0x15`, `0x2A`, `0x00`, `0x3F` read back **4/4**, restored to `0x00` | `codec test` |
+| Side effects | second dump identical to the first | `codec` |
+| Bus | I2C2 119 transfers, 0 NACK / timeout / bus error | `i2c stats` |
+
+The ES8388 has no chip-ID register; the ACK, the dump and the read-back
+stand in for an ID check. The audio path (I2S3, microphone, headphone jack)
+is not exercised: PackSense does not record or play audio (PRD §3).
+
 ### M1 on-board results
 
 From `evidence/m1_boot.log` (firmware git `8d71a0c`, RT-Spark HW1.1), checked with

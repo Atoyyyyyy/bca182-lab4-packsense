@@ -111,7 +111,7 @@ The four EXTI lines are all distinct, so there is no EXTI conflict.
 
 | Item | Pins | Notes | Sheet | Status |
 |---|---|---|---|---|
-| **ES8388** codec | I2C2 `0x10`; I2S3: MCK PC7, SCK PB3, SD PB5, ext_SD PB4, WS PA15 | onboard microphone (MIC) and a 3.5 mm headphone jack (PJ-320A). Shares PB3/PA15 with SWO/JTDI | 9 | S |
+| **ES8388** codec | I2C2 `0x10`; I2S3: MCK PC7, SCK PB3, SD PB5, ext_SD PB4, WS PA15 | onboard microphone (MIC) and a 3.5 mm headphone jack (PJ-320A). Shares PB3/PA15 with SWO/JTDI | 9 | ✔ I2C control port ([`m2_codec.log`](../../evidence/m2_codec.log)); I2S3 pins not configured (no audio) |
 
 PackSense does **not** record audio (privacy, PRD §3). The codec is reached only from
 DIAG (ID/register read, and optionally a short test tone or a mic level meter that

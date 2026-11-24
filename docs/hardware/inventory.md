@@ -27,7 +27,7 @@ file in the *Evidence* column. Anything missing or broken goes to
 | 12 | RW007 Wi-Fi module (U12) | SPI2, CS PF10, INT PG11, RST PG15 | ☐ | ☐ | **Comms (optional)**: event report | LogTask, DIAG | |
 | 13 | Onboard ST-LINK/V2.1 + VCP | SWD; USART1 PA9/PA10 | ☐ | ☐ | **Debug + data capture** | console, CAPTURE CSV | |
 | 14 | IR transmitter (D6) + receiver IRM-H638T (U9) | TX PB1, RX PF8 | ☑ | ☑ | **Diagnostics** | DIAG IR loopback self-test | [`m2_ir.log`](../../evidence/m2_ir.log): loopback 20/20 + 64/64, dry control 0/20 (optical). Remote test inconclusive (0 edges) |
-| 15 | ES8388 audio codec + mic + headphone jack (U11) | I2C2 `0x10`, I2S3 | ☑ | ☐ | **Diagnostics only** (no audio stored) | DIAG codec ID / level meter | answers `0x10` in `i2c scan` ([`m2_imu.log`](../../evidence/m2_imu.log)); codec ID: later M2 step |
+| 15 | ES8388 audio codec + mic + headphone jack (U11) | I2C2 `0x10`, I2S3 | ☑ | ☑ control port | **Diagnostics only** (no audio stored) | DIAG codec register check | [`m2_codec.log`](../../evidence/m2_codec.log): 53 registers read, write/read-back 4/4 and restored, dump unchanged. No chip-ID register; I2S / mic / jack not tested (no audio by design) |
 | 16 | CAN1, RS485, PMOD1/2, USB OTG connectors | see pinmap | ☐ | n/a | Connectors only, not sensors (unless a module is attached) | — | |
 
 Legend: ☐ = not yet checked · ☑ = confirmed with evidence · ✗ = absent/broken (→ `exceptions.md`)
