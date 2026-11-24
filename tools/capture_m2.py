@@ -214,8 +214,7 @@ PLANS = {
         ("ask", "Did you press a remote during that listen? (type: remote / none)", ["remote", "none"]),
     ],
     "codec": [
-        ("say", "Audio codec test (control registers only, no sound, no recording). No hands needed after
-"
+        ("say", "Audio codec test (control registers only, no sound, no recording). No hands needed after\n"
                 "   the RESET. About 10 s."),
         ("cmd", "codec", 10, []),
         ("cmd", "codec test", 10, []),
