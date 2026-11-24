@@ -64,6 +64,7 @@ static const char *s_diag_msg;
 static uint32_t s_last_fault;
 static uint32_t s_hot_since;
 static bool s_hot_pending;
+static volatile bool s_alarm_req; /* `alarm test` (CLI task) -> UiTask */
 
 /* Climate thresholds (RAM; `climate set`). */
 static float s_t_high = CLIMATE_T_HIGH_C, s_rh_high = CLIMATE_RH_HIGH;
@@ -212,6 +213,15 @@ static void banner(const char *text, uint16_t bg)
     s_banner_t = T_NOW();
 }
 
+static void alarm_start(void)
+{
+    s_alarm = true;
+    s_alarm_t0 = T_NOW();
+    s_alarm_flash_t = 0U;
+    led_set(LED_RED, true);
+    beep(BUZ_ALARM);
+}
+
 static void on_result(const infer_result_t *r)
 {
     const app_mode_t m = s_v.mode;
@@ -240,11 +250,7 @@ static void on_result(const infer_result_t *r)
             const bool guarded = (m == MODE_GUARD);
             evlog_post(EV_ACCESS, (uint8_t)m, CLS_ACCESS, conf, guarded ? 1U : 0U, 0U);
             if (guarded && !s_alarm) {
-                s_alarm = true;
-                s_alarm_t0 = T_NOW();
-                s_alarm_flash_t = 0U;
-                led_set(LED_RED, true);
-                beep(BUZ_ALARM);
+                alarm_start();
                 console_printf("[ui] t=%lu GUARD alarm: ACCESS (conf %u %%)\r\n", (unsigned long)T_NOW(), conf);
             }
         }
@@ -352,57 +358,87 @@ static void on_key(const button_event_t *e)
                        (unsigned long)e->t_ms, (unsigned long)(T_NOW() - e->t_edge_ms));
         return;
     }
+    const char *action = "none";
     if (s_swallow[e->key]) {
         s_swallow[e->key] = false;
-        return;
-    }
-    if (m == MODE_DIAG) {
+        action = "after_ack";
+    } else if (m == MODE_DIAG) {
+        bool io = false;
         switch (e->key) {
-        case BTN_LEFT: s_page = (s_page + SCR_DIAG_PAGES - 1U) % SCR_DIAG_PAGES; s_redraw_full = true; break;
-        case BTN_RIGHT: s_page = (s_page + 1U) % SCR_DIAG_PAGES; s_redraw_full = true; break;
-        case BTN_UP: enter_mode(s_return); return;
+        case BTN_LEFT:
+            s_page = (s_page + SCR_DIAG_PAGES - 1U) % SCR_DIAG_PAGES;
+            s_redraw_full = true;
+            action = "page_prev";
+            break;
+        case BTN_RIGHT:
+            s_page = (s_page + 1U) % SCR_DIAG_PAGES;
+            s_redraw_full = true;
+            action = "page_next";
+            break;
+        case BTN_UP:
+            enter_mode(s_return);
+            action = "diag_exit";
+            break;
         case BTN_DOWN:
-            if (s_page == 4U) {
-                diag_io_test();
-            }
+            io = (s_page == 4U);
+            action = io ? "io_test" : "none";
             break;
         default: break;
         }
-        s_diag_msg = (s_page == 4U) ? s_diag_msg : NULL;
-        draw();
-        return;
-    }
-    switch (e->key) {
-    case BTN_LEFT:
-        if (e->long_press) {
-            enter_mode(m == MODE_GUARD ? MODE_RUN : MODE_GUARD);
-            beep(BUZ_CHIRP);
-        }
-        break;
-    case BTN_UP:
-        if (!e->long_press) {
-            s_page = 0U;
-            s_diag_msg = NULL;
-            enter_mode(MODE_DIAG);
-        }
-        break;
-    case BTN_DOWN:
-        if (e->long_press) {
-            s_v.muted = !s_v.muted;
-            buzzer_stop();
-            console_printf("[ui] t=%lu buzzer %s\r\n", (unsigned long)T_NOW(), s_v.muted ? "muted" : "on");
-            if (!s_v.muted) {
-                buzzer_play(BUZ_CHIRP);
-            }
+        if (e->key != BTN_UP && !io) {
+            s_diag_msg = (s_page == 4U) ? s_diag_msg : NULL;
             draw();
         }
-        break;
-    case BTN_RIGHT:
-        s_v.banner = NULL;
-        draw();
-        break;
-    default: break;
+        if (io) {
+            /* log first: the test itself takes ~1.5 s (its first step, red LED on, is the response) */
+            console_printf("[key] t=%lu %s release held=%lu edge=%lu action=%s edge_to_action_ms=%lu\r\n",
+                           (unsigned long)T_NOW(), button_name(e->key), (unsigned long)e->held_ms,
+                           (unsigned long)e->t_edge_ms, action, (unsigned long)(T_NOW() - e->t_edge_ms));
+            diag_io_test();
+            draw();
+            return;
+        }
+    } else {
+        switch (e->key) {
+        case BTN_LEFT:
+            if (e->long_press) {
+                enter_mode(m == MODE_GUARD ? MODE_RUN : MODE_GUARD);
+                beep(BUZ_CHIRP);
+                action = (m == MODE_GUARD) ? "disarm" : "arm";
+            }
+            break;
+        case BTN_UP:
+            if (!e->long_press) {
+                s_page = 0U;
+                s_diag_msg = NULL;
+                enter_mode(MODE_DIAG);
+                action = "diag_enter";
+            }
+            break;
+        case BTN_DOWN:
+            if (e->long_press) {
+                s_v.muted = !s_v.muted;
+                buzzer_stop();
+                console_printf("[ui] t=%lu buzzer %s\r\n", (unsigned long)T_NOW(), s_v.muted ? "muted" : "on");
+                if (!s_v.muted) {
+                    buzzer_play(BUZ_CHIRP);
+                }
+                draw();
+                action = s_v.muted ? "mute" : "unmute";
+            }
+            break;
+        case BTN_RIGHT:
+            s_v.banner = NULL;
+            draw();
+            action = "clear";
+            break;
+        default: break;
+        }
     }
+    /* T7 (PRD 9): release edge -> action done (screen redrawn, chirp started). */
+    console_printf("[key] t=%lu %s release held=%lu edge=%lu action=%s edge_to_action_ms=%lu\r\n",
+                   (unsigned long)T_NOW(), button_name(e->key), (unsigned long)e->held_ms,
+                   (unsigned long)e->t_edge_ms, action, (unsigned long)(T_NOW() - e->t_edge_ms));
 }
 
 /* ---- boot self-test (PRD 5.1 BOOT_SELFTEST) ------------------------------------ */
@@ -522,6 +558,14 @@ static void ui_task(void *arg)
             continue;
         }
 
+        if (s_alarm_req) {
+            s_alarm_req = false;
+            if (!s_alarm && (s_v.mode == MODE_RUN || s_v.mode == MODE_GUARD)) {
+                alarm_start();
+                console_printf("[ui] t=%lu alarm raised by `alarm test` (no detection; acknowledge with a key)\r\n",
+                               (unsigned long)T_NOW());
+            }
+        }
         button_event_t e;
         while (buttons_get_event(&e, 0)) {
             on_key(&e);
@@ -660,8 +704,23 @@ static int cmd_ui(int argc, char **argv)
     return 0;
 }
 
+static int cmd_alarm_test(int argc, char **argv)
+{
+    (void)argv;
+    if (argc != 0) {
+        return 1;
+    }
+    if (s_v.mode != MODE_RUN && s_v.mode != MODE_GUARD) {
+        console_printf("[ui] alarm test works in RUN or GUARD only (now %s)\r\n", app_mode_name(s_v.mode));
+        return 0;
+    }
+    s_alarm_req = true; /* UiTask raises it within one period (50 ms) */
+    return 0;
+}
+
 static const cli_cmd_t s_cmds[] = {
     {"ui", "", "UI state and sense-to-feedback latency (AC-4)", cmd_ui},
+    {"alarm test", "", "raise the GUARD alarm without a detection (T7 acknowledge timing)", cmd_alarm_test},
     {"climate", "[set <degC> <rh%> <hold_s>]", "climate warning thresholds", cmd_climate},
     {"fault", "[inject|clear <imu|als|aht|all>] [hang <task>]", "sensor health, fault injection (AC-8), watchdog",
      cmd_fault},

@@ -88,6 +88,7 @@ Hold UP while pressing RESET to start in CAPTURE mode (M3), as before.
 | `selftest model [v]` | golden-vector parity (AC-3), `v` = error per feature |
 | `fault`, `fault inject\|clear imu\|als\|aht\|all` | sensor health; simulate a NACK (AC-8) |
 | `fault hang <task>` | that task stops checking in → watchdog reset (shows the IWDG) |
+| `alarm test` | raise the GUARD alarm without a detection (M6 T7: timing ten acknowledges) |
 | `climate [set <°C> <RH%> <hold_s>]` | climate warning thresholds (default 40 °C / 80 % / 30 s) |
 | `log [n]`, `log clear yes` | the flash event log |
 | `wifi off`, `wifi on` | hold the RW007 in reset / start it (offline test, AC-7) |
