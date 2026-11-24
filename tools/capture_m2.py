@@ -14,6 +14,7 @@ Run it with PlatformIO's Python (it has pyserial), from the project folder:
     ... tools\\capture_m2.py storage    (microSD detect + SPI flash ID and write test)
     ... tools\\capture_m2.py ir         (IR LED -> receiver loopback, optional remote)
     ... tools\\capture_m2.py codec      (ES8388 register dump + write/read-back, no audio)
+    ... tools\\capture_m2.py wifi       (RW007 ID/firmware/MAC, 2 scans, flash on the shared bus)
 
 Options: --port COM3 (default: auto-detect the ST-LINK virtual COM port),
          --flash (build + upload first), --force (overwrite an existing log),
@@ -212,6 +213,17 @@ PLANS = {
                 "   at the bottom-left corner and press a button 2-3 times. No remote: just wait."),
         ("cmd", "ir rx 10", 20, [(0.3, "remote: press a button 2-3 times now, pointed at the bottom-left corner")]),
         ("ask", "Did you press a remote during that listen? (type: remote / none)", ["remote", "none"]),
+    ],
+    "wifi": [
+        ("say", "Wi-Fi test: RW007 module ID, firmware, MAC and two scans (no network is joined; network\n"
+                "   names are not logged, only their length). Then the SPI flash test on the same bus.\n"
+                "   No hands needed after the RESET. About 20 s."),
+        ("cmd", "wifi", 15, []),
+        ("cmd", "wifi scan", 25, []),
+        ("cmd", "wifi scan", 25, []),
+        ("cmd", "flash test", 15, []),
+        ("cmd", "wifi stats", 10, []),
+        ("cmd", "diag mem", 10, []),
     ],
     "codec": [
         ("say", "Audio codec test (control registers only, no sound, no recording). No hands needed after\n"
@@ -528,7 +540,7 @@ def check_als(port):
 
 def main():
     ap = argparse.ArgumentParser(description="Guided M2 sensor evidence capture.")
-    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd", "matrix", "rtc", "storage", "ir", "codec",
+    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd", "matrix", "rtc", "storage", "ir", "codec", "wifi",
                                        "find-als", "check-als"],
                     help="all = imu, als, env; io = leds, buzzer, keys; find-als: live light/proximity readout to locate the sensor (writes no files); "
                          "check-als: 20 s timed cover/torch test, saved to logs/ (not evidence)")
