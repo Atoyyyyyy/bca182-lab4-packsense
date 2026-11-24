@@ -1,19 +1,19 @@
 # operator cues shown by tools/capture_m2.py (PC time, 2026-11-24)
-14:46:36.947 answer: Before the first matrix command: are ALL matrix LEDs off (dark)? -> Y
-14:46:36.949 sent: matrix
-14:46:45.887 answer: After 'matrix' (init): still ALL off? -> N
-14:46:45.888 sent: matrix fill 16 0 0
-14:46:48.958 answer: Are ALL the matrix LEDs lit RED (not green, none dark)? If some are dark or another colour, say how many. -> y
-14:46:48.958 sent: matrix fill 0 16 0
-14:46:55.440 answer: Are ALL of them GREEN now (not red)? -> y
-14:46:55.440 sent: matrix fill 0 0 16
-14:46:57.517 answer: Are ALL of them BLUE now? -> y
-14:46:57.520 sent: matrix fill 16 16 16
-14:47:00.536 answer: Are ALL of them WHITE-ish now (no LED clearly red/green/blue only)? -> y
-14:47:00.537 sent: matrix off
-14:47:04.055 answer: Are ALL of them off again? -> y
-14:47:05.253 sent: matrix chase 400
-14:47:05.688 cue: watch the matrix and COUNT how many different LEDs light up
-14:47:24.454 answer: How many different LEDs lit up, one at a time? -> 25
-14:47:27.876 answer: Where did it start, and how did it move? (a few words, e.g. 'centre, then the ring clockwise') -> y
-14:47:27.876 sent: matrix
+14:51:10.079 answer: Before the first matrix command: are ALL matrix LEDs off (dark)? -> Y
+14:51:10.080 sent: matrix
+14:51:15.477 answer: After 'matrix' (init): still ALL off? -> Y
+14:51:15.477 sent: matrix fill 16 0 0
+14:51:19.206 answer: Are ALL the matrix LEDs lit RED (not green, none dark)? If some are dark or another colour, say how many. -> Y
+14:51:19.208 sent: matrix fill 0 16 0
+14:51:20.618 answer: Are ALL of them GREEN now (not red)? -> Y
+14:51:20.618 sent: matrix fill 0 0 16
+14:51:22.682 answer: Are ALL of them BLUE now? -> Y
+14:51:22.682 sent: matrix fill 16 16 16
+14:51:32.504 answer: Are ALL of them WHITE-ish now (no LED clearly red/green/blue only)? -> y
+14:51:32.504 sent: matrix off
+14:51:36.976 answer: Are ALL of them off again? -> y
+14:51:38.223 sent: matrix chase 400
+14:51:38.613 cue: watch the matrix and COUNT how many different LEDs light up
+14:51:53.986 answer: How many different LEDs lit up, one at a time? (type the number you counted) -> 19
+14:52:04.519 answer: Where did it start, and how did it move? (e.g. 'centre, then the ring clockwise') -> 1 to 19
+14:52:04.520 sent: matrix
