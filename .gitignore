@@ -32,3 +32,6 @@ venv/
 Thumbs.db
 desktop.ini
 *.swp
+
+# Derived ML intermediates (rebuilt by ml/prepare.py, ml/train.py)
+ml/out/
