@@ -41,6 +41,20 @@
 #define CLI_MAX_ARGS               8U
 #define CLI_MAX_COMMANDS           32U
 
+/* SensorTask / EnvTask (PRD 6.3) */
+#define SENSOR_TASK_PRIO           5U
+#define SENSOR_TASK_STACK_WORDS    512U
+#define SENSOR_PERIOD_MS           10U   /* IMU 100 Hz */
+#define SENSOR_ALS_EVERY           5U    /* AP3216C every 5th tick = 20 Hz */
+#define SENSOR_QUEUE_LEN           64U   /* 0.64 s of samples */
+#define ENV_TASK_PRIO              2U
+#define ENV_TASK_STACK_WORDS       384U
+#define ENV_PERIOD_MS              1000U
+
+/* Capture mode (M3): writes samples to the SPI flash log */
+#define CAPTURE_TASK_PRIO          3U
+#define CAPTURE_TASK_STACK_WORDS   768U
+
 /* I2C */
 #define I2C_MAIN_CLOCK_HZ          400000U /* fast mode: ICM-20608, AP3216C, ES8388 */
 #define I2C_SOFT_HALF_PERIOD_US    5U      /* ~100 kHz bit-banged bus (AHT) */
