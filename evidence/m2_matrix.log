@@ -1,0 +1,56 @@
+14:46:23.352 > 
+14:46:23.353 > 
+14:46:23.353 > === PackSense 0.2.0-m2 (git 812b5f2) built Nov 24 2026 14:45:11 ===
+14:46:23.353 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+14:46:23.353 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+14:46:23.354 > [boot] clock source: HSE 8 MHz crystal -> PLL
+14:46:23.354 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+14:46:23.354 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+14:46:23.354 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+14:46:23.358 > [boot] FPU: CPACR CP10/CP11=full access
+14:46:23.415 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40944 B usable), max syscall prio 5
+14:46:23.415 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+14:46:23.415 > [boot] starting scheduler
+14:46:23.415 > [cli] ready, type 'help'
+14:46:23.415 > > [rtos] scheduler started, first task running at tick 0
+14:46:37.031 > matrix
+14:46:37.031 > [matrix] t=13612 init OK (19 LEDs, all off)
+14:46:37.031 > [matrix] t=13612 frames=1 timeouts=0 dma_errors=0 last_wire_us=545
+14:46:37.031 > > matrix fill 16 0 0
+14:46:46.021 > [matrix] t=22604 fill r=16 g=0 b=0
+14:46:46.021 > [matrix] t=22605 sent: OK
+14:46:46.021 > > matrix fill 0 16 0
+14:46:49.095 > [matrix] t=25676 fill r=0 g=16 b=0
+14:46:49.096 > [matrix] t=25677 sent: OK
+14:46:49.096 > > matrix fill 0 0 16
+14:46:55.575 > [matrix] t=32158 fill r=0 g=0 b=16
+14:46:55.575 > [matrix] t=32158 sent: OK
+14:46:55.576 > > matrix fill 16 16 16
+14:46:57.663 > [matrix] t=34247 fill r=16 g=16 b=16
+14:46:57.664 > [matrix] t=34247 sent: OK
+14:46:57.664 > > matrix off
+14:47:00.647 > [matrix] t=37218 all off: OK
+14:47:00.647 > > matrix chase 400
+14:47:05.381 > [matrix] t=41962 chase led=0
+14:47:05.751 > [matrix] t=42362 chase led=1
+14:47:06.128 > [matrix] t=42762 chase led=2
+14:47:06.567 > [matrix] t=43162 chase led=3
+14:47:06.945 > [matrix] t=43562 chase led=4
+14:47:07.383 > [matrix] t=43962 chase led=5
+14:47:07.750 > [matrix] t=44362 chase led=6
+14:47:08.173 > [matrix] t=44762 chase led=7
+14:47:08.537 > [matrix] t=45162 chase led=8
+14:47:08.980 > [matrix] t=45562 chase led=9
+14:47:09.385 > [matrix] t=45962 chase led=10
+14:47:09.757 > [matrix] t=46362 chase led=11
+14:47:10.130 > [matrix] t=46762 chase led=12
+14:47:10.568 > [matrix] t=47162 chase led=13
+14:47:10.946 > [matrix] t=47562 chase led=14
+14:47:11.381 > [matrix] t=47962 chase led=15
+14:47:11.744 > [matrix] t=48362 chase led=16
+14:47:12.167 > [matrix] t=48762 chase led=17
+14:47:12.537 > [matrix] t=49162 chase led=18
+14:47:12.970 > [matrix] t=49562 chase done: 19 of 19 frames sent OK, all off
+14:47:12.971 > [matrix] t=49562 frames=26 timeouts=0 dma_errors=0 last_wire_us=545
+14:47:12.971 > > matrix
+14:47:27.967 > [matrix] t=64540 frames=26 timeouts=0 dma_errors=0 last_wire_us=545
