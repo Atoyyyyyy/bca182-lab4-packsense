@@ -52,7 +52,7 @@
 /* #define HAL_NAND_MODULE_ENABLED */
 /* #define HAL_NOR_MODULE_ENABLED */
 /* #define HAL_PCCARD_MODULE_ENABLED */
-/* #define HAL_SRAM_MODULE_ENABLED */
+#define HAL_SRAM_MODULE_ENABLED   /* FSMC bank 1 for the LCD */
 /* #define HAL_SDRAM_MODULE_ENABLED */
 /* #define HAL_HASH_MODULE_ENABLED */
 #define HAL_GPIO_MODULE_ENABLED

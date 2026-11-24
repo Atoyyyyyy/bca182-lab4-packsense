@@ -19,12 +19,14 @@
 
 #include "app/diag_cmds.h"
 #include "app/io_cmds.h"
+#include "app/lcd_cmds.h"
 #include "app/tasks.h"
 #include "app_config.h"
 #include "drivers/console_uart.h"
 #include "drivers/i2c_bus.h"
 #include "drivers/buttons.h"
 #include "drivers/buzzer.h"
+#include "drivers/lcd.h"
 #include "drivers/led.h"
 #include "fault.h"
 #include "system_clock.h"
@@ -137,6 +139,7 @@ int main(void)
 
     led_init();
     buzzer_init();
+    lcd_early_init(); /* backlight off, panel held in reset until `lcd` */
     console_init();
     heap_init_for_stats();
     print_banner(clk, reset_csr);
@@ -146,6 +149,7 @@ int main(void)
     diag_cmds_register();
     buttons_init();
     io_cmds_register();
+    lcd_cmds_register();
     tasks_create();
 
     console_puts("[boot] starting scheduler\r\n");

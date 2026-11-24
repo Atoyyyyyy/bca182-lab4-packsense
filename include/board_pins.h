@@ -70,6 +70,28 @@
 #define I2C_ADDR_ES8388            0x10U
 #define I2C_ADDR_AHT               0x38U
 
+/* LCD: ST7789V3 240x240 on FSMC bank 1 region 3 (NE3), 8-bit 8080 bus. D/C
+   is FSMC_A18, so with an 8-bit bus the data register is base + (1 << 18)
+   (pinmap.md "LCD", sheet 8). All FSMC pins use alternate function 12. */
+#define LCD_FSMC_BANK_BASE         0x68000000UL
+#define LCD_FSMC_DC_ADDR_BIT       18U
+#define LCD_FSMC_GPIO_AF           GPIO_AF12_FSMC
+/* port D: D2 PD0, D3 PD1, NOE PD4, NWE PD5, A18 PD13, D0 PD14, D1 PD15 */
+#define LCD_FSMC_PD_PINS           (GPIO_PIN_0 | GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_5 | \
+                                    GPIO_PIN_13 | GPIO_PIN_14 | GPIO_PIN_15)
+/* port E: D4 PE7, D5 PE8, D6 PE9, D7 PE10 */
+#define LCD_FSMC_PE_PINS           (GPIO_PIN_7 | GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10)
+/* port G: NE3 PG10 */
+#define LCD_FSMC_PG_PINS           GPIO_PIN_10
+#define LCD_RST_PORT               GPIOD
+#define LCD_RST_PIN                GPIO_PIN_3  /* low = reset */
+#define LCD_TE_PORT                GPIOD
+#define LCD_TE_PIN                 GPIO_PIN_6  /* tearing-effect output of the panel */
+#define LCD_BL_PORT                GPIOF
+#define LCD_BL_PIN                 GPIO_PIN_9  /* S8050 low-side switch: HIGH = backlight on */
+#define LCD_BL_ON_LEVEL            GPIO_PIN_SET
+#define LCD_BL_OFF_LEVEL           GPIO_PIN_RESET
+
 /* Sensor interrupt lines (not used yet: sensors are polled). */
 #define ICM_INT_PORT               GPIOG
 #define ICM_INT_PIN                GPIO_PIN_12

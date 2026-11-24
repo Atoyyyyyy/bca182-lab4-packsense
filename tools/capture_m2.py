@@ -8,6 +8,7 @@ Run it with PlatformIO's Python (it has pyserial), from the project folder:
     ... tools\\capture_m2.py env
     ... tools\\capture_m2.py all        (the three, one after another)
     ... tools\\capture_m2.py leds | buzzer | keys | io   (io = those three)
+    ... tools\\capture_m2.py lcd        (screen: asks what you see)
 
 Options: --port COM3 (default: auto-detect the ST-LINK virtual COM port),
          --flash (build + upload first), --force (overwrite an existing log),
@@ -136,6 +137,35 @@ PLANS = {
         ("cmd", "keys 5", 10, [(0.3, "press and HOLD UP ..."), (2.8, "LET GO of UP")]),
         ("say", "Last: quick taps."),
         ("cmd", "keys 4", 10, [(0.3, "tap RIGHT 3 times quickly, then hands off")]),
+    ],
+    "lcd": [
+        ("say", "Hold the board with the long pin header at the TOP and the USB ports on the RIGHT, and keep it\n"
+                "   that way: 'top-left' etc. below mean the screen as you see it in this position.\n"
+                "   The screen should be dark now (backlight off until the first lcd command)."),
+        ("cmd", "lcd", 10, []),
+        ("ask", "Is the screen now lit (backlight on) and evenly BLACK, with no noise or stripes?"),
+        ("cmd", "lcd bus", 10, []),
+        ("cmd", "lcd te", 10, []),
+        ("cmd", "lcd fill white", 5, []),
+        ("ask", "Is the WHOLE screen white and evenly lit, with no dead lines or dark bands?"),
+        ("cmd", "lcd fill red", 5, []),
+        ("ask", "Is the whole screen RED (not blue)?"),
+        ("cmd", "lcd fill green", 5, []),
+        ("ask", "Is the whole screen GREEN?"),
+        ("cmd", "lcd fill blue", 5, []),
+        ("ask", "Is the whole screen BLUE (not red)?"),
+        ("cmd", "lcd bl off", 5, []),
+        ("ask", "Backlight off: did the screen go dark (blue image almost invisible)?"),
+        ("cmd", "lcd bl on", 5, []),
+        ("cmd", "lcd test", 5, []),
+        ("ask", "Test pattern: is a thin WHITE frame visible along ALL FOUR edges? If a side is missing, say which."),
+        ("ask", "Which colour is the square in the TOP-LEFT corner (red / green / blue / yellow)?"),
+        ("ask", "Which colour is the square in the TOP-RIGHT corner?"),
+        ("ask", "Which colour is the square in the BOTTOM-LEFT corner?"),
+        ("ask", "The three bars in the middle, from LEFT to RIGHT: which colours?"),
+        ("ask", "Photo: take one of the test pattern (whole board, header at the top), save it as "
+                "evidence/m2_lcd_test.jpg, then type 'done' (or 'skip')."),
+        ("cmd", "lcd", 10, []),
     ],
 }
 
@@ -393,7 +423,7 @@ def check_als(port):
 
 def main():
     ap = argparse.ArgumentParser(description="Guided M2 sensor evidence capture.")
-    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io",
+    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd",
                                        "find-als", "check-als"],
                     help="all = imu, als, env; io = leds, buzzer, keys; find-als: live light/proximity readout to locate the sensor (writes no files); "
                          "check-als: 20 s timed cover/torch test, saved to logs/ (not evidence)")
