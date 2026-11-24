@@ -66,13 +66,10 @@ status_t led_matrix_init(void)
     __HAL_RCC_TIM3_CLK_ENABLE();
     __HAL_RCC_DMA1_CLK_ENABLE();
 
-    /* Buffer on. */
-    HAL_GPIO_WritePin(LEDMX_EN_PORT, LEDMX_EN_PIN, LEDMX_EN_ON_LEVEL);
-    gpio.Pin = LEDMX_EN_PIN;
-    gpio.Mode = GPIO_MODE_OUTPUT_PP;
-    gpio.Pull = GPIO_NOPULL;
-    gpio.Speed = GPIO_SPEED_FREQ_LOW;
-    HAL_GPIO_Init(LEDMX_EN_PORT, &gpio);
+    /* Order matters (m2_matrix.log at 812b5f2: LEDs were not all off after
+       init when EN went low first): make PA7 a timer output driven LOW, then
+       enable the buffer, then hold the line low for longer than the reset
+       time before the first frame. */
 
     /* TIM3: 8.4 MHz tick, 10 counts per bit, PWM mode 1 on CH2 with preload,
        output low (CCR2 = 0) while idle. */
@@ -104,6 +101,16 @@ status_t led_matrix_init(void)
     DMA_STREAM->CR = (DMA_CHANNEL << DMA_SxCR_CHSEL_Pos) | DMA_SxCR_PL_1 /* high */ |
                      DMA_SxCR_MSIZE_0 | DMA_SxCR_PSIZE_0 /* 16-bit */ | DMA_SxCR_MINC |
                      DMA_SxCR_DIR_0 /* memory to peripheral */;
+
+    /* Buffer on, with PA7 already low. */
+    HAL_GPIO_WritePin(LEDMX_EN_PORT, LEDMX_EN_PIN, LEDMX_EN_ON_LEVEL);
+    gpio.Pin = LEDMX_EN_PIN;
+    gpio.Mode = GPIO_MODE_OUTPUT_PP;
+    gpio.Pull = GPIO_NOPULL;
+    gpio.Speed = GPIO_SPEED_FREQ_LOW;
+    gpio.Alternate = 0U;
+    HAL_GPIO_Init(LEDMX_EN_PORT, &gpio);
+    vTaskDelay(pdMS_TO_TICKS(2)); /* line low >= 1 ms: any half-received frame is dropped */
 
     s_ready = true;
     memset(&s_stats, 0, sizeof s_stats);

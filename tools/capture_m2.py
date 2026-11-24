@@ -48,7 +48,7 @@ BAUD = 115200
 
 # Each step: ("say", text) waits for Enter; ("cmd", command, timeout_s, cues)
 # sends a command; cues = [(seconds after sending, text), ...] shown on screen;
-# ("ask", question[, words]) records what YOU saw or heard (y/n or a few words) in the
+# ("ask", question[, words or "text"]) records what YOU saw or heard (y/n or a few words) in the
 # _cues.txt file, for things only a person can check (LED colour, sound).
 COLOURS = ["red", "green", "blue", "yellow", "black", "white"]
 
@@ -189,8 +189,9 @@ PLANS = {
         ("ask", "Are ALL of them off again?"),
         ("say", "Next: one LED at a time walks through the chain (0.4 s each, about 8 s). Count the positions."),
         ("cmd", "matrix chase 400", 20, [(0.3, "watch the matrix and COUNT how many different LEDs light up")]),
-        ("ask", "How many different LEDs lit up, one at a time?", [str(n) for n in range(0, 26)]),
-        ("ask", "Where did it start, and how did it move? (a few words, e.g. 'centre, then the ring clockwise')"),
+        ("ask", "How many different LEDs lit up, one at a time? (type the number you counted)",
+         [str(n) for n in range(0, 41)]),
+        ("ask", "Where did it start, and how did it move? (e.g. 'centre, then the ring clockwise')", "text"),
         ("cmd", "matrix", 10, []),
     ],
 }
@@ -293,7 +294,12 @@ def run_plan(name, port, force, out_dir):
                     words = step[2] if len(step) > 2 else None
                     ans = ""
                     while not ans:
-                        if words:
+                        if words == "text":
+                            ans = input("?? Describe it in a few words (not y/n), then Enter: ").strip()
+                            if ans.lower() in ("y", "n", "yes", "no"):
+                                print("   Please describe what you saw, in words.")
+                                ans = ""
+                        elif words:
                             ans = input("?? Type one of: %s, then Enter: " % " / ".join(words)).strip().lower()
                             given = ans.replace(",", " ").split()
                             if not given or any(w not in words for w in given):
