@@ -9,9 +9,10 @@ Counts, from the firmware's own lines only:
   windows ([win]): total, rejected, missing window numbers, longest silence,
   events ([event]) by type, key presses ([key]), and stack / heap from the
   `diag mem` dumps (lowest HWM per task, heap minimum).
---notes: CSV `start,end,expected` (PC times HH:MM:SS, expected = STILL / CARRIED
-/ ROUGH / ACCESS) written by the operator; ROUGH / ACCESS events outside a
-window where that state was expected are counted as false alerts.
+--notes: CSV `start,end,expected` (PC times HH:MM:SS or HH:MM:SS.mmm, expected =
+STILL / CARRIED / ROUGH / ACCESS / anything else); tools/capture_m2.py m6_soak and
+m6_offline write it (<log>_notes.csv). ROUGH / ACCESS events outside a span
+where that state was expected are counted as false alerts.
 Needs the "HH:MM:SS.mmm > " prefix (pio device monitor / capture_m2.py) for
 durations and --notes.
 """
@@ -32,6 +33,12 @@ EVENT_TYPE = re.compile(r" boot=\d+ (\w+) mode=")
 
 def secs(h, m, s, ms):
     return int(h) * 3600 + int(m) * 60 + int(s) + int(ms) / 1000.0
+
+
+def hms(text):
+    """'HH:MM:SS' or 'HH:MM:SS.mmm' -> seconds of the day."""
+    h, m, s = text.strip().split(":")
+    return int(h) * 3600 + int(m) * 60 + float(s)
 
 
 def main():
@@ -141,8 +148,8 @@ def main():
         spans = []
         with open(a.notes, encoding="utf-8") as f:
             for r in csv.DictReader(f):
-                s = secs(*r["start"].split(":"), 0)
-                e = secs(*r["end"].split(":"), 0)
+                s = hms(r["start"]) + (day if t_first is not None and hms(r["start"]) < t_first - 43200 else 0)
+                e = hms(r["end"]) + (day if t_first is not None and hms(r["end"]) < t_first - 43200 else 0)
                 spans.append((s, e, r["expected"].strip().upper()))
         false = [(t, typ) for t, typ in alerts
                  if not any(s - 2 <= t <= e + 3 and exp == typ for s, e, exp in spans)]

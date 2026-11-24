@@ -17,6 +17,16 @@ Run it with PlatformIO's Python (it has pyserial), from the project folder:
     ... tools\\capture_m2.py wifi       (RW007 ID/firmware/MAC, 2 scans, flash on the shared bus)
     ... tools\\capture_m2.py m5_parity  (M5: selftest model + 30 s of live windows -> evidence/m5_parity.log)
     ... tools\\capture_m2.py m5_func    (M5: guided per-class check, GUARD alarm, fault injection)
+    ... tools\\capture_m2.py m6_t1_still | m6_t1_carried | m6_t1_rough | m6_t1_access
+                                         (M6 T1: 20 new trials per class from docs/test_sheets/T1.csv)
+    ... tools\\capture_m2.py m6_soak    (M6 T4: 15+ min of mixed use, Wi-Fi module on)
+    ... tools\\capture_m2.py m6_offline (M6 T5: 5+ min of mixed use, Wi-Fi module held off)
+    ... tools\\capture_m2.py m6_eventlog (M6 T5 part B: read the event log after a power-bank run)
+    ... tools\\capture_m2.py m6_fault   (M6 T6: sensor faults, SD absent, Wi-Fi loss, RESET, watchdog)
+    ... tools\\capture_m2.py m6_keys    (M6 T7: acknowledge, arm/disarm, mute, mode switch, 10x each)
+    ... tools\\capture_m2.py m6_diag    (M6 T8: walk the DIAG pages + every module's console check)
+    The M6 plans also write <name>_notes.csv (start,end,expected per timed step) for
+    tools/t1_results.py, tools/t7_keys.py and tools/analyze_soak.py --notes.
 
 Options: --port COM3 (default: auto-detect the ST-LINK virtual COM port),
          --flash (build + upload first), --force (overwrite an existing log),
@@ -37,10 +47,12 @@ only one program can open the port.
 """
 
 import argparse
+import codecs
 import datetime
 import os
 import subprocess
 import sys
+import threading
 import time
 
 try:
@@ -58,6 +70,11 @@ BAUD = 115200
 # ("ask", question[, words or "text"]) records what YOU saw or heard (y/n or a few words) in the
 # _cues.txt file, for things only a person can check (LED colour, sound).
 # ("reset", text) asks for a RESET press and waits for the board to boot again.
+# ("reboot", text, timeout_s) waits for a reboot the board does by itself (watchdog).
+# ("seg", secs, expected, text[, trial_id]) is a timed step like "wait" whose start
+# and end go to <name>_notes.csv with the expected label (state or key action), for
+# the M6 analysis scripts. With a trial_id the operator then confirms the trial
+# (Enter = done as described, x = went wrong); the answer goes in the "ok" column.
 # In a command, {now} is replaced by the PC's local time ("YYYY-MM-DD hh:mm:ss").
 COLOURS = ["red", "green", "blue", "yellow", "black", "white"]
 
@@ -312,6 +329,247 @@ PLANS = {
     ],
 }
 
+# ---- M6 (system tests, PRD 9; procedures in docs/test_plan.md) --------------------
+
+T1_SHEET = os.path.join(ROOT, "docs", "test_sheets", "T1.csv")
+T1_CLASSES = ("still", "carried", "rough", "access")
+T1_INTRO = {
+    "still": "T1 STILL: 20 trials. Each time you move the bag to the place on the line, close it, press Enter\n"
+             "   and step back: nobody touches the bag or the table until STOP (12 s).",
+    "carried": "T1 CARRIED: 20 trials of walking. Put the bag on as the line says, stand still, press Enter,\n"
+               "   then walk normally until STOP (20 s). A team mate carries the laptop next to you, or use a long\n"
+               "   USB cable. Walk on level ground only (no stairs while tethered).",
+    "rough": "T1 ROUGH: 20 trials. DUMMY LOAD ONLY (books, a water bottle), never a laptop, no real drops.\n"
+             "   Hold the bag as the line says, press Enter, do the action until STOP (8 s), then hold the bag still.",
+    "access": "T1 ACCESS: 20 trials. Bag closed on the surface on the line. Press Enter, then open the\n"
+              "   compartment, reach in, move items and close it again before STOP (12 s).",
+}
+
+
+def t1_plan(cls):
+    """One T1 run (20 trials of one class) from docs/test_sheets/T1.csv."""
+    import csv
+    with open(T1_SHEET, encoding="utf-8", newline="") as f:
+        rows = [r for r in csv.DictReader(f) if r["class"].strip().lower() == cls]
+    steps = [
+        ("say", T1_INTRO[cls] + "\n   Bag set-up: board flat against the back panel, LCD facing into the compartment, as in\n"
+                "   the recordings (docs/test_sheets/m3_capture.md). The USB cable leaves through the corner of\n"
+                "   the zipper; close the zipper up to the cable."),
+        ("cmd", "infer", 10, []),
+        ("cmd", "infer log on", 5, []),
+    ]
+    for k, r in enumerate(rows, 1):
+        where = ", ".join(x for x in (r["bag"], r["load"], r["carrier"], r["place"], r["light"]) if x)
+        steps.append(("say", "%s (%d/%d) set-up: %s [%s]" % (r["trial"], k, len(rows), r["setup"], where)))
+        steps.append(("seg", int(r["secs"]), r["class"].upper(), "%s: %s" % (r["trial"], r["do"]), r["trial"]))
+    steps += [
+        ("cmd", "infer log off", 5, []),
+        ("cmd", "infer", 10, []),
+        ("cmd", "ui", 10, []),
+        ("cmd", "log 40", 15, []),
+        ("cmd", "diag mem", 10, []),
+        ("cmd", "version", 10, []),
+    ]
+    return steps
+
+
+if os.path.exists(T1_SHEET):
+    for _c in T1_CLASSES:
+        PLANS["m6_t1_" + _c] = t1_plan(_c)
+
+
+def _keys_plan():
+    steps = [
+        ("say", "T7 input control: board flat on the desk, LCD visible. Every step names ONE key action:\n"
+                "   do it once, then wait for the next line. 'hold' = keep the key down about 1 s, then let go.\n"
+                "   About 5 minutes."),
+        ("cmd", "ui", 10, []),
+    ]
+    for i in range(1, 11):
+        steps.append(("cmd", "alarm test", 5, []))
+        steps.append(("seg", 4, "ack", "ACK %d/10: the alarm is on - press ANY key once" % i))
+    for i in range(1, 11):
+        steps.append(("seg", 4, "arm", "ARM %d/10: hold LEFT ~1 s, let go (header turns red: GUARD)" % i))
+        steps.append(("seg", 4, "disarm", "DISARM %d/10: hold LEFT ~1 s, let go (header back to RUN)" % i))
+    for i in range(1, 11):
+        steps.append(("seg", 4, "mute", "MUTE %d/10: hold DOWN ~1 s, let go (MUTE in the header)" % i))
+        steps.append(("seg", 4, "unmute", "UNMUTE %d/10: hold DOWN ~1 s, let go (chirp, MUTE gone)" % i))
+    for i in range(1, 11):
+        steps.append(("seg", 3, "diag_enter", "MODE %d/10: press UP once (DIAG page 1)" % i))
+        steps.append(("seg", 3, "diag_exit", "MODE %d/10: press UP once (back to RUN)" % i))
+    steps += [
+        ("cmd", "ui", 10, []),
+        ("cmd", "mode", 5, []),
+        ("cmd", "log 20", 15, []),
+    ]
+    return steps
+
+
+PLANS.update({
+    # T4: >= 15 min of mixed use. The RW007 stays powered (online condition) so T5,
+    # with it held in reset, has something to compare with.
+    "m6_soak": [
+        ("say", "T4 soak: 16 minutes of mixed use, following the timed lines on this screen (no Enter\n"
+                "   presses until the end). Bag with the DUMMY load (there are rough-handling steps), board in\n"
+                "   the bag as for the recordings, laptop next to the bag. For the walking steps a team mate\n"
+                "   carries the laptop, or use a long USB cable."),
+        ("cmd", "wifi on", 15, []),
+        ("cmd", "infer log on", 5, []),
+        ("cmd", "diag mem", 10, []),
+        ("seg", 150, "STILL", "bag closed on the desk or floor, hands off"),
+        ("seg", 10, "CARRIED", "pick the bag up and put it on your back"),
+        ("seg", 120, "CARRIED", "walk normally with the bag on your back"),
+        ("seg", 10, "STILL", "put the bag down gently, hands off"),
+        ("seg", 60, "STILL", "hands off"),
+        ("seg", 15, "ROUGH", "dummy load: set the bag down hard / swing it"),
+        ("seg", 45, "STILL", "put it down, hands off"),
+        ("seg", 15, "ACCESS", "open the bag, reach in, rummage, close"),
+        ("seg", 45, "STILL", "hands off"),
+        ("seg", 5, "KEYS", "hold LEFT ~1 s: arm GUARD"),
+        ("seg", 30, "STILL", "GUARD armed, hands off"),
+        ("seg", 15, "ACCESS", "open the bag, reach in: the alarm should sound - press any key once to stop it, close"),
+        ("seg", 5, "KEYS", "hold LEFT ~1 s: disarm (back to RUN)"),
+        ("seg", 60, "STILL", "hands off"),
+        ("cmd", "diag mem", 10, []),
+        ("seg", 15, "ROUGH", "dummy load: toss the bag onto a cushion/bed (<= 50 cm), pick it up, again"),
+        ("seg", 45, "STILL", "put it down, hands off"),
+        ("seg", 20, "KEYS", "press UP (DIAG), RIGHT 4 times (pages), UP (back to RUN)"),
+        ("seg", 10, "KEYS", "hold DOWN ~1 s (mute), then hold DOWN ~1 s again (unmute)"),
+        ("seg", 10, "CARRIED", "pick the bag up and put it on your back"),
+        ("seg", 60, "CARRIED", "walk normally"),
+        ("seg", 10, "STILL", "put the bag down gently, hands off"),
+        ("seg", 180, "STILL", "hands off until the end"),
+        ("cmd", "infer log off", 5, []),
+        ("cmd", "infer", 10, []),
+        ("cmd", "ui", 10, []),
+        ("cmd", "fault", 10, []),
+        ("cmd", "wifi stats", 10, []),
+        ("cmd", "i2c stats", 10, []),
+        ("cmd", "diag mem", 10, []),
+        ("cmd", "log 80", 20, []),
+        ("cmd", "uptime", 5, []),
+        ("cmd", "version", 10, []),
+        ("ask", "Did the board restart, freeze or stop updating the LCD at any time? (y/n, or what happened)"),
+    ],
+    # T5: >= 5 min with the Wi-Fi module held in reset.
+    "m6_offline": [
+        ("say", "T5 offline: 5.5 minutes with the Wi-Fi module switched OFF (held in reset), following the\n"
+                "   timed lines. Same bag and dummy load as the soak. If you can, film the LCD with a phone for\n"
+                "   the whole run (the video stays out of git; put a link in evidence/video_links.md)."),
+        ("cmd", "wifi off", 10, []),
+        ("cmd", "infer log on", 5, []),
+        ("seg", 100, "STILL", "bag closed, hands off (Wi-Fi is off)"),
+        ("seg", 10, "CARRIED", "pick the bag up and put it on your back"),
+        ("seg", 60, "CARRIED", "walk normally"),
+        ("seg", 10, "STILL", "put the bag down gently, hands off"),
+        ("seg", 15, "ACCESS", "open the bag, reach in, rummage, close"),
+        ("seg", 30, "STILL", "hands off"),
+        ("seg", 15, "ROUGH", "dummy load: set the bag down hard / swing it"),
+        ("seg", 90, "STILL", "put it down, hands off until the end"),
+        ("cmd", "infer log off", 5, []),
+        ("cmd", "infer", 10, []),
+        ("cmd", "ui", 10, []),
+        ("cmd", "wifi stats", 10, []),
+        ("cmd", "diag mem", 10, []),
+        ("cmd", "log 40", 15, []),
+        ("ask", "Did the LCD keep showing the state (and change with what you did) the whole time? (y/n, or what happened)"),
+        ("ask", "Video of the LCD recorded? (type: done / skip)", ["done", "skip"]),
+    ],
+    # T6: AC-8, every failure case the kit allows.
+    "m6_fault": [
+        ("say", "T6 controlled failures: board flat on the desk, hands off unless told. About 5 minutes,\n"
+                "   one RESET press. Watch the bottom line of the LCD and the red LED."),
+        ("cmd", "infer log on", 5, []),
+        ("seg", 10, "STILL", "reference: hands off"),
+        ("cmd", "fault inject imu", 5, []),
+        ("seg", 12, "FAULT_IMU", "IMU reads now fail: watch the LCD bottom line"),
+        ("ask", "Does the LCD show 'Sensor fault - IMU' (and is the red LED on)? (y/n)"),
+        ("cmd", "fault", 10, []),
+        ("cmd", "fault clear imu", 5, []),
+        ("seg", 10, "STILL", "IMU fault cleared: watch the LCD"),
+        ("ask", "Did the fault line go away and the state come back? (y/n)"),
+        ("cmd", "fault inject als", 5, []),
+        ("seg", 12, "FAULT_ALS", "light/proximity reads now fail: watch the LCD bottom line"),
+        ("ask", "Does the LCD show 'Sensor fault - ALS/PS'? (y/n)"),
+        ("cmd", "fault clear als", 5, []),
+        ("seg", 10, "STILL", "ALS fault cleared: watch the LCD"),
+        ("cmd", "fault inject aht", 5, []),
+        ("seg", 12, "FAULT_AHT", "temperature/humidity reads now fail: the state should keep updating"),
+        ("ask", "Does the LCD show 'Sensor fault - AHT' while the state keeps updating? (y/n, or what you saw)"),
+        ("cmd", "fault clear aht", 5, []),
+        ("seg", 10, "STILL", "AHT fault cleared"),
+        ("cmd", "fault", 10, []),
+        ("cmd", "sd", 15, []),
+        ("ask", "Is the microSD slot empty (no card in the kit)? (y/n)"),
+        ("cmd", "wifi on", 15, []),
+        ("seg", 10, "STILL", "Wi-Fi module on"),
+        ("cmd", "wifi off", 10, []),
+        ("seg", 15, "STILL", "Wi-Fi lost (module held in reset): the LCD should keep updating"),
+        ("cmd", "wifi on", 15, []),
+        ("cmd", "wifi stats", 10, []),
+        ("seg", 10, "STILL", "Wi-Fi back"),
+        ("cmd", "infer", 10, []),
+        ("reset", "RESET while classifying: the board should boot back into RUN by itself."),
+        ("cmd", "infer log on", 5, []),
+        ("seg", 10, "STILL", "after RESET: hands off"),
+        ("cmd", "log 20", 15, []),
+        ("cmd", "fault hang infer", 5, []),
+        ("reboot", "The inference task stops checking in: the watchdog should reset the board within ~8 s.", 30),
+        ("cmd", "fault", 10, []),
+        ("cmd", "log 10", 15, []),
+        ("cmd", "infer", 10, []),
+        ("cmd", "diag mem", 10, []),
+        ("ask", "After the watchdog reset, is the board back in RUN with the state updating? (y/n)"),
+    ],
+    # T5 part B: the board ran on a power bank with no laptop; read back what it logged.
+    "m6_eventlog": [
+        ("say", "T5 part B read-back: the board has just been plugged back into the laptop after its\n"
+                "   power-bank run. Nothing to do on the board; this reads its event log (about 20 s)."),
+        ("ask", "When did the power-bank run start and end (clock time), and what did you do with the bag?", "text"),
+        ("cmd", "log 200", 40, []),
+        ("cmd", "infer", 10, []),
+        ("cmd", "version", 10, []),
+    ],
+    "m6_keys": _keys_plan(),
+    # T8: every verified module reachable and live (DIAG pages + console checks).
+    "m6_diag": [
+        ("say", "T8 diagnostics: you walk through the 5 DIAG pages with the keys and answer what you see.\n"
+                "   If you can, film the LCD while you do it (link in evidence/video_links.md). About 4 minutes."),
+        ("cmd", "infer log off", 5, []),
+        ("say", "Press UP once: DIAG page 1/5 'Sensors'. Tilt the board a little, then cover the left edge\n"
+                "   below the screen with your hand, then press Enter here."),
+        ("ask", "Page 1 Sensors: did the a/g numbers change when you tilted it, and light/ps when you covered it? (y/n)"),
+        ("say", "Press RIGHT once: page 2/5 'Tasks'. Then press Enter here."),
+        ("ask", "Page 2 Tasks: heap free/min and a task list with hwm and cpu% numbers? (y/n)"),
+        ("say", "Press RIGHT once: page 3/5 'Inference'. Then press Enter here."),
+        ("ask", "Page 3 Inference: model, window counts, feature/MLP timing and latency lines? (y/n)"),
+        ("say", "Press RIGHT once: page 4/5 'System'. Then press Enter here."),
+        ("ask", "Page 4 System: RTC, flash, event log, SD card, Wi-Fi, watchdog and uptime lines? (y/n)"),
+        ("say", "Press RIGHT once: page 5/5 'I/O test'. Press DOWN once and watch: red LED, blue LED,\n"
+                "   LED matrix red / green / blue, buzzer chirp. Then press Enter here."),
+        ("ask", "I/O test: did you see the red LED, the blue LED, the matrix red, green and blue, and hear the chirp?\n"
+                "   (y, or name what was missing)"),
+        ("say", "Press UP once: back to RUN. Then press Enter here."),
+        ("cmd", "diag sensors", 10, []),
+        ("cmd", "i2c stats", 10, []),
+        ("cmd", "fault", 10, []),
+        ("cmd", "infer", 10, []),
+        ("cmd", "ui", 10, []),
+        ("cmd", "rtc", 10, []),
+        ("cmd", "flash", 10, []),
+        ("cmd", "sd", 15, []),
+        ("cmd", "codec", 10, []),
+        ("cmd", "ir loop", 10, []),
+        ("cmd", "wifi on", 15, []),
+        ("cmd", "wifi stats", 10, []),
+        ("cmd", "wifi off", 10, []),
+        ("cmd", "log 10", 15, []),
+        ("cmd", "diag mem", 10, []),
+        ("cmd", "version", 10, []),
+        ("ask", "Video of the DIAG walk recorded? (type: done / skip)", ["done", "skip"]),
+    ],
+})
+
 
 def ts():
     return datetime.datetime.now().strftime("%H:%M:%S.%f")[:-3]
@@ -325,7 +583,12 @@ def find_port():
 
 
 class Board:
-    """Reads lines from the board, timestamps them, writes them to the log."""
+    """Reads lines from the board, timestamps them, writes them to the log.
+
+    A background thread reads the port all the time, so lines keep their
+    arrival time while the operator is answering a prompt (the M6 analysis
+    lines board output up with the timed steps). `[win]` lines (2 per second)
+    go to the log but not to the screen; seg steps show the latest state."""
 
     def __init__(self, port, log_fp):
         self.ser = serial.Serial(port, BAUD, timeout=0.05)
@@ -334,28 +597,67 @@ class Board:
         self.partial_t = None
         self.last_rx = time.time()
         self.lines = []
+        self.last_win = ""
+        self._dec = codecs.getincrementaldecoder("utf-8")("replace")
+        self._stop = threading.Event()
+        self._thread = threading.Thread(target=self._reader, daemon=True)
+        self._thread.start()
 
     def close(self):
+        self._stop.set()
+        self._thread.join(1.0)
         self.ser.close()
 
-    def poll(self):
-        data = self.ser.read(4096)
-        if not data:
-            return
+    def _reader(self):
+        while not self._stop.is_set():
+            try:
+                data = self.ser.read(4096)
+            except serial.SerialException as e:
+                print("!! serial read failed: %s" % e)
+                return
+            if data:
+                self._feed(data)
+
+    def _feed(self, data):
         self.last_rx = time.time()
-        for ch in data.decode("utf-8", "replace"):
+        for ch in self._dec.decode(data):
             if self.partial_t is None:
                 self.partial_t = ts()
             if ch == "\n":
                 line = self.partial.rstrip("\r")
                 self.log.write("%s > %s\n" % (self.partial_t, line))
                 self.log.flush()
-                print("   | " + line)
+                i = line.find("[win]")
+                if i < 0:
+                    print("   | " + line)
+                else:
+                    self.last_win = line[i:]
+                    if line[:i].strip(" >"):
+                        print("   | " + line[:i])
                 self.lines.append(line)
                 self.partial = ""
                 self.partial_t = None
             else:
                 self.partial += ch
+
+    def poll(self):
+        """The reader thread does the work; this only paces the wait loops."""
+        time.sleep(0.02)
+
+    def state_text(self):
+        """Latest smoothed state from the [win] lines, for the operator."""
+        kv = dict(p.split("=", 1) for p in self.last_win.split() if "=" in p)
+        if not kv:
+            return "no window yet (is `infer log on`?)"
+        st = kv.get("state", "-")
+        if st == "-":
+            return "no state (no model, or not classified yet)"
+        try:
+            conf = "%d %%" % round(float(kv.get("conf", "0")) * 100)
+        except ValueError:
+            conf = "?"
+        return "%s %s%s%s" % (st, conf, " (uncertain)" if kv.get("unc") == "1" else "",
+                               " FAULT" if kv.get("fault", "0x0") != "0x0" else "")
 
     def send(self, text):
         for ch in text:
@@ -388,18 +690,62 @@ class Board:
         return False
 
 
+def after_boot(board, n_lines):
+    """M5+ firmware: wait for the boot self-test to reach RUN, stop the [win] lines."""
+    if board.wait_for(lambda: any("BOOT -> " in l for l in board.lines[max(0, n_lines - 5):]), 15):
+        board.send("infer log off")
+        board.wait_for(lambda: False, 1.0)
+    board.wait_for(board.at_prompt, 3)
+
+
+def run_seg(board, step, cues, notes):
+    """Timed step with an expected label: start/end PC times go to the notes CSV."""
+    secs, expected, text = step[1], step[2], step[3]
+    trial = step[4] if len(step) > 4 else ""
+    print("\n   ##########  NOW: %s (%d s)  ##########\n" % (text, secs))
+    t_start = ts()
+    cues.write("%s cue: %s (%d s)\n" % (t_start, text, secs))
+    cues.flush()
+    t0 = time.time()
+    tick = 2 if secs <= 20 else 5
+    next_tick = t0 + tick
+    while time.time() - t0 < secs:
+        board.poll()
+        left = secs - (time.time() - t0)
+        if time.time() >= next_tick and left > 0.5:
+            print("   .. %3d s left | board: %s" % (round(left), board.state_text()))
+            next_tick += tick
+    t_end = ts()
+    print("   ##########  STOP  ##########")
+    cues.write("%s cue: stop\n" % t_end)
+    ok = 1
+    if trial:
+        a = input("   Enter = trial done as described, x = something went wrong: ").strip().lower()
+        if a.startswith("x"):
+            ok = 0
+            why = input("   What went wrong (a few words)? ").strip()
+            cues.write("%s answer: %s went wrong: %s\n" % (ts(), trial, why))
+    notes.write("%s,%s,%s,%s,%d\n" % (trial, t_start, t_end, expected, ok))
+    notes.flush()
+    cues.flush()
+
+
 def run_plan(name, port, force, out_dir):
-    stem = name if name.startswith("m5_") else "m2_%s" % name
+    stem = name if name.startswith(("m5_", "m6_")) else "m2_%s" % name
     out = os.path.join(out_dir, "%s.log" % stem)
     cues_path = os.path.join(out_dir, "%s_cues.txt" % stem)
+    notes_path = os.path.join(out_dir, "%s_notes.csv" % stem)
     if os.path.exists(out) and not force:
         print("%s already exists. Use --force to overwrite it." % out)
         return False
+    has_seg = any(s[0] == "seg" for s in PLANS[name])
 
     print("\n=== %s: capturing to %s" % (name.upper(), out))
     with open(out, "w", encoding="utf-8", newline="\n") as log, \
-            open(cues_path, "w", encoding="utf-8", newline="\n") as cues:
+            open(cues_path, "w", encoding="utf-8", newline="\n") as cues, \
+            open(notes_path if has_seg else os.devnull, "w", encoding="utf-8", newline="\n") as notes:
         cues.write("# operator cues shown by tools/capture_m2.py (PC time, %s)\n" % datetime.date.today())
+        notes.write("trial,start,end,expected,ok\n")
         try:
             board = Board(port, log)
         except serial.SerialException as e:
@@ -413,10 +759,7 @@ def run_plan(name, port, force, out_dir):
             # M5 firmware: the UI runs the boot self-test (it also resets the
             # Wi-Fi module) and then enters RUN; wait for that before typing,
             # and stop the per-window lines so commands are easy to follow.
-            if board.wait_for(lambda: any("BOOT -> " in l for l in board.lines), 15):
-                board.send("infer log off")
-                board.wait_for(lambda: False, 1.0)
-            board.wait_for(board.at_prompt, 3)
+            after_boot(board, 0)
             banner = next((l for l in board.lines if l.startswith("=== PackSense")), "")
             if "-dirty" in banner:
                 print("WARNING: firmware was built from uncommitted changes (%s)." % banner)
@@ -462,12 +805,24 @@ def run_plan(name, port, force, out_dir):
                     n_ready = sum("[cli] ready" in l for l in board.lines)
                     if not board.wait_for(lambda: sum("[cli] ready" in l for l in board.lines) > n_ready, 60):
                         print("!! no reboot seen within 60 s")
-                    n_boot = len(board.lines)
-                    if board.wait_for(lambda: any("BOOT -> " in l for l in board.lines[n_boot - 5:]), 15):
-                        board.send("infer log off")
-                        board.wait_for(lambda: False, 1.0)
-                    board.wait_for(board.at_prompt, 3)
+                    after_boot(board, len(board.lines))
                     cues.flush()
+                    continue
+                if step[0] == "reboot":
+                    _, text, limit = step
+                    print("\n>> " + text + " (no key press needed)")
+                    cues.write("%s cue: wait for the board to reboot by itself (%s)\n" % (ts(), text))
+                    n_ready = sum("[cli] ready" in l for l in board.lines)
+                    if board.wait_for(lambda: sum("[cli] ready" in l for l in board.lines) > n_ready, limit):
+                        cues.write("%s cue: reboot seen\n" % ts())
+                        after_boot(board, len(board.lines))
+                    else:
+                        print("!! no reboot seen within %d s" % limit)
+                        cues.write("%s cue: NO reboot within %d s\n" % (ts(), limit))
+                    cues.flush()
+                    continue
+                if step[0] == "seg":
+                    run_seg(board, step, cues, notes)
                     continue
                 if step[0] == "wait":
                     _, secs, text = step
@@ -630,9 +985,9 @@ def check_als(port):
 
 def main():
     ap = argparse.ArgumentParser(description="Guided M2 sensor evidence capture.")
-    ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd", "matrix", "rtc", "storage", "ir", "codec", "wifi",
-                                       "m5_parity", "m5_func", "find-als", "check-als"],
-                    help="all = imu, als, env; io = leds, buzzer, keys; find-als: live light/proximity readout to locate the sensor (writes no files); "
+    ap.add_argument("sensor", choices=list(PLANS) + ["all", "io", "m6_t1", "find-als", "check-als"],
+                    help="all = imu, als, env; io = leds, buzzer, keys; m6_t1 = the four T1 runs; find-als: live "
+                         "light/proximity readout to locate the sensor (writes no files); "
                          "check-als: 20 s timed cover/torch test, saved to logs/ (not evidence)")
     ap.add_argument("--port", help="serial port (default: auto-detect the ST-LINK VCP)")
     ap.add_argument("--flash", action="store_true", help="build and upload the firmware first")
@@ -658,7 +1013,8 @@ def main():
     if args.sensor == "check-als":
         return check_als(port)
 
-    groups = {"all": ["imu", "als", "env"], "io": ["leds", "buzzer", "keys"]}
+    groups = {"all": ["imu", "als", "env"], "io": ["leds", "buzzer", "keys"],
+              "m6_t1": ["m6_t1_" + c for c in T1_CLASSES]}
     names = groups.get(args.sensor, [args.sensor])
     ok = all(run_plan(n, port, args.force, args.out_dir) for n in names)
     if ok:
