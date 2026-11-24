@@ -37,5 +37,8 @@ bool cli_arg_u32(const char *s, unsigned long min, unsigned long max, unsigned l
 
 /* Heartbeat console lines on/off (M1 [hb] lines; the LED always blinks). */
 extern volatile bool g_hb_print;
+/* Set while a command streams machine-read output (capture dump): background
+   tasks then skip their periodic console lines. */
+extern volatile bool g_console_quiet;
 
 #endif /* CLI_H */

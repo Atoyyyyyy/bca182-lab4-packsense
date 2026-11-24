@@ -1,6 +1,6 @@
 /*
- * model.c: MLP inference (dense layers, ReLU, softmax) and the rule baseline.
- * The only file that instantiates the generated tables.
+ * mlp_infer.c: MLP inference (dense layers, ReLU, softmax).
+ * The only file that instantiates the generated model tables.
  */
 #define MODEL_DEFINE_TABLES
 #include "model.h"
@@ -79,18 +79,4 @@ int model_infer(const float feat[FEAT_N], float prob[MODEL_N_CLASSES])
     }
     return -1;
 #endif
-}
-
-int baseline_classify(const float feat[FEAT_N])
-{
-    if (feat[FI_AMAG_STD] < BASELINE_T_STILL) {
-        return CLS_STILL;
-    }
-    if (feat[FI_JERK_PEAK] > BASELINE_T_ROUGH) {
-        return CLS_ROUGH;
-    }
-    if (feat[FI_ALS_LOGRANGE] > BASELINE_T_ALS || feat[FI_PS_NEAR] > BASELINE_T_PS) {
-        return CLS_ACCESS;
-    }
-    return CLS_CARRIED;
 }

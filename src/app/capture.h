@@ -17,8 +17,12 @@
 
 #include <stdbool.h>
 
-/* Task + console commands. Call before the scheduler starts.
-   start_in_mode: enter CAPTURE mode as soon as the task runs. */
-void capture_init(bool start_in_mode);
+/* Task + console commands. Call before the scheduler starts. */
+void capture_init(void);
+
+/* Enter / leave the mode (from the UI task, which owns mode changes; see
+   app_mode.h). Waits until done. Returns true if the mode is now on. */
+bool capture_set(bool on);
+bool capture_is_on(void);
 
 #endif /* CAPTURE_H */

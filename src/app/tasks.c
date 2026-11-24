@@ -17,6 +17,7 @@
 #include "task.h"
 
 #include "app/cli.h"
+#include "app/wdg.h"
 #include "app_config.h"
 #include "drivers/console_uart.h"
 #include "drivers/led.h"
@@ -38,6 +39,7 @@ static void heartbeat_task(void *arg)
                    (unsigned long)last_wake);
 
     for (;;) {
+        wdg_service(); /* feeds the IWDG while every task checks in */
         if (g_hb_led) {
             led_toggle(LED_RED);
         }

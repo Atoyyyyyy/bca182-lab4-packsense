@@ -5,7 +5,7 @@
 #define APP_CONFIG_H
 
 #define PACKSENSE_FW_NAME          "PackSense"
-#define PACKSENSE_FW_VERSION       "0.2.0-m2"
+#define PACKSENSE_FW_VERSION       "0.5.0-m5"
 
 #ifndef PACKSENSE_GIT_REV
 #define PACKSENSE_GIT_REV          "unknown" /* set by tools/pio_git_rev.py */
@@ -14,7 +14,7 @@
 /* Console */
 #define CONSOLE_BAUD               115200U
 #define CONSOLE_TX_BUF_SIZE        1024U /* bytes, power of two */
-#define CONSOLE_LINE_MAX           160U  /* longest formatted line */
+#define CONSOLE_LINE_MAX           256U  /* longest formatted line ([win] is ~210) */
 #define CONSOLE_RX_BUF_SIZE        128U  /* bytes typed ahead of the CLI */
 
 /* NVIC priorities (0 = highest). See the rules in FreeRTOSConfig.h. */
@@ -51,9 +51,41 @@
 #define ENV_TASK_STACK_WORDS       384U
 #define ENV_PERIOD_MS              1000U
 
+/* Sensor fault handling (PRD 6.4) */
+#define SENSOR_FAIL_LIMIT          3U    /* consecutive failed reads -> DEGRADED */
+#define SENSOR_REINIT_MS           5000U /* DEGRADED: re-init attempt period */
+
 /* Capture mode (M3): writes samples to the SPI flash log */
 #define CAPTURE_TASK_PRIO          3U
 #define CAPTURE_TASK_STACK_WORDS   768U
+
+/* Product firmware (M5, PRD 6.3) */
+#define INFER_TASK_PRIO            4U
+#define INFER_TASK_STACK_WORDS     1024U
+#define INFER_RESULT_QUEUE_LEN     4U
+#define INFER_MAX_INVALID          10U   /* > 5 % of a 200-sample window -> not classified */
+#define DECISION_MIN_CONF          0.5f  /* smoothed confidence below this = uncertain */
+#define UI_TASK_PRIO               3U
+#define UI_TASK_STACK_WORDS        768U
+#define UI_PERIOD_MS               50U
+#define UI_DIAG_PERIOD_MS          500U
+#define UI_SELFTEST_SHOW_MS        2000U
+#define UI_BANNER_MS               4000U /* "Rough handling detected" etc. */
+#define LOG_TASK_PRIO              1U
+#define LOG_TASK_STACK_WORDS       1024U
+#define LOG_QUEUE_LEN              16U
+
+/* Climate rule (AHT, context only; thresholds can be changed with `climate`) */
+#define CLIMATE_T_HIGH_C           40.0f
+#define CLIMATE_RH_HIGH            80.0f
+#define CLIMATE_HOLD_S             30U   /* above a threshold this long -> warning */
+#define CLIMATE_HYST_C             2.0f
+#define CLIMATE_HYST_RH            5.0f
+
+/* Independent watchdog: fed by the heartbeat task only while every
+   monitored task has checked in during the last window. */
+#define WDG_TIMEOUT_MS             4000U
+#define WDG_WINDOW_MS              2000U
 
 /* I2C */
 #define I2C_MAIN_CLOCK_HZ          400000U /* fast mode: ICM-20608, AP3216C, ES8388 */

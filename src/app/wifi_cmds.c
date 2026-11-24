@@ -120,8 +120,21 @@ static int cmd_wifi_stats(int argc, char **argv)
     return 0;
 }
 
+static int cmd_wifi_off(int argc, char **argv)
+{
+    (void)argv;
+    if (argc != 0) {
+        return 1;
+    }
+    rw007_off();
+    console_puts("[wifi] RW007 held in reset (radio off); `wifi on` starts it again\r\n");
+    return 0;
+}
+
 static const cli_cmd_t s_cmds[] = {
     {"wifi", "", "reset + init the RW007 (sn, firmware, MAC)", cmd_wifi},
+    {"wifi on", "", "same as `wifi`", cmd_wifi},
+    {"wifi off", "", "hold the RW007 in reset (offline test, AC-7)", cmd_wifi_off},
     {"wifi scan", "", "scan for networks (names masked in the output)", cmd_wifi_scan},
     {"wifi stats", "", "RW007 SPI transfer counters", cmd_wifi_stats},
 };

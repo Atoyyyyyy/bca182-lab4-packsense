@@ -27,9 +27,12 @@ typedef struct {
     float als[FEAT_WIN];                            /* lux */
     float ps[FEAT_WIN];                             /* raw count */
     uint8_t ps_valid[FEAT_WIN];
+    /* scratch for features_compute(): each caller owns its window, so the
+       function is reentrant (InferTask and `selftest model` can overlap) */
+    float amag[FEAT_WIN], gmag[FEAT_WIN], tmp[FEAT_WIN];
 } feat_window_t;
 
-/* out[FEAT_N] in the order of ml/common.py FEATURES. */
-void features_compute(const feat_window_t *w, float out[FEAT_N]);
+/* out[FEAT_N] in the order of ml/common.py FEATURES. Uses w->amag/gmag/tmp. */
+void features_compute(feat_window_t *w, float out[FEAT_N]);
 
 #endif /* FEATURES_H */

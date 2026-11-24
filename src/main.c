@@ -23,10 +23,15 @@
 #include "app/rtc_cmds.h"
 #include "app/storage_cmds.h"
 #include "app/wifi_cmds.h"
+#include "app/app_mode.h"
 #include "app/capture.h"
+#include "app/evlog.h"
+#include "app/infer_task.h"
 #include "app/selftest.h"
 #include "app/sensor_task.h"
 #include "app/tasks.h"
+#include "app/ui.h"
+#include "app/wdg.h"
 #include "app_config.h"
 #include "board_pins.h"
 #include "drivers/console_uart.h"
@@ -169,8 +174,13 @@ int main(void)
     if (capture_key) {
         console_puts("[boot] UP held: starting in CAPTURE mode\r\n");
     }
+    wdg_init(reset_csr);
+    app_mode_cmds_register();
     sensor_tasks_create();
-    capture_init(capture_key);
+    capture_init();
+    infer_task_create();
+    evlog_task_create();
+    ui_task_create(reset_csr, capture_key);
     tasks_create();
 
     console_puts("[boot] starting scheduler\r\n");

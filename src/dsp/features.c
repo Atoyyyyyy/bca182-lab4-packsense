@@ -11,7 +11,7 @@
 
 static float s_cos[FEAT_NFFT], s_sin[FEAT_NFFT];
 static bool s_tw_ready;
-static float s_amag[FEAT_WIN], s_gmag[FEAT_WIN], s_d[FEAT_WIN];
+
 
 static void twiddles(void)
 {
@@ -104,18 +104,18 @@ static float mean_range(const float *x, int from, int n)
     return mean_of(x + from, n);
 }
 
-void features_compute(const feat_window_t *w, float out[FEAT_N])
+void features_compute(feat_window_t *w, float out[FEAT_N])
 {
     if (!s_tw_ready) {
         twiddles();
     }
     for (int i = 0; i < FEAT_WIN; i++) {
-        s_amag[i] = sqrtf(w->ax[i] * w->ax[i] + w->ay[i] * w->ay[i] + w->az[i] * w->az[i]);
-        s_gmag[i] = sqrtf(w->gx[i] * w->gx[i] + w->gy[i] * w->gy[i] + w->gz[i] * w->gz[i]);
+        w->amag[i] = sqrtf(w->ax[i] * w->ax[i] + w->ay[i] * w->ay[i] + w->az[i] * w->az[i]);
+        w->gmag[i] = sqrtf(w->gx[i] * w->gx[i] + w->gy[i] * w->gy[i] + w->gz[i] * w->gz[i]);
     }
     float *f = out;
-    f = stats7(s_amag, f);
-    f = stats7(s_gmag, f);
+    f = stats7(w->amag, f);
+    f = stats7(w->gmag, f);
     f = stats3(w->ax, f);
     f = stats3(w->ay, f);
     f = stats3(w->az, f);
@@ -128,23 +128,23 @@ void features_compute(const feat_window_t *w, float out[FEAT_N])
     float jerk = 0.0f;
     int peaks = 0;
     for (int i = 1; i < FEAT_WIN; i++) {
-        const float dj = fabsf(s_amag[i] - s_amag[i - 1]);
+        const float dj = fabsf(w->amag[i] - w->amag[i - 1]);
         if (dj > jerk) {
             jerk = dj;
         }
-        if (s_amag[i] > thr && !(s_amag[i - 1] > thr)) {
+        if (w->amag[i] > thr && !(w->amag[i - 1] > thr)) {
             peaks++;
         }
     }
     *f++ = jerk;
     *f++ = (float)peaks;
 
-    const float am = mean_of(s_amag, FEAT_WIN);
+    const float am = mean_of(w->amag, FEAT_WIN);
     for (int i = 0; i < FEAT_WIN; i++) {
-        s_d[i] = s_amag[i] - am;
+        w->tmp[i] = w->amag[i] - am;
     }
-    *f++ = band_energy(s_d, FEAT_LOW_K0, FEAT_LOW_K1);
-    *f++ = band_energy(s_d, FEAT_HIGH_K0, FEAT_HIGH_K1);
+    *f++ = band_energy(w->tmp, FEAT_LOW_K0, FEAT_LOW_K1);
+    *f++ = band_energy(w->tmp, FEAT_HIGH_K0, FEAT_HIGH_K1);
 
     /* tilt change between the mean gravity vectors at both ends */
     const int e0 = FEAT_WIN - FEAT_TILT_N;

@@ -20,6 +20,7 @@
 #include "drivers/console_uart.h"
 
 volatile bool g_hb_print;
+volatile bool g_console_quiet;
 
 typedef struct {
     const cli_cmd_t *cmds;
@@ -180,7 +181,7 @@ static int cmd_diag_mem(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
-    enum { MAX_TASKS = 12 };
+    enum { MAX_TASKS = 16 };
     static TaskStatus_t st[MAX_TASKS]; /* CLI task only */
     configRUN_TIME_COUNTER_TYPE total = 0U;
     UBaseType_t n = uxTaskGetSystemState(st, MAX_TASKS, &total);

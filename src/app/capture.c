@@ -19,10 +19,12 @@
 #include "semphr.h"
 #include "task.h"
 
+#include "app/app_mode.h"
 #include "app/caplog.h"
 #include "app/cli.h"
 #include "app/sensor_task.h"
 #include "app/tasks.h"
+#include "app/wdg.h"
 #include "app_config.h"
 #include "board_pins.h"
 #include "drivers/buttons.h"
@@ -36,7 +38,7 @@
 
 #define NLABELS        4U
 #define COUNTDOWN_S    5U
-#define UI_PERIOD_MS   250U
+#define CAP_UI_PERIOD_MS   250U
 
 static const char *const k_label_name[NLABELS] = {"STILL", "CARRIED", "ROUGH", "ACCESS"};
 static const uint16_t k_label_s[NLABELS] = {30U, 30U, 15U, 15U}; /* default trial length */
@@ -68,7 +70,6 @@ static volatile uint32_t s_trial_records;
 static uint32_t s_phase_t0, s_phase_len_ms, s_trial_len_s;
 static uint32_t s_trial_errors;
 static uint32_t s_trial_dropped0, s_trial_gaps0;
-static bool s_start_in_mode;
 static bool s_lcd_ok;
 
 /* ---- feedback ------------------------------------------------------------- */
@@ -322,15 +323,13 @@ static void handle_key(const button_event_t *e)
 static void capture_task(void *arg)
 {
     (void)arg;
-    if (s_start_in_mode) {
-        enter_mode();
-    }
     uint32_t last_ui = 0U;
     uint32_t last_tick_s = 0U;
     for (;;) {
         rq_t r;
+        wdg_checkin(WDG_CAPTURE);
         if (!s_mode) {
-            if (xQueueReceive(s_rq, &r, portMAX_DELAY) == pdPASS) {
+            if (xQueueReceive(s_rq, &r, pdMS_TO_TICKS(1000)) == pdPASS) {
                 handle_rq(&r);
             }
             continue;
@@ -385,7 +384,7 @@ static void capture_task(void *arg)
         if (s_phase == PH_REC && (now - s_phase_t0) >= s_phase_len_ms) {
             stop_trial("time");
         }
-        if (now - last_ui >= UI_PERIOD_MS) {
+        if (now - last_ui >= CAP_UI_PERIOD_MS) {
             last_ui = now;
             ui_refresh(false);
         }
@@ -438,8 +437,7 @@ static int cmd_capture_on(int argc, char **argv)
     if (argc != 0) {
         return 1;
     }
-    post(RQ_ON, 0);
-    return 0;
+    return app_mode_request(MODE_CAPTURE) == MODE_CAPTURE ? 0 : 1;
 }
 
 static int cmd_capture_off(int argc, char **argv)
@@ -448,7 +446,7 @@ static int cmd_capture_off(int argc, char **argv)
     if (argc != 0) {
         return 1;
     }
-    post(RQ_OFF, 0);
+    (void)app_mode_request(MODE_RUN);
     return 0;
 }
 
@@ -543,6 +541,7 @@ static int cmd_capture_dump(int argc, char **argv)
         return 0;
     }
     const uint32_t n = ci.records;
+    g_console_quiet = true; /* no [win]/[event] lines in the middle of the dump */
     console_printf("#CAPDUMP v1 records=%lu from=%lu rec_size=%u acc_scale=800 gyr_scale=60 als_lsb=0.35 "
                    "baud=%lu\r\n",
                    (unsigned long)n, from, CAPLOG_REC_SIZE, baud ? baud : (unsigned long)CONSOLE_BAUD);
@@ -573,6 +572,7 @@ static int cmd_capture_dump(int argc, char **argv)
         vTaskDelay(pdMS_TO_TICKS(400));
         console_printf("#BAUD %lu\r\n", (unsigned long)CONSOLE_BAUD);
     }
+    g_console_quiet = false;
     return 0;
 }
 
@@ -607,9 +607,19 @@ static const cli_cmd_t s_cmds[] = {
     {"capture wipe", "yes", "erase the whole capture log", cmd_capture_wipe},
 };
 
-void capture_init(bool start_in_mode)
+bool capture_set(bool on)
 {
-    s_start_in_mode = start_in_mode;
+    post(on ? RQ_ON : RQ_OFF, 0);
+    return s_mode;
+}
+
+bool capture_is_on(void)
+{
+    return s_mode;
+}
+
+void capture_init(void)
+{
     s_rq = xQueueCreateStatic(4, sizeof(rq_t), s_rq_storage, &s_rq_buf);
     s_ack = xSemaphoreCreateBinaryStatic(&s_ack_buf);
     TaskHandle_t h = xTaskCreateStatic(capture_task, "Capture", CAPTURE_TASK_STACK_WORDS, NULL, CAPTURE_TASK_PRIO,

@@ -53,12 +53,27 @@ typedef struct {
     uint32_t env_reads;
 } sensor_stats_t;
 
+typedef enum { SENS_IMU = 0, SENS_ALS, SENS_AHT, SENS_COUNT } sensor_id_t;
+
+typedef struct {
+    bool degraded;                 /* not read; re-init every SENSOR_REINIT_MS */
+    bool injected;                 /* `fault inject` active */
+    uint32_t consecutive;          /* failed reads in a row */
+    uint32_t failures;             /* failed reads in total */
+    uint32_t degraded_events;
+    uint32_t reinit_tries;
+    uint32_t recoveries;
+} sensor_health_t;
+
 /* Create both tasks (static, CCM). Call before the scheduler starts. */
 void sensor_tasks_create(void);
 
 /* Init the sensors if needed (from the calling task) and start sampling.
-   Returns false if the IMU is missing (the queue then stays empty). */
+   Returns false if the IMU is missing (the queue then stays empty). For
+   CAPTURE, which needs the IMU. */
 bool sensors_start(void);
+/* Product modes: start even if a sensor is missing; it starts DEGRADED. */
+void sensors_start_any(void);
 void sensors_stop(void);
 
 /* The sample queue (depth SENSOR_QUEUE_LEN). One consumer at a time. */
@@ -66,5 +81,10 @@ QueueHandle_t sensors_queue(void);
 
 void sensors_get_stats(sensor_stats_t *out);
 void sensors_reset_stats(void);
+
+const char *sensor_name(sensor_id_t id);
+void sensors_get_health(sensor_health_t out[SENS_COUNT]);
+uint32_t sensors_fault_mask(void);          /* bit per DEGRADED sensor */
+void sensors_inject(sensor_id_t id, bool on); /* simulate a NACK (PRD 8.6) */
 
 #endif /* SENSOR_TASK_H */
