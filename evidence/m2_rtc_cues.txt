@@ -1,0 +1,10 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-24)
+14:58:51.014 sent: rtc
+14:58:51.504 sent: rtc set 2026-11-24 14:58:51
+14:58:52.126 sent: rtc
+14:58:52.644 sent: rtc check 20
+14:58:56.100 sent: rtc check 20
+14:58:59.090 cue: press RESET (The RTC should keep running through a RESET (same power).)
+14:59:07.522 sent: rtc
+14:59:08.036 sent: rtc set 2026-02-30 10:00:00
+14:59:08.662 sent: rtc

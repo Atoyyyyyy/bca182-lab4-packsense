@@ -1,0 +1,52 @@
+14:58:46.538 > 
+14:58:46.538 > 
+14:58:46.538 > === PackSense 0.2.0-m2 (git c4464ec) built Nov 24 2026 14:57:16 ===
+14:58:46.599 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+14:58:46.601 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+14:58:46.602 > [boot] clock source: HSE 8 MHz crystal -> PLL
+14:58:46.602 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+14:58:46.602 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+14:58:46.602 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+14:58:46.603 > [boot] FPU: CPACR CP10/CP11=full access
+14:58:46.603 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40944 B usable), max syscall prio 5
+14:58:46.605 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+14:58:46.605 > [boot] starting scheduler
+14:58:46.605 > [cli] ready, type 'help'
+14:58:46.605 > > [rtos] scheduler started, first task running at tick 0
+14:58:51.088 > rtc
+14:58:51.088 > [rtc] t=4433 init OK in 0 ms: source=LSE kept_running=yes lse_start_ms=0
+14:58:51.088 > [rtc] t=4433 2026-11-24 15:01:00.542 source=LSE time_valid=yes
+14:58:51.088 > > rtc set 2026-11-24 14:58:51
+14:58:51.691 > [rtc] t=5031 set OK
+14:58:51.691 > [rtc] t=5031 2026-11-24 14:58:51.000 source=LSE time_valid=yes
+14:58:51.691 > > rtc
+14:58:52.205 > [rtc] t=5546 2026-11-24 14:58:51.511 source=LSE time_valid=yes
+14:58:52.205 > > rtc check 20
+14:58:52.753 > [rtc] t=6105 rate check over 20 RTC seconds (+~3 s to lock on)...
+14:58:55.662 > [rtc] t=9031 rate check RANGE_ERR
+14:58:55.662 > > rtc check 20
+14:58:56.210 > [rtc] t=9560 rate check over 20 RTC seconds (+~3 s to lock on)...
+14:58:58.650 > [rtc] t=12031 rate check RANGE_ERR
+14:58:58.650 > > 
+14:59:04.414 > 
+14:59:04.414 > === PackSense 0.2.0-m2 (git c4464ec) built Nov 24 2026 14:57:16 ===
+14:59:04.415 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+14:59:04.475 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+14:59:04.475 > [boot] clock source: HSE 8 MHz crystal -> PLL
+14:59:04.476 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+14:59:04.476 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+14:59:04.476 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+14:59:04.477 > [boot] FPU: CPACR CP10/CP11=full access
+14:59:04.477 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40944 B usable), max syscall prio 5
+14:59:04.477 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+14:59:04.477 > [boot] starting scheduler
+14:59:04.477 > [cli] ready, type 'help'
+14:59:04.477 > > [rtos] scheduler started, first task running at tick 0
+14:59:07.600 > rtc
+14:59:07.600 > [rtc] t=3074 init OK in 0 ms: source=LSE kept_running=yes lse_start_ms=0
+14:59:07.600 > [rtc] t=3074 2026-11-24 14:59:06.910 source=LSE time_valid=yes
+14:59:07.601 > > rtc set 2026-02-30 10:00:00
+14:59:08.223 > [rtc] t=3700 set RANGE_ERR
+14:59:08.224 > [rtc] t=3700 2026-11-24 14:59:07.539 source=LSE time_valid=yes
+14:59:08.224 > > rtc
+14:59:08.738 > [rtc] t=4212 2026-11-24 14:59:08.050 source=LSE time_valid=yes
