@@ -213,7 +213,7 @@ def write_session(sid, recs, raw_dir):
         for r in recs:
             t, ax, ay, az, gx, gy, gz, als, ps, temp, rh, label, flags, trial, _sess, _chk = r
             w.writerow([sid, trial, LABELS[label] if label < 4 else label, t,
-                        f"{ax / 800:.4f}", f"{ay / 800:.4f}", f"{az / 800:.4f}",
+                        f"{ax / 800:.5f}", f"{ay / 800:.5f}", f"{az / 800:.5f}",  # exact (1/800 = 0.00125)
                         f"{gx / 60:.3f}", f"{gy / 60:.3f}", f"{gz / 60:.3f}",
                         f"{als * 0.35:.2f}", ps, 1 if flags & 0x40 else 0,
                         f"{temp / 100:.2f}", f"{rh / 100:.2f}", flags & 0x3F])
