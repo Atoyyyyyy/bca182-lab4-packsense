@@ -104,8 +104,10 @@ Type into `pio device monitor`. `help` lists everything; any key stops a stream.
 
 M3–M5 add: `capture`, `capture on|off|label|start|stop|dump|wipe` (recording
 trials, see [`m3_capture.md`](docs/test_sheets/m3_capture.md)); `mode`,
-`infer`, `ui`, `selftest model`, `fault`, `climate`, `log`, `wifi on|off`
-(see [`m5_product.md`](docs/test_sheets/m5_product.md)).
+`infer`, `ui`, `selftest model`, `fault`, `climate`, `log`, `wifi on|off`,
+`alarm test` (see [`m5_product.md`](docs/test_sheets/m5_product.md)). Every key
+press prints `[key] ... press ... edge_to_feedback_ms=` and every release the
+action it triggered (`action=arm`, `edge_to_action_ms=`), for the M6 timing tests.
 
 Analyse captured streams with `python tools/m2_sensor_stats.py <log>`. The
 M2 capture procedures are in [`docs/test_sheets/m2_sensors.md`](docs/test_sheets/m2_sensors.md)
@@ -121,7 +123,7 @@ and [`docs/test_sheets/m2_io.md`](docs/test_sheets/m2_io.md).
 | M3 | Data capture | firmware (CAPTURE mode → SPI flash log), `tools/capture.py`, protocol ([data/README.md](data/README.md), [test sheet](docs/test_sheets/m3_capture.md)) done; **recording sessions: TODO (H)** |
 | M4 | Features, baseline, model, C export | `ml/` pipeline, C features + MLP + baseline, `selftest model` done and smoke-tested on synthetic data; **real training: after M3** |
 | M5 | On-device inference + product firmware | firmware done and running (placeholder model); parity + functional check after M4 ([test sheet](docs/test_sheets/m5_product.md)) |
-| M6 | Testing and evaluation | — |
+| M6 | Testing and evaluation | [test plan](docs/test_plan.md) T1–T9, guided capture plans (`capture_m2.py m6_*`), analysis scripts (`t1_results.py`, `t7_keys.py`, `size_report.py`, `analyze_soak.py`, `latency_stats.py`) and the [operator sheet](docs/test_sheets/m6_tests.md) done; **runs: after M5 parity (H)** |
 | M7 | Report, README, demo | — |
 
 ## Results

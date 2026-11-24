@@ -1,0 +1,81 @@
+trial,class,secs,bag,load,carrier,place,light,setup,do
+S01,STILL,12,B1,empty,P1,floor,bright,"put the bag on the floor, closed; press Enter and step back",hands off
+S02,STILL,12,B1,empty,P2,desk,bright,"put the bag on the desk, closed; press Enter and step back",hands off
+S03,STILL,12,B1,loaded,P3,chair,bright,"put the bag on a chair seat, closed; press Enter and step back",hands off
+S04,STILL,12,B2,loaded,P1,floor,dim,"put the bag on the floor, closed; press Enter and step back",hands off
+S05,STILL,12,B2,empty,P2,bed or sofa,dim,"put the bag on a bed or sofa, closed; press Enter and step back",hands off
+S06,STILL,12,B1,loaded,P3,desk,dim,"put the bag on the desk lying flat on its back, closed; press Enter and step back",hands off
+S07,STILL,12,B2,empty,P1,chair,bright,"put the bag on a chair seat leaning on the backrest; press Enter and step back",hands off
+S08,STILL,12,B1,empty,P2,floor,dim,"stand the bag upright on the floor against a wall; press Enter and step back",hands off
+S09,STILL,12,B2,loaded,P3,desk,bright,"put the bag on the desk, closed; press Enter and step back",hands off
+S10,STILL,12,B1,loaded,P1,bench or stool,bright,"put the bag on a bench or stool, closed; press Enter and step back",hands off
+S11,STILL,12,B2,empty,P2,floor,bright,"put the bag on the floor in another spot of the room; press Enter and step back",hands off
+S12,STILL,12,B1,empty,P3,bed or sofa,bright,"put the bag on a bed or sofa, closed; press Enter and step back",hands off
+S13,STILL,12,B2,loaded,P1,chair,dim,"put the bag on a chair seat, closed; press Enter and step back",hands off
+S14,STILL,12,B1,loaded,P2,floor,bright,"put the bag on the floor lying flat on its front; press Enter and step back",hands off
+S15,STILL,12,B2,empty,P3,desk,dim,"put the bag on the desk, closed; press Enter and step back",hands off
+S16,STILL,12,B1,empty,P1,desk,bright,"hang the bag on a chair back or hook if there is one, else put it on the desk; press Enter and step back",hands off
+S17,STILL,12,B2,loaded,P2,floor,dim,"put the bag on the floor, closed; press Enter and step back",hands off
+S18,STILL,12,B1,loaded,P3,chair,dim,"put the bag on a chair seat, closed; press Enter and step back",hands off
+S19,STILL,12,B2,empty,P1,bench or stool,bright,"put the bag on a bench or stool, closed; press Enter and step back",hands off
+S20,STILL,12,B1,empty,P2,floor,bright,"put the bag on the floor, closed; press Enter and step back",hands off
+C01,CARRIED,20,B1,empty,P1,corridor,bright,"put the bag on your back (both straps) and stand still",walk normally
+C02,CARRIED,20,B1,loaded,P2,corridor,bright,"put the bag on your back (both straps) and stand still",walk normally
+C03,CARRIED,20,B1,loaded,P3,room,dim,"hold the bag by its top handle and stand still",walk normally carrying it by the handle
+C04,CARRIED,20,B2,empty,P1,corridor,dim,"put the bag on your back (both straps) and stand still",walk normally
+C05,CARRIED,20,B2,loaded,P2,corridor,bright,"put the bag on one shoulder (one strap) and stand still",walk normally
+C06,CARRIED,20,B1,empty,P3,corridor,bright,"put the bag on your back (both straps) and stand still",walk briskly (a bit faster than normal)
+C07,CARRIED,20,B2,empty,P1,room,bright,"put the bag on your back (both straps) and stand still",walk slowly
+C08,CARRIED,20,B1,loaded,P2,corridor,dim,"put the bag on your back (both straps) and stand still","walk normally, turn around at the end and walk back"
+C09,CARRIED,20,B2,loaded,P3,corridor,bright,"put the bag on your back (both straps) and stand still",walk normally
+C10,CARRIED,20,B1,empty,P1,corridor,bright,"put the bag on one shoulder (one strap) and stand still",walk normally
+C11,CARRIED,20,B2,empty,P2,corridor,dim,"hold the bag by its top handle and stand still",walk normally carrying it by the handle
+C12,CARRIED,20,B1,loaded,P3,corridor,bright,"put the bag on your back (both straps) and stand still",walk normally
+C13,CARRIED,20,B2,loaded,P1,room,dim,"put the bag on your back (both straps) and stand still",walk normally around the room
+C14,CARRIED,20,B1,empty,P2,corridor,bright,"put the bag on your back (both straps) and stand still",walk briskly (a bit faster than normal)
+C15,CARRIED,20,B2,empty,P3,corridor,bright,"put the bag on your back (both straps) and stand still",walk normally
+C16,CARRIED,20,B1,loaded,P1,corridor,dim,"put the bag on your back (both straps) and stand still",walk slowly
+C17,CARRIED,20,B2,loaded,P2,corridor,bright,"put the bag on one shoulder (one strap) and stand still",walk normally
+C18,CARRIED,20,B1,empty,P3,room,bright,"hold the bag by its top handle and stand still",walk normally carrying it by the handle
+C19,CARRIED,20,B2,empty,P1,corridor,dim,"put the bag on your back (both straps) and stand still","walk normally, turn around at the end and walk back"
+C20,CARRIED,20,B1,loaded,P2,corridor,bright,"put the bag on your back (both straps) and stand still",walk normally
+R01,ROUGH,8,B1,dummy,P1,floor,bright,hold the bag by the handle about 30 cm above the floor,"set it down HARD on the floor, lift it, set it down hard again"
+R02,ROUGH,8,B1,dummy,P2,cushion or bed,bright,hold the bag about 40 cm above a cushion or bed,"toss it onto the cushion/bed, pick it up, toss again"
+R03,ROUGH,8,B1,empty,P3,in hand,bright,hold the bag by the handle,swing it back and forth hard the whole time
+R04,ROUGH,8,B2,dummy,P1,in hand,dim,hold the bag with both hands,shake it hard the whole time
+R05,ROUGH,8,B2,empty,P2,desk,dim,hold the bag about 20 cm above the desk,"set it down HARD on the desk, lift it, set it down hard again"
+R06,ROUGH,8,B1,dummy,P3,chair,bright,hold the bag about 30 cm above a chair seat,"drop-toss it onto the chair seat, pick it up, again"
+R07,ROUGH,8,B2,dummy,P1,cushion or bed,bright,hold the bag about 50 cm above a cushion or bed,"toss it onto the cushion/bed, pick it up, toss again"
+R08,ROUGH,8,B1,empty,P2,in hand,dim,hold the bag with both hands,shake it hard the whole time
+R09,ROUGH,8,B2,dummy,P3,floor,bright,hold the bag by the handle about 30 cm above the floor,"set it down HARD on the floor, lift it, set it down hard again"
+R10,ROUGH,8,B1,dummy,P1,in hand,bright,hold the bag by the handle,swing it back and forth hard the whole time
+R11,ROUGH,8,B2,empty,P2,cushion or bed,dim,hold the bag about 40 cm above a cushion or bed,"toss it onto the cushion/bed, pick it up, toss again"
+R12,ROUGH,8,B1,dummy,P3,desk,bright,hold the bag about 20 cm above the desk,"set it down HARD on the desk, lift it, set it down hard again"
+R13,ROUGH,8,B2,dummy,P1,in hand,bright,hold the bag with both hands,shake it hard the whole time
+R14,ROUGH,8,B1,empty,P2,floor,dim,hold the bag by the handle about 30 cm above the floor,"set it down HARD on the floor, lift it, set it down hard again"
+R15,ROUGH,8,B2,dummy,P3,in hand,dim,hold the bag by the handle,swing it back and forth hard the whole time
+R16,ROUGH,8,B1,dummy,P1,chair,bright,hold the bag about 30 cm above a chair seat,"drop-toss it onto the chair seat, pick it up, again"
+R17,ROUGH,8,B2,empty,P2,cushion or bed,bright,hold the bag about 50 cm above a cushion or bed,"toss it onto the cushion/bed, pick it up, toss again"
+R18,ROUGH,8,B1,dummy,P3,in hand,bright,hold the bag with both hands,shake it hard the whole time
+R19,ROUGH,8,B2,dummy,P1,floor,dim,hold the bag by the handle about 30 cm above the floor,"set it down HARD on the floor, lift it, set it down hard again"
+R20,ROUGH,8,B1,empty,P2,in hand,bright,hold the bag by the handle,swing it back and forth hard the whole time
+A01,ACCESS,12,B1,loaded,P1,desk,bright,"bag closed on the desk, your hand on the zipper","open the compartment, reach in, move items around, close it"
+A02,ACCESS,12,B1,loaded,P2,floor,bright,"bag closed on the floor, crouch next to it","open the compartment, reach in, move items around, close it"
+A03,ACCESS,12,B1,empty,P3,chair,dim,"bag closed on a chair seat","open the compartment, reach in, feel around, close it"
+A04,ACCESS,12,B2,loaded,P1,desk,dim,"bag closed on the desk","open the compartment SLOWLY, reach in, move items, close it"
+A05,ACCESS,12,B2,loaded,P2,floor,bright,"bag closed on the floor","open the compartment, take one item out, put it back, close it"
+A06,ACCESS,12,B1,loaded,P3,desk,bright,"bag closed on the desk","open the compartment FAST, reach in, move items, close it"
+A07,ACCESS,12,B2,empty,P1,bed or sofa,bright,"bag closed on a bed or sofa","open the compartment, reach in, feel around, close it"
+A08,ACCESS,12,B1,loaded,P2,chair,dim,"bag closed on a chair seat","open the compartment halfway, reach in, move items, close it"
+A09,ACCESS,12,B2,loaded,P3,desk,bright,"bag closed on the desk","open the compartment, reach in, move items around, close it"
+A10,ACCESS,12,B1,empty,P1,floor,dim,"bag closed on the floor","open the compartment, reach in, feel around, close it"
+A11,ACCESS,12,B2,loaded,P2,desk,bright,"bag closed on the desk","open the compartment, take one item out, put it back, close it"
+A12,ACCESS,12,B1,loaded,P3,floor,bright,"bag closed on the floor","open the compartment SLOWLY, reach in, move items, close it"
+A13,ACCESS,12,B2,empty,P1,chair,bright,"bag closed on a chair seat","open the compartment FAST, reach in, move items, close it"
+A14,ACCESS,12,B1,loaded,P2,desk,dim,"bag closed on the desk","open the compartment, reach in, move items around, close it"
+A15,ACCESS,12,B2,loaded,P3,bed or sofa,dim,"bag closed on a bed or sofa","open the compartment, reach in, move items around, close it"
+A16,ACCESS,12,B1,empty,P1,desk,bright,"bag closed on the desk","open the compartment halfway, reach in, move items, close it"
+A17,ACCESS,12,B2,loaded,P2,floor,dim,"bag closed on the floor","open the compartment, take one item out, put it back, close it"
+A18,ACCESS,12,B1,loaded,P3,chair,bright,"bag closed on a chair seat","open the compartment, reach in, move items around, close it"
+A19,ACCESS,12,B2,empty,P1,desk,bright,"bag closed on the desk","open the compartment, reach in, feel around, close it"
+A20,ACCESS,12,B1,loaded,P2,floor,bright,"bag closed on the floor","open the compartment, reach in, move items around, close it"
