@@ -1,0 +1,18 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-24)
+14:36:27.122 sent: lcd
+14:36:30.502 answer: Is the screen now lit (backlight on) and evenly BLACK, with no noise or stripes? -> Y
+14:36:30.504 sent: lcd bus
+14:36:31.039 sent: lcd te
+14:36:32.054 sent: lcd fill white
+14:38:50.772 answer: Is the WHOLE screen white and evenly lit, with no dead lines or dark bands? -> Y
+14:38:50.772 sent: lcd fill red
+14:38:53.213 answer: Is the whole screen RED (not blue)? -> Y
+14:38:53.215 sent: lcd fill green
+14:38:54.858 answer: Is the whole screen GREEN? -> y
+14:38:54.859 sent: lcd fill blue
+14:38:56.221 answer: Is the whole screen BLUE (not red)? -> Y
+14:38:56.223 sent: lcd bl off
+14:38:57.322 answer: Backlight off: did the screen go dark (blue image almost invisible)? -> y
+14:38:57.322 sent: lcd bl on
+14:38:57.857 sent: lcd test
+14:38:59.196 answer: Test pattern: is a thin WHITE frame visible along ALL FOUR edges? If a side is missing, say which. -> Y

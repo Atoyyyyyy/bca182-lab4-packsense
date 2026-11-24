@@ -1,0 +1,43 @@
+14:36:20.249 > 
+14:36:20.249 > 
+14:36:20.250 > === PackSense 0.2.0-m2 (git 15df5af) built Nov 24 2026 14:31:25 ===
+14:36:20.250 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+14:36:20.250 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+14:36:20.250 > [boot] clock source: HSE 8 MHz crystal -> PLL
+14:36:20.250 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+14:36:20.250 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+14:36:20.314 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+14:36:20.315 > [boot] FPU: CPACR CP10/CP11=full access
+14:36:20.316 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40944 B usable), max syscall prio 5
+14:36:20.317 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+14:36:20.317 > [boot] starting scheduler
+14:36:20.317 > [cli] ready, type 'help'
+14:36:20.318 > > [rtos] scheduler started, first task running at tick 0
+14:36:27.201 > lcd
+14:36:27.515 > [lcd] t=7192 init OK in 334 ms
+14:36:27.515 > [lcd] t=7192 id=81 81 B3 power_mode=0x9C madctl=0x00 colmod=0x05 backlight=on
+14:36:27.515 > [lcd] power_mode: booster=1 idle=0 partial=0 sleep_out=1 normal=1 display_on=1
+14:36:27.515 > > lcd bus
+14:36:30.599 > [lcd] bus reg=0x36 wrote=0xFC expect=0xFC read=0xFC ok
+14:36:30.599 > [lcd] bus reg=0x36 wrote=0x00 expect=0x00 read=0x00 ok
+14:36:30.600 > [lcd] bus reg=0x36 wrote=0xA8 expect=0xA8 read=0xA8 ok
+14:36:30.600 > [lcd] bus reg=0x36 wrote=0x54 expect=0x54 read=0x54 ok
+14:36:30.600 > [lcd] bus reg=0x3A wrote=0x55 expect=0x05 read=0x05 ok
+14:36:30.600 > [lcd] bus reg=0x3A wrote=0x66 expect=0x06 read=0x06 ok
+14:36:30.600 > [lcd] t=10259 bus test PASS (0 of 6 mismatched)
+14:36:30.600 > > lcd te
+14:36:31.617 > [lcd] t=11307 te: 31 rising edges, period 16924 us = 59.08 Hz
+14:36:31.617 > > lcd fill white
+14:36:32.178 > [lcd] t=11854 fill white rgb565=0xFFFF 240x240 took 13390 us
+14:36:32.178 > > lcd fill red
+14:38:50.888 > [lcd] t=150574 fill red rgb565=0xF800 240x240 took 13391 us
+14:38:50.888 > > lcd fill green
+14:38:53.339 > [lcd] t=153023 fill green rgb565=0x07E0 240x240 took 13391 us
+14:38:53.339 > > lcd fill blue
+14:38:54.977 > [lcd] t=154664 fill blue rgb565=0x001F 240x240 took 13391 us
+14:38:54.977 > > lcd bl off
+14:38:56.328 > [lcd] t=156000 backlight off
+14:38:56.328 > > lcd bl on
+14:38:57.427 > [lcd] t=157104 backlight on
+14:38:57.427 > > lcd test
+14:38:57.950 > [lcd] t=157641 test pattern: white frame; corners TL red, TR green, BL blue, BR yellow; middle bars red green blue
