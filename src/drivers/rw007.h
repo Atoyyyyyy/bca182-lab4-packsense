@@ -59,6 +59,9 @@ typedef struct {
 status_t rw007_init(rw007_info_t *info);
 bool rw007_is_ready(void);
 
+/* Hold the module in reset (radio off) until the next rw007_init(). */
+void rw007_off(void);
+
 /* Start a scan and collect reports until SCAN_DONE or timeout_ms. */
 status_t rw007_scan(uint32_t timeout_ms, rw007_scan_t *out);
 

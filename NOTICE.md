@@ -15,7 +15,8 @@ build yet.
 | GNU Arm toolchain | Compiler, newlib-nano | GPL (tools), BSD-style (newlib) | `toolchain-gccarmnoneeabi` 1.70201.0 (GCC 7.2.1) | in use (M1) |
 | CMSIS-DSP (only if used for the FFT) | `arm_rfft_fast_f32` | Apache-2.0 | TODO(pin) | optional |
 | FatFs (ChaN) | SD-card filesystem (`lib/FatFs/`) | FatFs license (BSD-style, 1-clause) | TODO(pin), vendored in M2 | planned |
-| scikit-learn, NumPy, pandas, matplotlib | Host-side ML pipeline (`ml/`) | BSD-3-Clause / BSD / BSD / PSF-based | pinned in `ml/requirements.txt` (M4) | planned |
+| scikit-learn, NumPy, PyYAML, matplotlib | Host-side ML pipeline (`ml/`) | BSD-3-Clause / BSD-3-Clause / MIT / PSF-based | scikit-learn 1.9.1, NumPy 2.5.5, PyYAML 6.0.4, matplotlib 3.11.2, pinned in `ml/requirements.txt` | in use (M4) |
+| DejaVu Sans Mono (Regular, Bold) | LCD bitmap fonts: `tools/make_font.py` renders ASCII 32–126 into `src/ui/font_data.h` | Bitstream Vera Fonts license (DejaVu changes public domain) | the TTFs shipped with matplotlib 3.11.2 (`mpl-data/fonts/ttf`, license text in `LICENSE_DEJAVU` there) | in use (M5) |
 | pyserial | Host capture script (`tools/capture.py`) | BSD-3-Clause | pinned in `ml/requirements.txt` (M3) | planned |
 
 ## Hardware documentation (referenced, not redistributed)
@@ -30,3 +31,17 @@ and checks their SHA-256. See `docs/hardware/SOURCES.md`.
   AHT10 datasheet v1.1 (Aosong): copies distributed inside the RT-Thread BSP packages.
 
 No RT-Thread OS code is used. The mandatory stack is STM32Cube HAL/LL + FreeRTOS.
+
+## Font notice (LCD text)
+
+`src/ui/font_data.h` contains 1-bit bitmaps rendered from DejaVu Sans Mono
+(regular and bold) by `tools/make_font.py`. The rendered glyphs are not
+distributed as a font file or under the Bitstream, Vera or DejaVu names.
+
+- Bitstream Vera Fonts: Copyright (c) 2003 by Bitstream, Inc. All Rights
+  Reserved. Bitstream Vera is a trademark of Bitstream, Inc.
+- DejaVu changes are in the public domain.
+- Glyphs imported from Arev fonts are (c) Tavmjong Bah.
+
+The full license text is the `LICENSE_DEJAVU` file next to the TTFs in
+matplotlib's `mpl-data/fonts/ttf/` folder.

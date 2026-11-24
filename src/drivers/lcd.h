@@ -51,6 +51,12 @@ void lcd_backlight(bool on);
 void lcd_fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color);
 void lcd_fill(uint16_t color);
 
+/* 1-bit bitmap (row-major, MSB = left, `stride` bytes per row), each pixel
+   drawn as a scale x scale block in fg or bg. Clipped as a whole: nothing is
+   drawn if it does not fit on the panel. */
+void lcd_draw_mono(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint8_t *bits, uint16_t stride,
+                   uint16_t fg, uint16_t bg, uint8_t scale);
+
 /* Bus check: write test values to MADCTL (0x36) and COLMOD (0x3A), read each
    back (0x0B / 0x0C), then restore the init values. Only the bits a register
    reads back are compared: MADCTL D7..D2, COLMOD D2..D0 (this panel returns

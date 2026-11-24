@@ -36,6 +36,7 @@ static volatile uint32_t s_dropped[BTN_COUNT];
 static bool s_stable[BTN_COUNT];       /* true = pressed */
 static TickType_t s_press_tick[BTN_COUNT];
 static uint32_t s_edges_since[BTN_COUNT]; /* raw edges since the last stable change */
+static TickType_t s_first_edge[BTN_COUNT]; /* ISR time of the first of those edges */
 static uint32_t s_presses[BTN_COUNT];
 static uint32_t s_long[BTN_COUNT];
 static button_event_t s_pending[BTN_COUNT]; /* events found in one settle pass */
@@ -104,6 +105,9 @@ static void settle(const raw_edge_t *first)
     raw_edge_t e = *first;
     do {
         if (e.key < BTN_COUNT) {
+            if (s_edges_since[e.key] == 0U) {
+                s_first_edge[e.key] = e.tick;
+            }
             s_edges_since[e.key]++;
         }
     } while (xQueueReceive(s_q, &e, pdMS_TO_TICKS(BUTTON_DEBOUNCE_MS)) == pdPASS);
@@ -119,6 +123,7 @@ static void settle(const raw_edge_t *first)
         ev->key = (button_id_t)k;
         ev->pressed = level;
         ev->t_ms = (uint32_t)now;
+        ev->t_edge_ms = s_edges_since[k] ? (uint32_t)s_first_edge[k] : (uint32_t)now;
         ev->edges = s_edges_since[k];
         s_edges_since[k] = 0U;
         if (level) {

@@ -414,6 +414,13 @@ bool rw007_is_ready(void)
     return s_ready;
 }
 
+void rw007_off(void)
+{
+    s_ready = false;
+    HAL_NVIC_DisableIRQ(EXTI15_10_IRQn);
+    gpio_init(); /* RST driven low: module held in reset */
+}
+
 static bool scan_done(void)
 {
     return s_scan != NULL && s_scan->done;

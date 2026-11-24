@@ -30,6 +30,7 @@ typedef struct {
     bool pressed;     /* true = press, false = release */
     bool long_press;  /* release only: held >= BUTTON_LONG_PRESS_MS */
     uint32_t t_ms;    /* when the key settled (tick count) */
+    uint32_t t_edge_ms; /* first raw EXTI edge of this change (tick count, ISR time) */
     uint32_t held_ms; /* release only */
     uint32_t edges;   /* raw edges seen for this change (1 = clean, more = bounce) */
 } button_event_t;

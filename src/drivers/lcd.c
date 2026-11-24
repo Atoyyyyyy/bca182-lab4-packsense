@@ -280,6 +280,33 @@ void lcd_fill_rect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t colo
     }
 }
 
+void lcd_draw_mono(uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint8_t *bits, uint16_t stride,
+                   uint16_t fg, uint16_t bg, uint8_t scale)
+{
+    if (!s_ready || scale == 0U) {
+        return;
+    }
+    const uint32_t W = (uint32_t)w * scale, H = (uint32_t)h * scale;
+    if (x + W > LCD_WIDTH || y + H > LCD_HEIGHT || W == 0U || H == 0U) {
+        return; /* only whole glyphs are drawn */
+    }
+    set_window(x, y, (uint16_t)(x + W - 1U), (uint16_t)(y + H - 1U));
+    const uint8_t fh = (uint8_t)(fg >> 8), fl = (uint8_t)fg, bh = (uint8_t)(bg >> 8), bl = (uint8_t)bg;
+    for (uint32_t r = 0; r < H; r++) {
+        const uint8_t *row = &bits[(r / scale) * stride];
+        for (uint32_t c = 0; c < W; c++) {
+            const uint32_t col = c / scale;
+            if (row[col >> 3] & (0x80U >> (col & 7U))) {
+                LCD_DATA = fh;
+                LCD_DATA = fl;
+            } else {
+                LCD_DATA = bh;
+                LCD_DATA = bl;
+            }
+        }
+    }
+}
+
 void lcd_fill(uint16_t color)
 {
     lcd_fill_rect(0, 0, LCD_WIDTH, LCD_HEIGHT, color);
