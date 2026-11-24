@@ -21,6 +21,7 @@
 #include "app/io_cmds.h"
 #include "app/lcd_cmds.h"
 #include "app/rtc_cmds.h"
+#include "app/storage_cmds.h"
 #include "app/tasks.h"
 #include "app_config.h"
 #include "drivers/console_uart.h"
@@ -28,6 +29,7 @@
 #include "drivers/buttons.h"
 #include "drivers/buzzer.h"
 #include "drivers/lcd.h"
+#include "drivers/sdcard.h"
 #include "drivers/led.h"
 #include "fault.h"
 #include "system_clock.h"
@@ -141,6 +143,7 @@ int main(void)
     led_init();
     buzzer_init();
     lcd_early_init(); /* backlight off, panel held in reset until `lcd` */
+    sd_early_init();  /* card-detect input */
     console_init();
     heap_init_for_stats();
     print_banner(clk, reset_csr);
@@ -152,6 +155,7 @@ int main(void)
     io_cmds_register();
     lcd_cmds_register();
     rtc_cmds_register();
+    storage_cmds_register();
     tasks_create();
 
     console_puts("[boot] starting scheduler\r\n");

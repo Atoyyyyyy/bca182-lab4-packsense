@@ -107,6 +107,20 @@
 #define LEDMX_EN_OFF_LEVEL         GPIO_PIN_SET
 #define LEDMX_COUNT                19U
 
+/* microSD, SDIO 4-bit: D0..D3 PC8..PC11, CK PC12, CMD PD2, all AF12;
+   card detect GPIO_CARD_DETECT on PF3 (pinmap.md "Storage", sheets 5, 7).
+   The card-detect polarity is not confirmed yet (no card in our kit so far),
+   so the driver reports the raw pin level and relies on the SDIO init. */
+#define SD_DATA_PORT               GPIOC
+#define SD_DATA_PINS               (GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11)
+#define SD_CK_PORT                 GPIOC
+#define SD_CK_PIN                  GPIO_PIN_12
+#define SD_CMD_PORT                GPIOD
+#define SD_CMD_PIN                 GPIO_PIN_2
+#define SD_GPIO_AF                 GPIO_AF12_SDIO
+#define SD_CD_PORT                 GPIOF
+#define SD_CD_PIN                  GPIO_PIN_3
+
 /* Sensor interrupt lines (not used yet: sensors are polled). */
 #define ICM_INT_PORT               GPIOG
 #define ICM_INT_PIN                GPIO_PIN_12
