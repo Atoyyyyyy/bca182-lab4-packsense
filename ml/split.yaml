@@ -1,0 +1,10 @@
+# Session split (PRD 7.2): no session appears in both lists, so no trial
+# contributes windows to both train and test. Edit to match the recorded
+# sessions (data/manifest.csv); the plan in docs/test_sheets/m3_capture.md
+# holds out session 4 (different bag and carrier) as the test set.
+train: [S01, S02, S03]
+test: [S04]
+
+# Trials to drop, as "S<nn>/<trial>" (wrong label, someone bumped the bag, ...).
+# Give the reason in a comment.
+exclude_trials: []
