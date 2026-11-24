@@ -1,5 +1,6 @@
 /*
- * diag_cmds.c: console readouts for the I2C buses and the sensors.
+ * diag_cmds.c: console readouts for the I2C buses, the sensors and the
+ * ES8388 codec control port.
  *
  * Every line starts with a tag in brackets so logs can be grepped, and carries
  * t=<ms since boot> so tools can measure timing.
@@ -23,6 +24,8 @@
 #include "drivers/aht.h"
 #include "drivers/ap3216c.h"
 #include "drivers/icm20608.h"
+#include "drivers/es8388.h"
+#include <stdio.h>
 
 #define T_NOW() ((unsigned long)xTaskGetTickCount())
 
@@ -448,6 +451,62 @@ static int cmd_diag_sensors(int argc, char **argv)
     return cmd_i2c_stats(0, NULL);
 }
 
+/* ---- codec: ES8388 control port (no audio path, PRD 3) ------------------- */
+
+static int cmd_codec(int argc, char **argv)
+{
+    (void)argv;
+    if (argc != 0) {
+        return 1;
+    }
+    const uint32_t t0 = xTaskGetTickCount();
+    status_t st = i2c_probe(I2C_BUS_MAIN, I2C_ADDR_ES8388);
+    console_printf("[codec] t=%lu ES8388 at 0x%02X on I2C2: %s\r\n", T_NOW(), I2C_ADDR_ES8388,
+                   st == ST_OK ? "ACK" : status_str(st));
+    if (st != ST_OK) {
+        return 0;
+    }
+    uint8_t r[ES8388_NREGS];
+    st = es8388_dump(r);
+    if (st != ST_OK) {
+        console_printf("[codec] dump %s\r\n", status_str(st));
+        return 0;
+    }
+    for (unsigned base = 0; base < ES8388_NREGS; base += 16U) {
+        char line[16 * 3 + 1];
+        size_t n = 0;
+        for (unsigned k = base; k < base + 16U && k < ES8388_NREGS; k++) {
+            n += (size_t)snprintf(line + n, sizeof line - n, " %02X", r[k]);
+        }
+        console_printf("[codec] reg %02X:%s\r\n", base, line);
+    }
+    console_printf("[codec] t=%lu dump OK: %u registers in %lu ms; DACPOWER(0x04)=0x%02X LOUT1VOL(0x2E)=0x%02X\r\n",
+                   T_NOW(), (unsigned)ES8388_NREGS, (unsigned long)(xTaskGetTickCount() - t0),
+                   r[ES8388_REG_DACPOWER], r[ES8388_REG_LOUT1VOL]);
+    return 0;
+}
+
+static int cmd_codec_test(int argc, char **argv)
+{
+    (void)argv;
+    if (argc != 0) {
+        return 1;
+    }
+    uint8_t wrote[ES8388_RW_TESTS] = {0}, got[ES8388_RW_TESTS] = {0}, orig = 0, after = 0;
+    unsigned bad = 0;
+    status_t st = es8388_rw_test(wrote, got, &orig, &bad);
+    status_t st2 = i2c_read_regs(I2C_BUS_MAIN, I2C_ADDR_ES8388, ES8388_REG_LOUT1VOL, &after, 1);
+    console_printf("[codec] t=%lu rw test %s on LOUT1VOL(0x2E): original=0x%02X\r\n", T_NOW(),
+                   (st == ST_OK && bad == 0U) ? "OK" : (st != ST_OK ? status_str(st) : "MISMATCH"), orig);
+    for (unsigned i = 0; i < ES8388_RW_TESTS; i++) {
+        console_printf("[codec]   wrote 0x%02X read 0x%02X %s\r\n", wrote[i], got[i],
+                       ((got[i] & 0x3FU) == wrote[i]) ? "ok" : "BAD");
+    }
+    console_printf("[codec] mismatches=%u restored=0x%02X %s\r\n", bad, after,
+                   (st2 == ST_OK && after == orig) ? "(same as original)" : "(NOT restored)");
+    return 0;
+}
+
 static const cli_cmd_t s_cmds[] = {
     {"i2c scan", "", "list devices that answer on both I2C buses", cmd_i2c_scan},
     {"i2c stats", "", "transfer and error counters per bus", cmd_i2c_stats},
@@ -460,6 +519,8 @@ static const cli_cmd_t s_cmds[] = {
     {"env", "", "one temperature/humidity reading (inits on first use)", cmd_env},
     {"env stream", "[n] [period_ms]", "n temp/RH samples as CSV (30 @ 1000 ms, min 1 s)", cmd_env_stream},
     {"diag sensors", "", "one reading from every sensor + bus counters", cmd_diag_sensors},
+    {"codec", "", "ES8388 codec: I2C ACK + register dump (no audio)", cmd_codec},
+    {"codec test", "", "ES8388 write/read-back on LOUT1VOL, then restore", cmd_codec_test},
 };
 
 void diag_cmds_register(void)
