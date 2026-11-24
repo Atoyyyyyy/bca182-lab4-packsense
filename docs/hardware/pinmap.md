@@ -79,8 +79,8 @@ M2 drivers poll and do not use these lines yet).
 | Buzzer | **PB0** | **active (self-oscillating) buzzer** via S8050 NPN, active high. Plain GPIO on/off, no PWM tone needed | 5, 6 | ✔ [`m2_buzzer.log`](../../evidence/m2_buzzer.log) (silent at reset, beep/chirp/error/alarm heard) |
 | LED matrix | DATA **PA7**, EN **PF2** | **19 × SK6805** (WS2812-style serial RGB) behind a 74LVC1G125 buffer. `EN` is the buffer's /OE with a 10 kΩ pull-up → drive **low** to enable. PA7 is **shared with PMOD1 MOSI** | 5, 6 | ✔ [`m2_matrix.log`](../../evidence/m2_matrix.log): 19 LEDs counted, colours correct, EN low enables (driven as TIM3_CH2, AF2) |
 | LED_EXT_IO | PC6 | expansion connector | 5, 11 | S |
-| IR transmitter | **PB1** | IR LED via S8050 NPN, active high | 5, 6 | S |
-| IR receiver | **PF8** | IRM-H638T demodulating receiver (38 kHz class), output active low | 5, 6 | S |
+| IR transmitter | **PB1** | IR LED via S8050 NPN, active high. Driven by TIM8_CH3N (AF3), not TIM3_CH4 (TIM3 = LED matrix) | 5, 6 | ✔ [`m2_ir.log`](../../evidence/m2_ir.log): 38 kHz bursts seen by the on-board receiver, 0 with the LED held off |
+| IR receiver | **PF8** | IRM-H638T demodulating receiver (38 kHz class), output active low | 5, 6 | ✔ [`m2_ir.log`](../../evidence/m2_ir.log): idle high, low ≈ 550 µs per 560 µs burst, 232 µs delay |
 
 ## User input
 

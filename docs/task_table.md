@@ -158,6 +158,21 @@ Captured with `tools/capture_m2.py storage`, firmware `f8699b4`, SD slot empty.
 With 8 MB, the flash holds settings and a fallback event log (PRD 6.2);
 continuous sample capture stays on the UART / SD path.
 
+### M2 on-board results: IR
+
+Captured with `tools/capture_m2.py ir`, firmware `aab7b56`.
+
+| Check | Measured | Source |
+|---|---|---|
+| Carrier | 38 000 Hz (168 MHz / 4421), 1/3 duty, TIM8_CH3N on PB1 | `ir` |
+| Loopback | **20/20** and **64/64** bursts detected; 0 extra edges, 0 idle edges in the 50 ms before | `ir loop`, `ir loop 64` |
+| Receiver timing | output low 232–233 µs after the burst starts, for 546–551 µs (bursts are 560 µs) | `ir loop` |
+| Control | PB1 held low, same timing: **0/20** twice, so the loop is optical | `ir loop dry` |
+| Remote | operator pressed a remote: 0 edges in 10 s. Inconclusive (remote type/aim/battery); the receiver itself is proven by the loopback | `ir rx 10`, cues |
+
+EXTI8 (IR RX) and EXTI5 (key UP) share the EXTI9_5 vector; each handler
+clears only its own pending bit.
+
 ### M1 on-board results
 
 From `evidence/m1_boot.log` (firmware git `8d71a0c`, RT-Spark HW1.1), checked with
