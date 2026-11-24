@@ -144,6 +144,18 @@ void console_write(const char *data, size_t len)
     (void)xSemaphoreGive(s_mutex);
 }
 
+void console_set_baud(uint32_t baud)
+{
+    (void)xSemaphoreTake(s_mutex, portMAX_DELAY);
+    while (s_tx_head != s_tx_tail) {
+        vTaskDelay(pdMS_TO_TICKS(1));
+    }
+    while ((CONSOLE_USART->SR & USART_SR_TC) == 0U) {
+    }
+    CONSOLE_USART->BRR = UART_BRR_SAMPLING16(HAL_RCC_GetPCLK2Freq(), baud);
+    (void)xSemaphoreGive(s_mutex);
+}
+
 void console_puts(const char *s)
 {
     console_write(s, strlen(s));

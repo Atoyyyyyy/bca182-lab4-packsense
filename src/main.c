@@ -23,8 +23,11 @@
 #include "app/rtc_cmds.h"
 #include "app/storage_cmds.h"
 #include "app/wifi_cmds.h"
+#include "app/capture.h"
+#include "app/sensor_task.h"
 #include "app/tasks.h"
 #include "app_config.h"
+#include "board_pins.h"
 #include "drivers/console_uart.h"
 #include "drivers/i2c_bus.h"
 #include "drivers/buttons.h"
@@ -158,6 +161,14 @@ int main(void)
     rtc_cmds_register();
     storage_cmds_register();
     wifi_cmds_register();
+    /* Holding UP while the board resets starts CAPTURE mode (PRD 5.1), so
+       trials can be recorded on a power bank without a console. */
+    const bool capture_key = HAL_GPIO_ReadPin(KEYS_PORT, KEY_UP_PIN) == GPIO_PIN_RESET;
+    if (capture_key) {
+        console_puts("[boot] UP held: starting in CAPTURE mode\r\n");
+    }
+    sensor_tasks_create();
+    capture_init(capture_key);
     tasks_create();
 
     console_puts("[boot] starting scheduler\r\n");

@@ -21,6 +21,10 @@ void console_rtos_init(void);
 
 void console_write(const char *data, size_t len);
 void console_puts(const char *s);
+
+/* Wait until every queued byte has left the wire, then change the baud rate
+   (USART1 on PCLK2). Used by the capture dump; call from a task. */
+void console_set_baud(uint32_t baud);
 void console_printf(const char *fmt, ...) __attribute__((format(printf, 1, 2)));
 
 /* Polled, lock-free output for fault/assert handlers (interrupts disabled). */
