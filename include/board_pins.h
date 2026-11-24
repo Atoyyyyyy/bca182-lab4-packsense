@@ -138,6 +138,17 @@
 #define WIFI_CS_PORT               GPIOF
 #define WIFI_CS_PIN                GPIO_PIN_10
 
+/* IR: transmitter LED on PB1 through an S8050 NPN (HIGH = LED on), receiver
+   IRM-H638T on PF8, demodulated output active LOW (pinmap.md "Indicators and
+   outputs", sheets 5, 6). The 38 kHz carrier comes from TIM8_CH3N on PB1
+   (AF3, STM32F407 datasheet AF table) rather than TIM3_CH4, because TIM3
+   runs the LED matrix. PF8 uses EXTI8 (EXTI9_5 vector, shared with key UP). */
+#define IR_TX_PORT                 GPIOB
+#define IR_TX_PIN                  GPIO_PIN_1
+#define IR_TX_AF                   GPIO_AF3_TIM8
+#define IR_RX_PORT                 GPIOF
+#define IR_RX_PIN                  GPIO_PIN_8
+
 /* Sensor interrupt lines (not used yet: sensors are polled). */
 #define ICM_INT_PORT               GPIOG
 #define ICM_INT_PIN                GPIO_PIN_12

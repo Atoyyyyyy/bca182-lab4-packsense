@@ -11,12 +11,13 @@
  * | TIM6_DAC      | 4        | no (HAL tick)   |
  * | I2C2_EV/ER    | 5        | yes (notify)    |
  * | USART1        | 6        | yes (RX stream) |
- * | EXTI0/1/4/9_5 | 7        | yes (key queue) |
+ * | EXTI0/1/4/9_5 | 7        | yes (key queue); EXTI8 = IR RX, no RTOS call |
  * | SysTick/PendSV| 15       | kernel          |
  */
 #include "stm32f4xx_hal.h"
 
 #include "drivers/buttons.h"
+#include "drivers/ir.h"
 #include "drivers/console_uart.h"
 #include "drivers/i2c_bus.h"
 #include "fault.h"
@@ -91,5 +92,6 @@ void EXTI4_IRQHandler(void)
 
 void EXTI9_5_IRQHandler(void)
 {
-    buttons_exti_irq();
+    buttons_exti_irq(); /* key UP, PC5 = EXTI5 */
+    ir_exti_irq();      /* IR receiver, PF8 = EXTI8 */
 }

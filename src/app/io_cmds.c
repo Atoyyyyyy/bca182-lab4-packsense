@@ -1,6 +1,6 @@
 /*
  * io_cmds.c: console commands for the indicator LED (D4, red + blue), the
- * buzzer, the arrow keys and the LED matrix.
+ * buzzer, the arrow keys, the LED matrix and the IR transmitter/receiver.
  *
  * Output lines start with a bracketed tag and t=<ms since boot>, like the
  * sensor commands. `keys` prints one CSV line per debounced event so the log
@@ -21,6 +21,7 @@
 #include "drivers/buttons.h"
 #include "drivers/buzzer.h"
 #include "drivers/console_uart.h"
+#include "drivers/ir.h"
 #include "drivers/led.h"
 #include "drivers/led_matrix.h"
 #include "board_pins.h"
@@ -316,6 +317,85 @@ static int cmd_matrix_chase(int argc, char **argv)
     return 0;
 }
 
+/* ---- IR ------------------------------------------------------------------- */
+
+static bool ir_ready(void)
+{
+    if (ir_is_initialised()) {
+        return true;
+    }
+    status_t st = ir_init();
+    console_printf("[ir] t=%lu init %s: carrier %lu Hz on PB1 (TIM8_CH3N), receiver PF8 level=%s\r\n", T_NOW(),
+                   status_str(st), (unsigned long)ir_carrier_hz(),
+                   HAL_GPIO_ReadPin(IR_RX_PORT, IR_RX_PIN) == GPIO_PIN_SET ? "high (idle)" : "LOW");
+    return st == ST_OK;
+}
+
+static int cmd_ir(int argc, char **argv)
+{
+    (void)argv;
+    if (argc != 0) {
+        return 1;
+    }
+    (void)ir_ready();
+    return 0;
+}
+
+/* "ir loop [bursts] [dry]": NEC-like bursts (560 us carrier, 1690 us gap)
+   from the board's own IR LED, counted by the board's own receiver. "dry"
+   runs the same timing with PB1 held low (LED dark): a control, so any
+   pulses then would be electrical crosstalk, not light. */
+static int cmd_ir_loop(int argc, char **argv)
+{
+    unsigned long n = 20UL;
+    bool dry = false;
+    if (argc >= 1 && strcmp(argv[argc - 1], "dry") == 0) {
+        dry = true;
+        argc--;
+    }
+    if (argc > 1 || (argc == 1 && !cli_arg_u32(argv[0], 1UL, 64UL, &n))) {
+        return 1;
+    }
+    if (!ir_ready()) {
+        return 0;
+    }
+    ir_loop_result_t r;
+    if (dry) {
+        ir_tx_connect(false);
+    }
+    status_t st = ir_loopback((unsigned)n, 560U, 1690U, &r);
+    if (dry) {
+        ir_tx_connect(true);
+    }
+    console_printf("[ir] t=%lu loop%s %s: bursts=%u detected=%u extra_edges=%u idle_edges=%u "
+                   "delay=%lu us low=%lu us (burst 560 us)\r\n",
+                   T_NOW(), dry ? " DRY (LED held off)" : "", status_str(st), r.bursts, r.detected, r.extra_edges, r.idle_edges,
+                   (unsigned long)r.mean_delay_us, (unsigned long)r.mean_low_us);
+    return 0;
+}
+
+/* "ir rx [seconds]": show what the receiver sees (point a remote at it). */
+static int cmd_ir_rx(int argc, char **argv)
+{
+    unsigned long s = 10UL;
+    if (argc > 1 || (argc == 1 && !cli_arg_u32(argv[0], 1UL, 60UL, &s))) {
+        return 1;
+    }
+    if (!ir_ready()) {
+        return 0;
+    }
+    console_printf("[ir] t=%lu listening %lu s\r\n", T_NOW(), s);
+    ir_listen_result_t r;
+    (void)ir_listen(s * 1000UL, &r);
+    console_printf("[ir] t=%lu rx: edges=%u frames=%u%s\r\n", T_NOW(), r.edges, r.frames,
+                   r.overflow ? " (ring overflow: some edges lost)" : "");
+    for (unsigned f = 0; f < r.frames && f < 8U; f++) {
+        console_printf("[ir] frame %u: edges=%u first_low=%lu us\r\n", f, r.frame_edges[f],
+                       (unsigned long)r.first_low_us[f]);
+    }
+    return 0;
+}
+
 static const cli_cmd_t s_cmds[] = {
     {"led", "[auto | red|blue on|off]", "indicator LED state / drive it by hand", cmd_led},
     {"buzzer", "chirp|alarm|error | beep [ms] | off", "play a buzzer pattern", cmd_buzzer},
@@ -325,6 +405,9 @@ static const cli_cmd_t s_cmds[] = {
     {"matrix off", "", "all LEDs off", cmd_matrix_off},
     {"matrix set", "<i> <r> <g> <b>", "one LED (0..18)", cmd_matrix_set},
     {"matrix chase", "[ms]", "light LED 0..18 one at a time (default 300 ms each)", cmd_matrix_chase},
+    {"ir", "", "IR transmitter/receiver init (carrier frequency, receiver level)", cmd_ir},
+    {"ir loop", "[bursts] [dry]", "IR LED -> own receiver self-test (dry = LED held off, control)", cmd_ir_loop},
+    {"ir rx", "[seconds]", "show IR remote pulses seen by the receiver (default 10 s)", cmd_ir_rx},
 };
 
 void io_cmds_register(void)
