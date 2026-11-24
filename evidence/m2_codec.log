@@ -1,0 +1,39 @@
+15:29:05.358 > 
+15:29:05.358 > 
+15:29:05.358 > === PackSense 0.2.0-m2 (git 78bada8) built Nov 24 2026 15:28:19 ===
+15:29:05.358 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+15:29:05.358 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+15:29:05.358 > [boot] clock source: HSE 8 MHz crystal -> PLL
+15:29:05.358 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+15:29:05.358 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+15:29:05.358 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+15:29:05.360 > [boot] FPU: CPACR CP10/CP11=full access
+15:29:05.360 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40952 B usable), max syscall prio 5
+15:29:05.362 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+15:29:05.414 > [boot] starting scheduler
+15:29:05.414 > [cli] ready, type 'help'
+15:29:05.414 > > [rtos] scheduler started, first task running at tick 0
+15:29:10.808 > codec
+15:29:10.808 > [codec] t=5392 ES8388 at 0x10 on I2C2: ACK
+15:29:10.810 > [codec] reg 00: 06 5C C3 FC C0 00 00 7C 80 00 00 02 00 06 30 20
+15:29:10.810 > [codec] reg 10: C0 C0 38 B0 32 06 00 00 06 22 C0 C0 08 00 1F F7
+15:29:10.810 > [codec] reg 20: FD FF 1F F7 FD FF 00 38 28 28 38 00 00 00 00 00
+15:29:10.810 > [codec] reg 30: 00 00 00 AA AA
+15:29:10.810 > [codec] t=5399 dump OK: 53 registers in 7 ms; DACPOWER(0x04)=0xC0 LOUT1VOL(0x2E)=0x00
+15:29:10.810 > > codec test
+15:29:11.346 > [codec] t=5923 rw test OK on LOUT1VOL(0x2E): original=0x00
+15:29:11.347 > [codec]   wrote 0x15 read 0x15 ok
+15:29:11.347 > [codec]   wrote 0x2A read 0x2A ok
+15:29:11.347 > [codec]   wrote 0x00 read 0x00 ok
+15:29:11.348 > [codec]   wrote 0x3F read 0x3F ok
+15:29:11.348 > [codec] mismatches=0 restored=0x00 (same as original)
+15:29:11.348 > > codec
+15:29:11.867 > [codec] t=6447 ES8388 at 0x10 on I2C2: ACK
+15:29:11.867 > [codec] reg 00: 06 5C C3 FC C0 00 00 7C 80 00 00 02 00 06 30 20
+15:29:11.867 > [codec] reg 10: C0 C0 38 B0 32 06 00 00 06 22 C0 C0 08 00 1F F7
+15:29:11.868 > [codec] reg 20: FD FF 1F F7 FD FF 00 38 28 28 38 00 00 00 00 00
+15:29:11.868 > [codec] reg 30: 00 00 00 AA AA
+15:29:11.869 > [codec] t=6453 dump OK: 53 registers in 6 ms; DACPOWER(0x04)=0xC0 LOUT1VOL(0x2E)=0x00
+15:29:11.869 > > i2c stats
+15:29:12.399 > [i2c] bus=i2c2(PF1/PF0) transfers=119 nacks=0 timeouts=0 bus_errors=0 recoveries=0
+15:29:12.399 > [i2c] bus=soft(PE0/PE1) transfers=0 nacks=0 timeouts=0 bus_errors=0 recoveries=0

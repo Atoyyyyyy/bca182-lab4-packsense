@@ -1,0 +1,5 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-24)
+15:29:10.729 sent: codec
+15:29:11.237 sent: codec test
+15:29:11.786 sent: codec
+15:29:12.304 sent: i2c stats
