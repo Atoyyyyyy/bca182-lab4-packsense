@@ -144,6 +144,20 @@ Captured with `tools/capture_m2.py rtc`; first run firmware `c4464ec`
 Bug found by the first capture: the rate check's sleep used a signed 32-bit
 cycle difference, which overflows after 12.8 s (fixed in `134d897`).
 
+### M2 on-board results: storage
+
+Captured with `tools/capture_m2.py storage`, firmware `f8699b4`, SD slot empty.
+
+| Part | Check | Measured | Source |
+|---|---|---|---|
+| microSD | no card | `init NOT_PRESENT` in 3–4 ms (HAL error `0x4` = command response timeout), same on the second try; PF3 high | `m2_storage.log` |
+| SPI flash | identity | JEDEC `EF 40 17`, SFDP v1.5, **8 MiB** (schematic: W25Q128 16 MB) | `flash` |
+| SPI flash | write test, last 4 KB sector (blank) | erase 65–68 ms; 4096 B in 16 pages programmed in 9.6 ms (≈ 0.6 ms per page); 0 erase / verify / restore errors, twice | `flash test` |
+| System | after the tests | heap min 40 928 B; CLI stack 854 of 1024 words free | `diag mem` |
+
+With 8 MB, the flash holds settings and a fallback event log (PRD 6.2);
+continuous sample capture stays on the UART / SD path.
+
 ### M1 on-board results
 
 From `evidence/m1_boot.log` (firmware git `8d71a0c`, RT-Spark HW1.1), checked with

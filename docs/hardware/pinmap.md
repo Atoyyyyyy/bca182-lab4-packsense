@@ -98,8 +98,8 @@ The four EXTI lines are all distinct, so there is no EXTI conflict.
 
 | Item | Pins | Notes | Sheet | Status |
 |---|---|---|---|---|
-| microSD (SDIO 4-bit) | D0..D3 = PC8..PC11, CK = PC12, CMD = PD2 | card detect `GPIO_CARD_DETECT` → **PF3** | 5, 7 | S |
-| SPI flash, schematic: **W25Q128** (16 MB). **Our board: 8 MB** | SPI2: SCK **PB13**, MISO **PC2**, MOSI **PC3**, CS0 = SPI2_NSS **PB12** | shared SPI2 bus with RW007 → needs a bus mutex. **Board differs from the schematic:** JEDEC ID `EF 40 17` (Winbond, W25Q64-class) and the chip's SFDP table give 8 MiB (agent check 2026-11-24, `d6a26bb`+); the vendor BSP also names it W25Q64. H: read the chip marking (U10) | 5, 7 | ⚠ 8 MB, see notes |
+| microSD (SDIO 4-bit) | D0..D3 = PC8..PC11, CK = PC12, CMD = PD2 | card detect `GPIO_CARD_DETECT` → **PF3** | 5, 7 | ✔ slot + SDIO wiring answer (no card: `NOT_PRESENT` cleanly, [`m2_storage.log`](../../evidence/m2_storage.log)); PF3 reads high without a card, polarity with a card: TODO |
+| SPI flash, schematic: **W25Q128** (16 MB). **Our board: 8 MB** | SPI2: SCK **PB13**, MISO **PC2**, MOSI **PC3**, CS0 = SPI2_NSS **PB12** | shared SPI2 bus with RW007 → needs a bus mutex. **Board differs from the schematic:** JEDEC ID `EF 40 17` (Winbond, W25Q64-class) and the chip's SFDP table give 8 MiB (agent check 2026-11-24, `d6a26bb`+); the vendor BSP also names it W25Q64. H: read the chip marking (U10) | 5, 7 | ✔ [`m2_storage.log`](../../evidence/m2_storage.log): SPI2 pins and CS work, 8 MiB, write test 0 errors |
 
 ## Wireless
 
