@@ -15,6 +15,8 @@ Run it with PlatformIO's Python (it has pyserial), from the project folder:
     ... tools\\capture_m2.py ir         (IR LED -> receiver loopback, optional remote)
     ... tools\\capture_m2.py codec      (ES8388 register dump + write/read-back, no audio)
     ... tools\\capture_m2.py wifi       (RW007 ID/firmware/MAC, 2 scans, flash on the shared bus)
+    ... tools\\capture_m2.py m5_parity  (M5: selftest model + 30 s of live windows -> evidence/m5_parity.log)
+    ... tools\\capture_m2.py m5_func    (M5: guided per-class check, GUARD alarm, fault injection)
 
 Options: --port COM3 (default: auto-detect the ST-LINK virtual COM port),
          --flash (build + upload first), --force (overwrite an existing log),
@@ -242,6 +244,60 @@ PLANS = {
         ("cmd", "flash test", 15, []),
         ("cmd", "diag mem", 10, []),
     ],
+    # ---- M5 (product firmware; needs the trained model exported and flashed) ----
+    "m5_parity": [
+        ("say", "Model parity and timing (AC-3, AC-4): the board recomputes 50 test windows and compares\n"
+                "   them with the PC model, then classifies live for 30 s. Leave the board still on the desk.\n"
+                "   No hands needed after the RESET. About 1 minute."),
+        ("cmd", "selftest model", 40, []),
+        ("cmd", "selftest model v", 40, []),
+        ("cmd", "infer log on", 5, []),
+        ("wait", 30, "leave the board still (live windows are being logged)"),
+        ("cmd", "infer log off", 5, []),
+        ("cmd", "infer", 10, []),
+        ("cmd", "ui", 10, []),
+        ("cmd", "diag mem", 10, []),
+        ("cmd", "version", 10, []),
+    ],
+    "m5_func": [
+        ("say", "Quick functional check (M5). Put the board in the bag as for the recordings\n"
+                "   (docs/test_sheets/m3_capture.md), power bank in the bag, USB cable to the laptop long enough\n"
+                "   to walk a few steps (or carry the laptop). Use the DUMMY load for ROUGH. About 4 minutes."),
+        ("cmd", "infer log on", 5, []),
+        ("say", "STILL: put the bag down on the floor or a chair and do not touch it."),
+        ("wait", 20, "STILL - do not touch the bag"),
+        ("ask", "What state did the LCD show at the end?", ["still", "carried", "rough", "access", "other"]),
+        ("say", "CARRIED: wear the bag on your back and walk normally."),
+        ("wait", 25, "CARRIED - walk normally with the bag on your back"),
+        ("ask", "What state did the LCD show while you walked?", ["still", "carried", "rough", "access", "other"]),
+        ("say", "ROUGH (dummy load only!): set the bag down hard / toss it onto a cushion, about 3 times."),
+        ("wait", 20, "ROUGH - set down hard / toss onto a cushion, 3 times"),
+        ("ask", "Did you see 'Rough handling detected' and hear a chirp? (y/n, or what you saw)"),
+        ("say", "ACCESS (RUN mode, no alarm expected): open the compartment, reach in, move items, close."),
+        ("wait", 20, "ACCESS - open, reach in, move items, close"),
+        ("ask", "What state did the LCD show while your hand was in the bag?",
+         ["still", "carried", "rough", "access", "other"]),
+        ("say", "GUARD: hold LEFT for about 1 s (header turns red, says GUARD). Then leave the bag closed."),
+        ("wait", 10, "hold LEFT ~1 s to arm GUARD, then leave the bag closed"),
+        ("ask", "Does the header say GUARD? (y/n)"),
+        ("say", "Now open the bag and reach in. When the alarm sounds (red screen), press ANY key once."),
+        ("wait", 30, "open the bag, reach in; press any key when the alarm sounds"),
+        ("ask", "Did the alarm sound, and did one key press stop it? (y/n, or what happened)"),
+        ("say", "Disarm: hold LEFT for about 1 s (header back to RUN)."),
+        ("wait", 8, "hold LEFT ~1 s to disarm"),
+        ("cmd", "fault inject imu", 5, []),
+        ("wait", 8, "watch the LCD bottom line"),
+        ("ask", "Does the LCD show 'Sensor fault - IMU'? (y/n)"),
+        ("cmd", "fault clear imu", 5, []),
+        ("wait", 10, "watch the LCD bottom line"),
+        ("ask", "Did the fault line go away? (y/n)"),
+        ("cmd", "infer log off", 5, []),
+        ("cmd", "infer", 10, []),
+        ("cmd", "ui", 10, []),
+        ("cmd", "fault", 10, []),
+        ("cmd", "log 40", 15, []),
+        ("cmd", "diag mem", 10, []),
+    ],
     "rtc": [
         ("say", "RTC test: no hands needed except one RESET press. It takes about 1.5 minutes."),
         ("cmd", "rtc", 15, []),
@@ -319,10 +375,23 @@ class Board:
         """Command finished: the CLI printed its '> ' prompt and went quiet."""
         return self.partial.rstrip("\r").endswith("> ") and time.time() - self.last_rx > 0.4
 
+    def prompt_after(self, start, cmd):
+        """The prompt came back after the echo of cmd, even if background lines
+        (M5: [event], [key]) were printed after it on the same line."""
+        seen_echo = False
+        for line in self.lines[start:] + [self.partial]:
+            if not seen_echo:
+                seen_echo = line.rstrip().endswith(cmd)
+                continue
+            if line.startswith("> "):
+                return True
+        return False
+
 
 def run_plan(name, port, force, out_dir):
-    out = os.path.join(out_dir, "m2_%s.log" % name)
-    cues_path = os.path.join(out_dir, "m2_%s_cues.txt" % name)
+    stem = name if name.startswith("m5_") else "m2_%s" % name
+    out = os.path.join(out_dir, "%s.log" % stem)
+    cues_path = os.path.join(out_dir, "%s_cues.txt" % stem)
     if os.path.exists(out) and not force:
         print("%s already exists. Use --force to overwrite it." % out)
         return False
@@ -341,6 +410,12 @@ def run_plan(name, port, force, out_dir):
             if not board.wait_for(lambda: any("[cli] ready" in l for l in board.lines), 60):
                 print("No '[cli] ready' line within 60 s. Is the board flashed with the M2 firmware?")
                 return False
+            # M5 firmware: the UI runs the boot self-test (it also resets the
+            # Wi-Fi module) and then enters RUN; wait for that before typing,
+            # and stop the per-window lines so commands are easy to follow.
+            if board.wait_for(lambda: any("BOOT -> " in l for l in board.lines), 15):
+                board.send("infer log off")
+                board.wait_for(lambda: False, 1.0)
             board.wait_for(board.at_prompt, 3)
             banner = next((l for l in board.lines if l.startswith("=== PackSense")), "")
             if "-dirty" in banner:
@@ -387,7 +462,20 @@ def run_plan(name, port, force, out_dir):
                     n_ready = sum("[cli] ready" in l for l in board.lines)
                     if not board.wait_for(lambda: sum("[cli] ready" in l for l in board.lines) > n_ready, 60):
                         print("!! no reboot seen within 60 s")
+                    n_boot = len(board.lines)
+                    if board.wait_for(lambda: any("BOOT -> " in l for l in board.lines[n_boot - 5:]), 15):
+                        board.send("infer log off")
+                        board.wait_for(lambda: False, 1.0)
                     board.wait_for(board.at_prompt, 3)
+                    cues.flush()
+                    continue
+                if step[0] == "wait":
+                    _, secs, text = step
+                    print("\n   ##########  NOW: %s (%d s)  ##########\n" % (text, secs))
+                    cues.write("%s cue: %s (%d s)\n" % (ts(), text, secs))
+                    board.wait_for(lambda: False, secs)
+                    print("   ##########  STOP  ##########")
+                    cues.write("%s cue: stop\n" % ts())
                     cues.flush()
                     continue
                 _, cmd, timeout, cue_list = step
@@ -405,7 +493,9 @@ def run_plan(name, port, force, out_dir):
                         text = pending.pop(0)[1]
                         print("\n   ##########  NOW: %s  ##########\n" % text)
                         cues.write("%s cue: %s\n" % (ts(), text))
-                    if not pending and len(board.lines) > start_lines and board.at_prompt():
+                    if not pending and len(board.lines) > start_lines and (
+                            board.at_prompt() or board.prompt_after(start_lines, cmd)):
+                        board.wait_for(lambda: False, 0.3)
                         break
                 else:
                     print("!! '%s' did not finish within %d s" % (cmd, timeout))
@@ -541,7 +631,7 @@ def check_als(port):
 def main():
     ap = argparse.ArgumentParser(description="Guided M2 sensor evidence capture.")
     ap.add_argument("sensor", choices=["imu", "als", "env", "all", "leds", "buzzer", "keys", "io", "lcd", "matrix", "rtc", "storage", "ir", "codec", "wifi",
-                                       "find-als", "check-als"],
+                                       "m5_parity", "m5_func", "find-als", "check-als"],
                     help="all = imu, als, env; io = leds, buzzer, keys; find-als: live light/proximity readout to locate the sensor (writes no files); "
                          "check-als: 20 s timed cover/torch test, saved to logs/ (not evidence)")
     ap.add_argument("--port", help="serial port (default: auto-detect the ST-LINK VCP)")
