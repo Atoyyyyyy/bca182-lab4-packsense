@@ -127,6 +127,23 @@ Captured with `tools/capture_m2.py matrix`; first run firmware `812b5f2`
 TIM3 is shared with the IR transmitter (PB1 = TIM3_CH4): the IR step must
 not reprogram TIM3 behind the matrix driver.
 
+### M2 on-board results: RTC
+
+Captured with `tools/capture_m2.py rtc`; first run firmware `c4464ec`
+(commit `bb2ee1a`, rate check broken), re-run after the fix with `134d897`.
+
+| Check | Measured | Source |
+|---|---|---|
+| Clock source | LSE (crystal X1); started in 369 ms on first init (agent check), LSI fallback not needed | `m2_rtc.log`, commit `c4464ec` |
+| Rate vs HSE | 20 RTC s = 19 998 397 µs of CPU time, **+80.1 ppm**, identical in both runs (also +80.1 at 5 s and 13 s) | `rtc check 20` |
+| Rate vs PC (derived) | HSE is −70 ppm vs the PC (M1: 999.93 ticks/s), so the RTC is about **+10 ppm** vs the PC, ≈ 0.9 s/day | M1 + this table |
+| RESET | `kept_running=yes`, `time_valid=yes`; offset to the PC timestamps 1.136 s before and after the reset (no step) | `m2_rtc.log` |
+| Input check | `rtc set 2026-02-30 …` → `RANGE_ERR`, time unchanged | `m2_rtc.log` |
+| Power loss | no coin cell (holder empty): time is lost at power-off, `time_valid=no` after power-up | board photo, design |
+
+Bug found by the first capture: the rate check's sleep used a signed 32-bit
+cycle difference, which overflows after 12.8 s (fixed in `134d897`).
+
 ### M1 on-board results
 
 From `evidence/m1_boot.log` (firmware git `8d71a0c`, RT-Spark HW1.1), checked with

@@ -22,7 +22,7 @@ fixed here first, then in code.
 | Item | Value | Sheet | Status |
 |---|---|---|---|
 | HSE crystal X2 | **8 MHz** (12 pF), PH0/PH1 | 5/10 | S |
-| LSE crystal X1 | **32.768 kHz** (12 pF), PC14/PC15 | 5/10 | S |
+| LSE crystal X1 | **32.768 kHz** (12 pF), PC14/PC15 | 5/10 | ✔ [`m2_rtc.log`](../../evidence/m2_rtc.log): LSE starts (~370 ms), RTC +80.1 ppm vs HSE |
 | PC13 | not connected | 5/10 | S |
 | BOOT0 | 10 kΩ pull-down (R4) | 5/10 | S |
 

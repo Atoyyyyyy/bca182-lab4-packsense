@@ -21,7 +21,7 @@ file in the *Evidence* column. Anything missing or broken goes to
 | 6 | LED matrix, 19 × SK6805 (U6 buffer) | DATA PA7, EN PF2 (active low) | ☑ | ☑ | **Output**: alert animation | alarm, DIAG self-test | [`m2_matrix.log`](../../evidence/m2_matrix.log): 19 LEDs lit in chain order, red/green/blue/white on all, 0 DMA errors (operator: all yes) |
 | 7 | Active buzzer (BUZ1) | PB0, active high | ☑ | ☑ | **Output**: audible alert | alerts, DIAG | [`m2_buzzer.log`](../../evidence/m2_buzzer.log): silent at reset; beep, chirp, 3-beep error, 3 s alarm that stops (operator: all yes) |
 | 8 | 4 arrow keys (SW2–SW5) + reset (SW6) | PC5 UP, PC1 DOWN, PC0 LEFT, PC4 RIGHT; active low | ☑ | ☑ | **User input** | ack, arm guard, mute, mode, capture labels | [`m2_keys.log`](../../evidence/m2_keys.log): each printed label reports its own pin; long press 2009 ms; debounce removes bounce; 0 dropped |
-| 9 | RTC + 32.768 kHz crystal (X1) (+ backup battery? `____`) | internal RTC, LSE PC14/PC15 | ☐ | ☐ | **Logging**: timestamps | logs, DIAG | |
+| 9 | RTC + 32.768 kHz crystal (X1) (+ backup battery? **none: holder empty**) | internal RTC, LSE PC14/PC15 | ☑ | ☑ | **Logging**: timestamps | logs, DIAG | [`m2_rtc.log`](../../evidence/m2_rtc.log): runs on LSE, keeps time through RESET, +80.1 ppm vs HSE (≈ +10 ppm vs PC). No coin cell: time lost at power-off |
 | 10 | microSD slot (SDIO) + card (size `____`) | PC8–PC12, PD2, CD PF3 | ☐ | ☐ | **Logging**: events + captures | LogTask, DIAG | |
 | 11 | W25Q128 16 MB SPI flash (U10) | SPI2 PB13/PC2/PC3, CS PB12 | ☐ | ☐ | **Config / fallback log** | settings, DIAG | |
 | 12 | RW007 Wi-Fi module (U12) | SPI2, CS PF10, INT PG11, RST PG15 | ☐ | ☐ | **Comms (optional)**: event report | LogTask, DIAG | |
