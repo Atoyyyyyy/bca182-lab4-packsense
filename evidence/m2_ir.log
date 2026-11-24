@@ -1,0 +1,28 @@
+15:23:45.678 > 
+15:23:45.679 > 
+15:23:45.679 > === PackSense 0.2.0-m2 (git aab7b56) built Nov 24 2026 15:22:36 ===
+15:23:45.679 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+15:23:45.741 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+15:23:45.742 > [boot] clock source: HSE 8 MHz crystal -> PLL
+15:23:45.742 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+15:23:45.742 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+15:23:45.742 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+15:23:45.742 > [boot] FPU: CPACR CP10/CP11=full access
+15:23:45.742 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40952 B usable), max syscall prio 5
+15:23:45.747 > [boot] CCM RAM: 7472 of 65536 B used (.ccmram)
+15:23:45.748 > [boot] starting scheduler
+15:23:45.748 > [cli] ready, type 'help'
+15:23:45.748 > > [rtos] scheduler started, first task running at tick 0
+15:23:49.892 > ir
+15:23:49.892 > [ir] t=4112 init OK: carrier 38000 Hz on PB1 (TIM8_CH3N), receiver PF8 level=high (idle)
+15:23:49.892 > > ir loop
+15:23:50.487 > [ir] t=4734 loop OK: bursts=20 detected=20 extra_edges=0 idle_edges=0 delay=233 us low=546 us (burst 560 us)
+15:23:50.487 > > ir loop dry
+15:23:51.094 > [ir] t=5344 loop DRY (LED held off) OK: bursts=20 detected=0 extra_edges=0 idle_edges=0 delay=0 us low=0 us (burst 560 us)
+15:23:51.095 > > ir loop 64
+15:23:51.838 > [ir] t=6066 loop OK: bursts=64 detected=64 extra_edges=0 idle_edges=0 delay=232 us low=551 us (burst 560 us)
+15:23:51.838 > > ir loop dry
+15:23:52.440 > [ir] t=6685 loop DRY (LED held off) OK: bursts=20 detected=0 extra_edges=0 idle_edges=0 delay=0 us low=0 us (burst 560 us)
+15:23:52.440 > > ir rx 10
+15:23:54.253 > [ir] t=8472 listening 10 s
+15:24:04.215 > [ir] t=18472 rx: edges=0 frames=0

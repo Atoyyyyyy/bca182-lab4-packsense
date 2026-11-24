@@ -1,0 +1,9 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-24)
+15:23:49.830 sent: ir
+15:23:50.332 sent: ir loop
+15:23:50.925 sent: ir loop dry
+15:23:51.550 sent: ir loop 64
+15:23:52.263 sent: ir loop dry
+15:23:54.162 sent: ir rx 10
+15:23:54.556 cue: remote: press a button 2-3 times now, pointed at the bottom-left corner
+15:24:25.882 answer: Did you press a remote during that listen? (type: remote / none) -> remote
