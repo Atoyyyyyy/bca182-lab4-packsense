@@ -47,8 +47,10 @@ BAUD = 115200
 
 # Each step: ("say", text) waits for Enter; ("cmd", command, timeout_s, cues)
 # sends a command; cues = [(seconds after sending, text), ...] shown on screen;
-# ("ask", question) records what YOU saw or heard (y/n or a few words) in the
+# ("ask", question[, words]) records what YOU saw or heard (y/n or a few words) in the
 # _cues.txt file, for things only a person can check (LED colour, sound).
+COLOURS = ["red", "green", "blue", "yellow", "black", "white"]
+
 PLANS = {
     "imu": [
         ("say", "Lay the board FLAT on the table, components up. Do not touch it until told."),
@@ -159,12 +161,13 @@ PLANS = {
         ("cmd", "lcd bl on", 5, []),
         ("cmd", "lcd test", 5, []),
         ("ask", "Test pattern: is a thin WHITE frame visible along ALL FOUR edges? If a side is missing, say which."),
-        ("ask", "Which colour is the square in the TOP-LEFT corner (red / green / blue / yellow)?"),
-        ("ask", "Which colour is the square in the TOP-RIGHT corner?"),
-        ("ask", "Which colour is the square in the BOTTOM-LEFT corner?"),
-        ("ask", "The three bars in the middle, from LEFT to RIGHT: which colours?"),
+        ("ask", "Which colour is the square in the TOP-LEFT corner?", COLOURS),
+        ("ask", "Which colour is the square in the TOP-RIGHT corner?", COLOURS),
+        ("ask", "Which colour is the square in the BOTTOM-LEFT corner?", COLOURS),
+        ("ask", "Which colour is the square in the BOTTOM-RIGHT corner?", COLOURS),
+        ("ask", "The three bars in the middle, from LEFT to RIGHT: which colours? (three words)", COLOURS),
         ("ask", "Photo: take one of the test pattern (whole board, header at the top), save it as "
-                "evidence/m2_lcd_test.jpg, then type 'done' (or 'skip')."),
+                "evidence/m2_lcd_test.jpg, then type 'done' (or 'skip').", ["done", "skip"]),
         ("cmd", "lcd", 10, []),
     ],
 }
@@ -264,9 +267,22 @@ def run_plan(name, port, force, out_dir):
                 if step[0] == "ask":
                     board.poll()
                     print("\n?? " + step[1])
+                    words = step[2] if len(step) > 2 else None
                     ans = ""
                     while not ans:
-                        ans = input("?? Answer y / n (or a few words), then Enter: ").strip()
+                        if words:
+                            ans = input("?? Type one of: %s, then Enter: " % " / ".join(words)).strip().lower()
+                            given = ans.replace(",", " ").split()
+                            if not given or any(w not in words for w in given):
+                                print("   Please answer with those words only (not y/n).")
+                                ans = ""
+                            elif ans == "done":
+                                photo = os.path.join(out_dir, "m2_%s_test.jpg" % name)
+                                if not os.path.exists(photo):
+                                    print("   %s is not there yet. Save it, then type done (or skip)." % photo)
+                                    ans = ""
+                        else:
+                            ans = input("?? Answer y / n (or a few words), then Enter: ").strip()
                     cues.write("%s answer: %s -> %s\n" % (ts(), step[1], ans))
                     cues.flush()
                     continue
