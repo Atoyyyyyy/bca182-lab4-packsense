@@ -500,7 +500,10 @@ static void boot_selftest(void)
     rw007_info_t wi;
     const status_t ws = rw007_init(&wi);
     if (ws == ST_OK) {
-        (void)snprintf(d, sizeof d, "%.12s, off", wi.version);
+        /* LCD row: 12-column name + "OK " leaves 14 columns. Drop the "RW007_"
+           prefix so the whole version fits ("2.1.0-a7a0 off"); `wifi` prints it all. */
+        const char *ver = strncmp(wi.version, "RW007_", 6) == 0 ? &wi.version[6] : wi.version;
+        (void)snprintf(d, sizeof d, "%.10s off", ver);
         rw007_off(); /* not used by the product; `wifi on` starts it */
     }
     report("Wi-Fi", ws == ST_OK ? R_OK : (ws == ST_NOT_PRESENT ? R_ABSENT : R_FAIL), ws == ST_OK ? d : "");
