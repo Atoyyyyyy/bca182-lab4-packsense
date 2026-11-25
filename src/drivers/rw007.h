@@ -24,8 +24,10 @@ typedef struct {
     char version[17];
     uint8_t mac[6];
     uint32_t init_ms;      /* INIT + SET_MODE + SN + VERSION + MAC */
+    bool wake_no_answer;   /* first CS window after reset read all 0xFF (expected) */
 } rw007_info_t;
 
+/* Counters since the last rw007_init() (each init resets the module and them). */
 typedef struct {
     uint32_t transfers;
     uint32_t stage1_err;

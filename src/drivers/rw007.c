@@ -322,6 +322,33 @@ static void copy_str(char *dst, size_t cap)
     }
 }
 
+/*
+ * First chip-select window after a reset. Measured on this board (4 of 4
+ * resets): the module does not drive MISO in its first CS window after a
+ * reset (the master reads 16 x 0xFF) and answers normally from the next
+ * window on, so INIT's first stage 1 always failed once and was retried.
+ * This window arms the module instead. It carries no magic words, so a
+ * module that is already armed drops it as a bad header. Returns true when
+ * the module did not answer (MISO all 0xFF), the expected case.
+ */
+static bool wake_window(void)
+{
+    uint8_t h[HDR] = {0}, r[HDR];
+    SPI_HandleTypeDef *spi = spi2_bus_handle();
+    spi2_take();
+    cs(true);
+    const bool ok = HAL_SPI_TransmitReceive(spi, h, r, HDR, SPI_TIMEOUT) == HAL_OK;
+    cs(false);
+    spi2_give();
+    vTaskDelay(1);
+    (void)xSemaphoreTake(s_int, 0); /* drop an edge the window may cause */
+    bool all_ff = ok;
+    for (unsigned i = 0; i < HDR && all_ff; i++) {
+        all_ff = r[i] == 0xFFU;
+    }
+    return all_ff;
+}
+
 static void gpio_init(void)
 {
     GPIO_InitTypeDef gpio = {0};
@@ -369,6 +396,7 @@ status_t rw007_init(rw007_info_t *info)
     gpio_init();
     memset(s_tx, 0, sizeof s_tx);
     s_tx_pending = false;
+    memset(&s_stats, 0, sizeof s_stats); /* counters cover this reset only */
 
     /* Reset pulse and boot wait, as in the vendor port (rw007_stm32_port.c). */
     vTaskDelay(pdMS_TO_TICKS(100));
@@ -384,6 +412,8 @@ status_t rw007_init(rw007_info_t *info)
     vTaskDelay(pdMS_TO_TICKS(200));
     int_irq_enable();
     (void)xSemaphoreTake(s_int, 0);
+
+    info->wake_no_answer = wake_window();
 
     const TickType_t t1 = xTaskGetTickCount();
     status_t st = command(CMD_INIT, NULL, 0U, 5000U);

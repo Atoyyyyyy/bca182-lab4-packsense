@@ -61,7 +61,8 @@ static int cmd_wifi(int argc, char **argv)
                        T_NOW());
         return 0;
     }
-    console_printf("[wifi] t=%lu boot: INT high %lu ms after reset\r\n", T_NOW(), (unsigned long)i.boot_ms);
+    console_printf("[wifi] t=%lu boot: INT high %lu ms after reset; wake window: %s\r\n", T_NOW(),
+                   (unsigned long)i.boot_ms, i.wake_no_answer ? "no answer (expected)" : "answered");
     if (st != ST_OK) {
         console_printf("[wifi] t=%lu init %s after %lu ms\r\n", T_NOW(), status_str(st), (unsigned long)i.init_ms);
         print_stats();
