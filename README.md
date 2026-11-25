@@ -14,7 +14,9 @@ Team: Sherie Grace L. Lupoz · Renato G. Beroy · Binyusoph P. Sansarona
 > logs except the Wi-Fi capture. M3 capture firmware/tools and the M4 ML
 > pipeline + C inference are written and checked (synthetic smoke test only;
 > no real data yet). M5 product firmware (all PRD §6.3 tasks, modes, alerts,
-> event log, watchdog) runs on the board with a placeholder model. **Next:**
+> event log, watchdog) runs on the board with a placeholder model. M6 test
+> plan, guided test runs and analysis scripts, and the M7 report draft and
+> demo script are written; their results wait for real data. **Next:**
 > record the M3 sessions, then train/export the real model.
 > See [Milestones](#milestones).
 
@@ -124,7 +126,7 @@ and [`docs/test_sheets/m2_io.md`](docs/test_sheets/m2_io.md).
 | M4 | Features, baseline, model, C export | `ml/` pipeline, C features + MLP + baseline, `selftest model` done and smoke-tested on synthetic data; **real training: after M3** |
 | M5 | On-device inference + product firmware | firmware done and running (placeholder model); parity + functional check after M4 ([test sheet](docs/test_sheets/m5_product.md)) |
 | M6 | Testing and evaluation | [test plan](docs/test_plan.md) T1–T9, guided capture plans (`capture_m2.py m6_*`), analysis scripts (`t1_results.py`, `t7_keys.py`, `size_report.py`, `analyze_soak.py`, `latency_stats.py`) and the [operator sheet](docs/test_sheets/m6_tests.md) done; **runs: after M5 parity (H)** |
-| M7 | Report, README, demo | — |
+| M7 | Report, README, demo | [report draft](docs/report/report.md) (results `TODO(measure)`), [demo shot list](docs/report/demo_script.md), troubleshooting table; **video, contributions, review: H** |
 
 ## Results
 
@@ -148,7 +150,15 @@ All figures are `TODO(measure)` until they are produced from real logs in `evide
 | `!!! PANIC`, `!!! FAULT` or `assert` on the console, red LED blinking fast | The line says what failed. For a FAULT, look up `pc=` with `arm-none-eabi-addr2line -e .pio/build/rt_spark/firmware.elf <pc>` |
 | Banner says `FALLBACK: HSE did not start` | The 8 MHz crystal X2 did not start. The firmware still runs at 168 MHz from the internal HSI (less accurate). Report it |
 
-More entries are added as issues come up (heap/stack overflow, SD mount, …).
+| `!!! PANIC: stack overflow in task <name>` | That task's stack is too small for what it now does. Raise its `*_STACK_WORDS` in `include/app_config.h` (stacks live in the 64 KB CCM RAM, see the build's CCMRAM line) and check the margin with `diag mem` (`hwm_words`) |
+| `!!! PANIC: FreeRTOS heap exhausted` | `pvPortMalloc` failed. Tasks and their stacks are static; the heap holds queues, mutexes and timers. Check `diag mem` (`heap_min`) and raise `configTOTAL_HEAP_SIZE` in `include/FreeRTOSConfig.h` |
+| `!!! FAULT: UsageFault` at the first floating-point operation (`cfsr` bit 19 `NOCP` set) | The FPU is not enabled or soft-float objects were linked in. The hard-float flags must reach the linker too (`tools/pio_fpu_link.py`); do a `pio run -t clean` after changing flags |
+| `[wdg] ... check-in missing, IWDG no longer fed: <task>`, then a reset | That task was blocked for more than the 2 s check-in window. `fault` shows how long ago each task last checked in; after the reset `[wdg] the last reset was the watchdog` names the task and the event log has a `WDG` record |
+| LCD shows `Sensor fault - IMU` (or `ALS/PS`, `AHT`) | `fault` shows the failure counters and whether a fault was injected (`fault clear all`); `i2c scan` must list `0x68`, `0x1E` (I2C2) and `0x38` (soft I2C). The sensor is re-initialised every 5 s by itself |
+| LCD shows `NO MODEL` | The firmware was built with the placeholder model. Train and export (`ml/`, see `data/README.md`), then rebuild |
+| `sd`: `init NOT_PRESENT` | No microSD card, or not seated (this kit has none: `docs/hardware/exceptions.md`). The product logs to the SPI flash instead, so nothing else is affected |
+| `capture_m2.py` / `capture.py`: `Cannot open COM3` | Another program holds the port (`pio device monitor`, a VS Code serial monitor, a second capture). Close it and run again |
+| Capture tools warn `-dirty` | The firmware was built from uncommitted changes. Commit, then run the tool with `--flash` so the evidence names an exact revision |
 
 ## Authors and contributions
 
