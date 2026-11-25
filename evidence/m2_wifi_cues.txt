@@ -1,0 +1,7 @@
+# operator cues shown by tools/capture_m2.py (PC time, 2026-11-25)
+08:12:32.695 sent: wifi
+08:12:34.135 sent: wifi scan
+08:12:35.898 sent: wifi scan
+08:12:37.672 sent: flash test
+08:12:38.272 sent: wifi stats
+08:12:38.708 sent: diag mem

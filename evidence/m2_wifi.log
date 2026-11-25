@@ -1,0 +1,74 @@
+08:12:25.578 > 
+08:12:25.579 > 
+08:12:25.579 > === PackSense 0.5.0-m5 (git aa4b41a) built Nov 25 2026 08:02:19 ===
+08:12:25.579 > [boot] board: RT-Spark HW1.1 | MCU dev_id=0x413 rev_id=0x101f flash=1024 KB
+08:12:25.640 > [boot] reset cause: PIN (RCC_CSR=0x04000000)
+08:12:25.640 > [boot] clock source: HSE 8 MHz crystal -> PLL
+08:12:25.640 > [boot] RCC: SWS=PLL PLLSRC=HSE M=8 N=336 P=2 Q=7 flash_latency=5 WS
+08:12:25.640 > [boot] clocks (computed, HSE_VALUE=8000000): SYSCLK=168000000 HCLK=168000000 PCLK1=42000000 PCLK2=84000000 Hz
+08:12:25.640 > [boot] HAL init OK: HAL v1.8.5, HAL tick on TIM6 (prio 4), NVIC grouping 4
+08:12:25.640 > [boot] FPU: CPACR CP10/CP11=full access
+08:12:25.640 > [boot] FreeRTOS V11.1.0: tick 1000 Hz, heap 40960 B (heap_4, 40944 B usable), max syscall prio 5
+08:12:25.641 > [boot] CCM RAM: 47848 of 65536 B used (.ccmram)
+08:12:25.641 > [boot] starting scheduler
+08:12:25.641 > [selftest] t=0 boot self-test
+08:12:25.641 > [cli] ready, type 'help'
+08:12:25.641 > > [rtos] scheduler started, first task running at tick 0
+08:12:25.822 > [log] event log: 0 records, next slot 0, boot 1
+08:12:25.988 > [selftest] LCD        OK
+08:12:26.169 > [selftest] IMU        OK
+08:12:26.392 > [selftest] ALS/PS     OK
+08:12:26.392 > [selftest] AHT        OK
+08:12:26.392 > [selftest] RTC        OK LSE time unset
+08:12:26.392 > [selftest] SPI flash  OK 8192 KB
+08:12:26.392 > [selftest] LED matrix OK
+08:12:26.392 > [selftest] SD card    absent
+08:12:26.456 > [selftest] Codec      OK
+08:12:27.437 > [selftest] Wi-Fi      OK RW007_2.1.0-, off
+08:12:27.437 > [selftest] Model      absent none
+08:12:27.437 > [selftest] t=1788 boot: 9 OK, 2 absent, 0 FAIL (mask 0x000) in 1788 ms
+08:12:27.489 > [event] seq=1 t=1789 rtc-unset boot=1 BOOT mode=BOOT state=- conf=0 a=67108864 b=0
+08:12:29.421 > [wdg] t=3789 IWDG started: timeout 4000 ms, check-in window 2000 ms, 7 tasks
+08:12:29.488 > [mode] t=3789 BOOT -> RUN
+08:12:29.488 > [event] seq=2 t=3789 rtc-unset boot=1 MODE mode=RUN state=- conf=0 a=1 b=0
+08:12:29.539 > infer log off
+08:12:29.604 > > wifi
+08:12:32.757 > [wifi] t=7083 reset RW007 (RST PG15), waiting for INT PG11
+08:12:33.756 > [wifi] t=8100 boot: INT high 666 ms after reset
+08:12:33.756 > [wifi] t=8100 init OK in 51 ms: station mode, sn=[rw007c745bb22fc584aa6e44] fw=[RW007_2.1.0-a7a0]
+08:12:33.756 > [wifi] mac FC:58:4A:A6:E4:4A
+08:12:33.756 > [wifi] stats: transfers=22 retries=2 stage1_err=2 stage2_err=0 int_timeouts=0 int_edges=56 rx=10 unsolicited=0
+08:12:33.756 > > wifi scan
+08:12:35.524 > [wifi] t=9880 scan OK in 1331 ms: 3 networks (SCAN_DONE)
+08:12:35.524 > [wifi]    0 rssi= -33 dBm ch= 5 sec=WPA2-AES   oui=B0:EC:DD name_len=9
+08:12:35.525 > [wifi]    1 rssi= -70 dBm ch= 1 sec=WPA2-AES   oui=00:67:62 name_len=17
+08:12:35.586 > [wifi]    2 rssi= -84 dBm ch= 9 sec=WPA2-AES   oui=8E:83:E8 name_len=5
+08:12:35.586 > [wifi] rssi range -84 .. -33 dBm
+08:12:35.586 > [wifi] stats: transfers=154 retries=2 stage1_err=2 stage2_err=0 int_timeouts=0 int_edges=324 rx=15 unsolicited=0
+08:12:35.586 > > wifi scan
+08:12:37.292 > [wifi] t=11641 scan OK in 1332 ms: 5 networks (SCAN_DONE)
+08:12:37.292 > [wifi]    0 rssi= -35 dBm ch= 5 sec=WPA2-AES   oui=B0:EC:DD name_len=9
+08:12:37.292 > [wifi]    1 rssi= -72 dBm ch= 1 sec=WPA2-AES   oui=00:67:62 name_len=17
+08:12:37.292 > [wifi]    2 rssi= -76 dBm ch= 9 sec=WPA2-AES   oui=8E:83:E8 name_len=5
+08:12:37.356 > [wifi]    3 rssi= -89 dBm ch= 4 sec=WPA2-AES   oui=0E:61:F9 name_len=0 (hidden)
+08:12:37.357 > [wifi]    4 rssi= -90 dBm ch= 4 sec=WPA2-AES   oui=0C:61:F9 name_len=12
+08:12:37.357 > [wifi] rssi range -90 .. -35 dBm
+08:12:37.357 > [wifi] stats: transfers=290 retries=2 stage1_err=2 stage2_err=0 int_timeouts=0 int_edges=600 rx=22 unsolicited=0
+08:12:37.357 > > flash test
+08:12:37.956 > [flash] t=12262 test OK in 174 ms: sector 0x7FF000 was_blank=yes erase=69 ms program 4096 B=9855 us
+08:12:37.956 > [flash] errors: erase=0 verify=0 restore=0 (bytes)
+08:12:37.956 > > wifi stats
+08:12:38.322 > [wifi] stats: transfers=290 retries=2 stage1_err=2 stage2_err=0 int_timeouts=0 int_edges=600 rx=22 unsolicited=0
+08:12:38.388 > > diag mem
+08:12:38.763 > [diag mem] t=13115 heap_free=40944 heap_min=40928 console_rx_dropped=0
+08:12:38.763 > [diag mem] task            prio state    hwm_words cpu_permille
+08:12:38.764 > [diag mem] CLI                2 run            834            5
+08:12:38.826 > [diag mem] IDLE               0 ready          101          936
+08:12:38.826 > [diag mem] Sensor             5 blocked        369            3
+08:12:38.826 > [diag mem] Ui                 3 blocked        490           34
+08:12:38.826 > [diag mem] Infer              4 blocked        880            7
+08:12:38.826 > [diag mem] Heartbeat          1 blocked        124            0
+08:12:38.826 > [diag mem] Env                2 blocked        306            0
+08:12:38.826 > [diag mem] Log                1 blocked        866           10
+08:12:38.826 > [diag mem] Capture            3 blocked        693            0
+08:12:38.827 > [diag mem] Tmr Svc            2 blocked        206            0
