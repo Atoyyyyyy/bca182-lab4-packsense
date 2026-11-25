@@ -79,7 +79,7 @@ was taken from a generic STM32F407 board.
 | SPI flash | SPI2 | event log, capture log | JEDEC `EF 40 17`, **8 MiB** (schematic says W25Q128 16 MB), write test 0 errors (`m2_storage.log`) |
 | IR LED + receiver | TIM8, PF8 | diagnostics | optical loopback 20/20 and 64/64, dry control 0/20 (`m2_ir.log`) |
 | ES8388 codec | I2C2 `0x10` | diagnostics (no audio) | 53 registers, write/read-back 4/4 (`m2_codec.log`) |
-| RW007 Wi-Fi | SPI2 | optional, off in the product | TODO(measure): `evidence/m2_wifi.log` |
+| RW007 Wi-Fi | SPI2 (shared with the flash) | optional, off in the product | INT high 666 ms after reset, firmware `RW007_2.1.0-a7a0`, scans found 3 and 5 networks; flash on the same bus still 0 errors (`m2_wifi.log`) |
 | microSD slot | SDIO | — | **no card in the kit**: `NOT_PRESENT`, handled (`docs/hardware/exceptions.md` #1) |
 
 Full table with the evidence links: `docs/hardware/inventory.md`.

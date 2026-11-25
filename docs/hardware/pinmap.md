@@ -105,7 +105,7 @@ The four EXTI lines are all distinct, so there is no EXTI conflict.
 
 | Item | Pins | Notes | Sheet | Status |
 |---|---|---|---|---|
-| **RW007** Wi-Fi (SPI) | SPI2 (shared), CS = `GPIO_SPI2_CS1` **PF10**, INT **PG11**, RST **PG15** | module may be socketed. **H: check if fitted** | 5, 10 | S |
+| **RW007** Wi-Fi (SPI) | SPI2 (shared), CS = `GPIO_SPI2_CS1` **PF10**, INT **PG11**, RST **PG15** | fitted (board photo); shares SPI2 with the flash (bus mutex) | 5, 10 | ✔ [`m2_wifi.log`](../../evidence/m2_wifi.log): RST → INT high in 666 ms, init OK, firmware `RW007_2.1.0-a7a0`, two scans `SCAN_DONE`; SPI flash test still 0 errors |
 
 ## Audio (not in the original PRD §4)
 

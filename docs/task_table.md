@@ -189,6 +189,25 @@ The ES8388 has no chip-ID register; the ACK, the dump and the read-back
 stand in for an ID check. The audio path (I2S3, microphone, headphone jack)
 is not exercised: PackSense does not record or play audio (PRD §3).
 
+### M2 on-board results: RW007 Wi-Fi
+
+Captured with `tools/capture_m2.py wifi`, firmware `aa4b41a` (clean build,
+product firmware: the boot self-test had already started the module and put it
+back in reset). No network was joined.
+
+| Check | Measured | Source |
+|---|---|---|
+| Boot | RST pulse on PG15 → INT (PG11) high after **666 ms** | `wifi` |
+| Init | INIT + station mode + serial + firmware + MAC in 51 ms; firmware `RW007_2.1.0-a7a0` | `wifi` |
+| Radio | scan 1: 3 networks in 1331 ms; scan 2: 5 networks in 1332 ms, both `SCAN_DONE`; RSSI −33 … −90 dBm, all WPA2-AES, one hidden | `wifi scan` ×2 |
+| SPI link | 290 transfers, 0 INT timeouts, 0 stage-2 errors; 2 stage-1 header errors, both during init and both recovered by a retry (none in the 268 scan transfers) | `wifi stats` |
+| Shared SPI2 bus | SPI flash test right after the scans: erase 69 ms, 4096 B programmed in 9.9 ms, 0 erase / verify / restore errors | `flash test` |
+| System | heap min 40 928 B; lowest task stack headroom 101 words (IDLE) | `diag mem` |
+
+Privacy: the log has network name lengths and vendor prefixes (OUI) only, no
+names or full BSSIDs (`src/app/wifi_cmds.c`). The module's own serial number
+and MAC are printed.
+
 ### M1 on-board results
 
 From `evidence/m1_boot.log` (firmware git `8d71a0c`, RT-Spark HW1.1), checked with

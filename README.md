@@ -10,8 +10,8 @@ BCA182 Embedded Systems Programming, Lab Activity No. 4, MSU-IIT CCS.
 Team: Sherie Grace L. Lupoz · Renato G. Beroy · Binyusoph P. Sansarona
 ([authors and contributions](#authors-and-contributions)).
 
-> **Status:** M1 done. M2: every module verified on the board with evidence
-> logs except the Wi-Fi capture. M3 capture firmware/tools and the M4 ML
+> **Status:** M1 done. M2 done: every fitted module verified on the board with
+> evidence logs (microSD: no card in the kit). M3 capture firmware/tools and the M4 ML
 > pipeline + C inference are written and checked (synthetic smoke test only;
 > no real data yet). M5 product firmware (all PRD §6.3 tasks, modes, alerts,
 > event log, watchdog) runs on the board with a placeholder model. M6 test
@@ -121,7 +121,7 @@ and [`docs/test_sheets/m2_io.md`](docs/test_sheets/m2_io.md).
 |---|---|---|
 | M0 | Repo + design docs | done (concept sign-off: TODO) |
 | M1 | PlatformIO board + FreeRTOS bring-up | done: on-board log passes `check_heartbeat.py` ([results](docs/task_table.md#m1-on-board-results)); LED blink by eye: TODO(measure) |
-| M2 | Sensor/module drivers + DIAG mode | all modules verified with evidence logs ([results](docs/task_table.md#m2-on-board-results-i2c-sensors)) except Wi-Fi: capture pending (`capture_m2.py wifi`) |
+| M2 | Sensor/module drivers + DIAG mode | done: every fitted module verified with evidence logs ([results](docs/task_table.md#m2-on-board-results-i2c-sensors)), Wi-Fi last ([RW007](docs/task_table.md#m2-on-board-results-rw007-wi-fi)); no microSD card ([exceptions](docs/hardware/exceptions.md)) |
 | M3 | Data capture | firmware (CAPTURE mode → SPI flash log), `tools/capture.py`, protocol ([data/README.md](data/README.md), [test sheet](docs/test_sheets/m3_capture.md)) done; **recording sessions: TODO (H)** |
 | M4 | Features, baseline, model, C export | `ml/` pipeline, C features + MLP + baseline, `selftest model` done and smoke-tested on synthetic data; **real training: after M3** |
 | M5 | On-device inference + product firmware | firmware done and running (placeholder model); parity + functional check after M4 ([test sheet](docs/test_sheets/m5_product.md)) |
