@@ -204,6 +204,18 @@ back in reset). No network was joined.
 | Shared SPI2 bus | SPI flash test right after the scans: erase 69 ms, 4096 B programmed in 9.9 ms, 0 erase / verify / restore errors | `flash test` |
 | System | heap min 40 928 B; lowest task stack headroom 101 words (IDLE) | `diag mem` |
 
+Follow-up on the 2 stage-1 errors (agent check on the board, not an evidence
+file): the counters were not reset between inits, so the 2 errors are one from
+the boot self-test's init and one from the `wifi` init. In 4 of 4 resets the
+first transfer after reset read 16 × `0xFF` (the module does not drive MISO in
+its first chip-select window) and the retry succeeded. Fixed in `ed9640b`: one
+wake window before INIT, and the counters restart at each init. After the fix:
+boot self-test plus three `wifi` inits and a scan, 0 stage-1 errors and 0
+retries; the flash test on the shared bus still showed 0 errors. The same
+capture with the new firmware would show `wake window: no answer (expected)`
+and `stage1_err=0`. The boot self-test row now shows the whole firmware version
+(`e6a55a5`: `Wi-Fi OK 2.1.0-a7a0 off`, previously cut to `RW007_2.1.0-`).
+
 Privacy: the log has network name lengths and vendor prefixes (OUI) only, no
 names or full BSSIDs (`src/app/wifi_cmds.c`). The module's own serial number
 and MAC are printed.
